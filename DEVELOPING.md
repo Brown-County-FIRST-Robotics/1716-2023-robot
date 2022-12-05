@@ -2,8 +2,9 @@
 
 ## Getting started
 
-See the getting started guide here
-https://github.com/Brown-County-FIRST-Robotics/Software-Setup-Guide
+See the [getting started guide](https://github.com/Brown-County-FIRST-Robotics/Software-Setup-Guide) to setup your computer.
+
+The first task will be to understand how the robot code works. We need to write a document that explains how our robot works. See #6
 
 ## How we use GitHub
 
