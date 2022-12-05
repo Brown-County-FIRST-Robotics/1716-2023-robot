@@ -27,7 +27,7 @@ using namespace frc;
 class Robot : public TimedRobot
 {
 public:
-	PigeonIMU cccc{0};
+	Pigeon2 pigeon{0};
 	WPI_TalonFX back_left{1};
 	double back_left_target_pos=0;
 	double back_left_pos=0;
@@ -113,8 +113,7 @@ public:
 
 	void TeleopPeriodic()
 	{
-		std::cout << cccc.GetAccelerometerAngles(output2) << "\n"; 
-		front_left.Set(cccc.GetAccelerometerAngles(output2));
+		mecDrive.DriveCartesian(0,0,(pigeon.GetYaw()-90)/90);
 		return;
 		double joyX = -controller.GetLeftX();
 		double joyR = -controller.GetLeftY();
