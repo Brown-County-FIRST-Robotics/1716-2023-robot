@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# simulation files 
+ simgui-ds.json 
+ simgui-window.json 
+ simgui.json 
+  
+  
+ build/ 
+ .gradle/
