@@ -105,7 +105,10 @@ public:
 
 	Timer autonomous_timer;
 	bool autonomous_shooting=false;
-	double output2[3]={0.0,0.0,0.0};
+	
+
+	double targetYaw=0;
+	double yawFactor=0.05;
 
 	void SimulationPeriodic()
 	{
@@ -113,8 +116,7 @@ public:
 
 	void TeleopPeriodic()
 	{
-		mecDrive.DriveCartesian(0,0,(pigeon.GetYaw()-90)/90);
-		return;
+
 		double joyX = -controller.GetLeftX();
 		double joyR = -controller.GetLeftY();
 		double joyY = controller.GetRightX();
@@ -126,147 +128,11 @@ public:
 			joyX = 0;
 		if (fabs(joyY) < 0.05)
 			joyY = 0;
+		
+		targetYaw+=joyR*yawFactor;
 
-		mecDrive.DriveCartesian(joyY*driveSpeed, joyX*driveSpeed, joyR*driveSpeed);
-
-		if(!hub_shooting[0]){
-			if(controller.GetRightBumper()){
-				shooter_angle.Set(shooter_angle_speed);
-			}else if(controller.GetLeftBumper()){
-				shooter_angle.Set(-shooter_angle_speed);
-			}else{
-				shooter_angle.Set(0);
-			}
-		}
-
-		if(!hub_shooting[0]){
-			if(controller.GetRightTriggerAxis()>controller.GetLeftTriggerAxis()){
-				shooter.Set(controller.GetRightTriggerAxis()*shooter_speed);
-				intake.Set(controller.GetRightTriggerAxis()*shooter_speed);
-			}
-
-			if(controller.GetRightTriggerAxis()<controller.GetLeftTriggerAxis()){
-				shooter.Set(controller.GetLeftTriggerAxis()*-0.5);
-				intake.Set(controller.GetLeftTriggerAxis()*-0.5);
-			}
-
-			if(controller.GetRightTriggerAxis()==controller.GetLeftTriggerAxis()){
-				shooter_top.Set(0);
-				shooter_bottom.Set(0);
-				intake.Set(0);
-			}	
-		}
-
-		if(controller.GetAButtonPressed()){
-			shooter_solenoid_timer.Start();
-			shooter_solenoid.Set(DoubleSolenoid::kForward);
-		}
-
-		if(shooter_solenoid_timer.HasElapsed(.1_s) && .2_s>shooter_solenoid_timer.Get()){
-			shooter_solenoid.Set(DoubleSolenoid::kOff);
-		}
-
-		if(shooter_solenoid_timer.HasElapsed(.5_s) && .55_s>shooter_solenoid_timer.Get()){
-			shooter_solenoid.Set(DoubleSolenoid::kReverse);
-		}
-
-		if(shooter_solenoid_timer.HasElapsed(.6_s) && .7_s>shooter_solenoid_timer.Get()){
-			shooter_solenoid_timer.Stop();
-			shooter_solenoid_timer.Reset();
-			shooter_solenoid.Set(DoubleSolenoid::kOff);
-		}
-
-		if(controller.GetBButtonPressed() && is_birb_activated){
-			climber_solenoid_timer.Start();
-			if(climber_solenoid_previous_position == DoubleSolenoid::kForward){
-				climber_solenoid.Set(DoubleSolenoid::kReverse);
-			}
-			if(climber_solenoid_previous_position == DoubleSolenoid::kReverse){
-				climber_solenoid.Set(DoubleSolenoid::kForward);
-			}
-		}
-
-		if(climber_solenoid_timer.HasElapsed(.25_s)){
-			climber_solenoid_timer.Stop();
-			climber_solenoid_timer.Reset();
-			climber_solenoid_previous_position=climber_solenoid.Get();
-			climber_solenoid.Set(DoubleSolenoid::kOff);
-		}
-
-		if(controller.GetStartButtonPressed()){
-			intake_solenoid_timer.Start();
-			if(intake_solenoid_previous_position==DoubleSolenoid::kForward){
-				intake_solenoid.Set(DoubleSolenoid::kReverse);
-			}
-
-			if(intake_solenoid_previous_position==DoubleSolenoid::kReverse){
-				intake_solenoid.Set(DoubleSolenoid::kForward);
-			}		
-		}
-
-		if(intake_solenoid_timer.HasElapsed(.25_s)){
-			intake_solenoid_timer.Stop();
-			intake_solenoid_timer.Reset();
-			intake_solenoid_previous_position=intake_solenoid.Get();
-			intake_solenoid.Set(DoubleSolenoid::kOff);
-		}
-
-		if(controller.GetXButtonPressed()){
-			hub_shooting[0]=!hub_shooting[0];
-			hub_shooting[1]=!hub_shooting[1];
-		}
-		/*        UNCOMMENT THIS ONCE POTENTIOMETER IS FIXED
-		if(hub_shooting[0]){
-			if(hub_shooting[1]){
-				double potentiometer_val = static_cast<double>(potentiometer.GetValue());
-				if(((potentiometer_val-2554.0)*(90.0/448.0))<55){
-					shooter_angle.Set(1);
-				}else if(((potentiometer_val-2554.0)*(90.0/448.0))>60){
-					shooter_angle.Set(-1);
-				}else{
-					shooter_angle.Set(0);
-					hub_shooting_timer.Start();
-					hub_shooting[1]=false;
-					shooter.Set(.3);
-				}
-			}
-
-			if(hub_shooting_timer.HasElapsed(1_s) && hub_shooting_timer.Get()<1.1_s){
-				shooter_solenoid.Set(DoubleSolenoid::kForward);
-			}else if(hub_shooting_timer.HasElapsed(1.25_s) && hub_shooting_timer.Get()<1.35_s){
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-			}else if(hub_shooting_timer.HasElapsed(1.75_s) && hub_shooting_timer.Get()<1.85_s){
-				shooter_solenoid.Set(DoubleSolenoid::kReverse);
-			}else if(hub_shooting_timer.HasElapsed(2_s) && hub_shooting_timer.Get()<2.1_s){
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-			}else if(hub_shooting_timer.HasElapsed(2.75_s) && hub_shooting_timer.Get()<2.8_s){
-				shooter_solenoid.Set(DoubleSolenoid::kForward);
-			}else if(hub_shooting_timer.HasElapsed(2.85_s) && hub_shooting_timer.Get()<2.95_s){
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-			}else if(hub_shooting_timer.HasElapsed(2.25_s) && hub_shooting_timer.Get()<2.3_s){
-				shooter_solenoid.Set(DoubleSolenoid::kReverse);
-			}else if(hub_shooting_timer.HasElapsed(2.35_s) && hub_shooting_timer.Get()<2.45_s){
-				hub_shooting_timer.Reset();
-				hub_shooting_timer.Stop();
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-				shooter.Set(0);
-				shooter_angle.Set(-1);
-			}
-			if(((potentiometer.GetValue()-2554)*(90/448))<-5 && !hub_shooting[1]){
-				shooter_angle.Set(0);
-				hub_shooting[0]=false;
-			}
-		}*/
-
-		if(controller.GetBackButtonPressed()){
-			shooter.Set(0);
-			shooter_angle.Set(0);
-			hub_shooting[0]=false;
-			hub_shooting_timer.Stop();
-			hub_shooting_timer.Reset();
-			shooter_solenoid.Set(DoubleSolenoid::kOff);
-		}
-
+		double normalYaw=(pigeon.GetYaw()>0)?pigeon.GetYaw():360.0+pigeon.GetYaw();
+		mecDrive.DriveCartesian(joyY*driveSpeed, joyX*driveSpeed, (normalYaw-targetYaw)/180);
 	}
 
 	void RobotInit()
