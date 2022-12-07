@@ -49,6 +49,14 @@ def gen_frames():  # generate frame by frame from camera
         # Capture frame-by-frame
         success, frame = camera.read()  # read the camera frame
 
+        #display april tags
+        if displayApril:
+            april.displayApril(frame, camera)
+        if displayColor:
+            color.findColor(frame, camera, numpy.array(cols[1], dtype=numpy.uint8), 
+                                           numpy.array(cols[2], dtype=numpy.uint8))
+
+        
         #draw crosshairs
         cv2.rectangle(frame, 
                       (int(camWidth / 2 - 2), int(camHeight / 2 - 16)),
@@ -58,13 +66,6 @@ def gen_frames():  # generate frame by frame from camera
                       (int(camWidth / 2 - 16), int(camHeight / 2 - 2)),
                       (int(camWidth / 2 + 16), int(camHeight / 2 + 2)),
                       [255, 0, 0],2)
-
-        #display april tags
-        if displayApril:
-            april.displayApril(frame, camera)
-        if displayColor:
-            color.findColor(frame, camera, numpy.array(cols[1], dtype=numpy.uint8), 
-                                           numpy.array(cols[0], dtype=numpy.uint8))
 
         # If something goes wrong with the camera, exit the function
         if not success:
@@ -145,8 +146,11 @@ def prev():
 
 @app.route('/capture_color')
 def captureColor():
-    global cols 
-    cols = color.getAverage(currentFrame, 32)
+    global cols
+    success, image = camera.read()
+    cols = color.getAverage(image, 100)
+    cols[1] = [ cols[0][0] - 50, cols[0][1] - 50, cols[0][2] - 50 ]
+    cols[2] = [ cols[0][0] + 50, cols[0][1] + 50, cols[0][2] + 50 ]
     return redirect('/')
 
 if __name__ == '__main__':
