@@ -3,11 +3,13 @@ from flask import Flask, render_template, Response, redirect
 import cv2
 import threading
 import april
+import color
+import numpy
 
 app = Flask(__name__)
 
 CAM_COUNT = 2
-MAX_PORT_SCAN = 1000
+MAX_PORT_SCAN = 256
 cameraIds = [ 0 ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
@@ -18,7 +20,11 @@ camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 currentCam = 0
 
-displayApril = True 
+displayApril = True
+displayColor = True
+
+cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
+currentFrame = camera.read();
 
 def getCamIds():
     #Attempt to scan all dev ports
@@ -36,6 +42,8 @@ def getCamIds():
 
 # This function gets called by the /video_feed route below
 def gen_frames():  # generate frame by frame from camera
+    global currentFrame
+
     # We want to loop this forever
     while True:
         # Capture frame-by-frame
@@ -45,20 +53,25 @@ def gen_frames():  # generate frame by frame from camera
         cv2.rectangle(frame, 
                       (int(camWidth / 2 - 2), int(camHeight / 2 - 16)),
                       (int(camWidth / 2 + 2), int(camHeight / 2 + 16)),
-                      [255,0,0],2)
+                      [255, 0, 0],2)
         cv2.rectangle(frame, 
                       (int(camWidth / 2 - 16), int(camHeight / 2 - 2)),
                       (int(camWidth / 2 + 16), int(camHeight / 2 + 2)),
-                      [255,0,0],2)
+                      [255, 0, 0],2)
 
         #display april tags
         if displayApril:
             april.displayApril(frame, camera)
+        if displayColor:
+            color.findColor(frame, camera, numpy.array(cols[1], dtype=numpy.uint8), 
+                                           numpy.array(cols[0], dtype=numpy.uint8))
 
         # If something goes wrong with the camera, exit the function
         if not success:
             break
         
+        currentFrame = frame;
+
         # This step encodes the data into a jpeg image
         ret, buffer = cv2.imencode('.jpg', frame)
 
@@ -107,6 +120,8 @@ def toggle_april():
 
 @app.route('/toggle_color_detection')
 def toggle_color():
+    global displayColor
+    displayColor = not displayColor
     return redirect('/');
 
 @app.route('/prev')
@@ -126,6 +141,12 @@ def prev():
     camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
     camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
+    return redirect('/')
+
+@app.route('/capture_color')
+def captureColor():
+    global cols 
+    cols = color.getAverage(currentFrame, 32)
     return redirect('/')
 
 if __name__ == '__main__':
