@@ -2,6 +2,7 @@
 from flask import Flask, render_template, Response, redirect
 import cv2
 import threading
+import april
 
 app = Flask(__name__)
 
@@ -16,6 +17,8 @@ camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 currentCam = 0
+
+displayApril = True 
 
 def getCamIds():
     #Attempt to scan all dev ports
@@ -47,6 +50,10 @@ def gen_frames():  # generate frame by frame from camera
                       (int(camWidth / 2 - 16), int(camHeight / 2 - 2)),
                       (int(camWidth / 2 + 16), int(camHeight / 2 + 2)),
                       [255,0,0],2)
+
+        #display april tags
+        if displayApril:
+            april.displayApril(frame, camera)
 
         # If something goes wrong with the camera, exit the function
         if not success:
@@ -94,6 +101,8 @@ def next():
 
 @app.route('/toggle_april_tag')
 def toggle_april():
+    global displayApril
+    displayApril = not displayApril
     return redirect('/');
 
 @app.route('/toggle_color_detection')
