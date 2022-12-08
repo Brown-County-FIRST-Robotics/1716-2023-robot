@@ -153,6 +153,50 @@ def captureColor():
     cols[2] = [ cols[0][0] + 50, cols[0][1] + 50, cols[0][2] + 50 ]
     return redirect('/')
 
+@app.route('/all')
+def all():
+    # We want to loop this forever
+    """
+    while True:
+        allCamFrames = ""
+        for i in range(CAM_COUNT):
+            cam = cv2.VideoCapture(cameraIds[i])
+            # Capture frame-by-frame
+            success, frame = cam.read()  # read the camera frame
+
+            # This step encodes the data into a jpeg image
+            ret, buffer = cv2.imencode('.jpg', frame)
+
+            # We have to return bytes to the user
+            frame = buffer.tobytes() 
+            allCams += frame 
+            cam.release()
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + allCamFrames + b'\r\n')  # concat frame one by one and show result
+    """
+    # We want to loop this forever
+    while True:
+        # Capture frame-by-frame
+        success, frame = camera.read()  # read the camera frame
+
+        # If something goes wrong with the camera, exit the function
+        if not success:
+            break
+        
+        currentFrame = frame;
+
+        # This step encodes the data into a jpeg image
+        ret, buffer = cv2.imencode('.jpg', frame)
+
+        # We have to return bytes to the user
+        frame = buffer.tobytes() 
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
 if __name__ == '__main__':
     getCamIds()
     print(cameraIds)
