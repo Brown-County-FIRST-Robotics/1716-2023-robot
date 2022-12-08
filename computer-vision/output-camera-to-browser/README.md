@@ -1,8 +1,5 @@
-# opencv-object-detection
-A Flask Web-App to stream live from local webcam and identify a colored
-object in the frame.
-
-This project is based on the code at https://github.com/NakulLakhotia/Live-Streaming-using-OpenCV-Flask
+# Driver Extension App To Hopefully  See The Action Really Easily 
+# (DEATH STARE)
 
 ## Usage
 
@@ -17,13 +14,14 @@ python app.py
 When you run the app it will print out the URL to access it
 
 ## How to use
-By default the app will look for red objects and draw a triangle around the
-largest red object it sees.
+Click "Previous Camera" or "Next Camera" to cycle to the cameras.
 
-There is a button labeled "Color Picker" that will bring up another screen
-with a small blue rectangle in the middle. Place the color you are
-interested in detecting in the middle then click the "Set Color" button.
+Click "Toggle April Tags" to toggle highlighting the april tags (on by default)
 
-After a new color is picked it will return you to the detection screen
+Click "Toggle Color Detection to toggle finding a specific color (on by default)
 
-### [Reference](https://blog.miguelgrinberg.com/post/video-streaming-with-flask)
+Click "Capture Color" to set the color to be searched for to the color that is being
+highlighted by the crosshairs
+
+## Some slight issues
+- I've gotten a segfault randomly one time so far and I'm not sure what caused it. Hopefully it isn't to big of a problem so hopefully someone will eventually fix it
