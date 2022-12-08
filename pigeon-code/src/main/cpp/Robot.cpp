@@ -24,6 +24,13 @@
 
 using namespace frc;
 
+double normalizeAngle(double ang){
+	if(ang<0){
+		return ang+360.0;
+	}
+	return ang;
+}
+
 class Robot : public TimedRobot
 {
 public:
@@ -110,13 +117,14 @@ public:
 	double targetYaw=0;
 	double yawFactor=0.05;
 
+	double driverForward = 90; // degrees
+
 	void SimulationPeriodic()
 	{
 	}
 
 	void TeleopPeriodic()
 	{
-
 		double joyX = -controller.GetLeftX();
 		double joyR = -controller.GetLeftY();
 		double joyY = controller.GetRightX();
@@ -128,11 +136,18 @@ public:
 			joyX = 0;
 		if (fabs(joyY) < 0.05)
 			joyY = 0;
-		
-		targetYaw+=joyR*yawFactor;
+		double driverTheta = normalizeAngle(atan2(joyY, joyX));
 
-		double normalYaw=(pigeon.GetYaw()>0)?pigeon.GetYaw():360.0+pigeon.GetYaw();
-		mecDrive.DriveCartesian(joyY*driveSpeed, joyX*driveSpeed, (normalYaw-targetYaw)/180);
+		double robotCommandAngle = normalizeAngle(driverTheta+driverForward)-normalizeAngle(pigeon.GetYaw());
+
+		double commandMagnitude = sqrt(pow(joyX,2)+pow(joyY,2));		
+		
+		mecDrive.DriveCartesian(driveSpeed*commandMagnitude*sin(driverTheta),driveSpeed*commandMagnitude*cos(driverTheta),joyR);
+
+		if(controller.GetStartButtonPressed()){
+			driverForward=normalizeAngle(pigeon.GetYaw());
+		}
+		// mecDrive.DriveCartesian(joyY*driveSpeed, joyX*driveSpeed, (normalYaw-targetYaw)/180);
 	}
 
 	void RobotInit()
