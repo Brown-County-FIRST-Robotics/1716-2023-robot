@@ -2,7 +2,7 @@
 #include <iostream>
 #include <rev/CANSparkMax.h>
 
-Motors::Motors() : tfx{1}, tsrx{0} {} //constructor
+Motors::Motors() : tfx{0}, tsrx{1} {} //constructor
 
 void Motors::SetTfx(double speed) {
   tfx.Set(speed);
