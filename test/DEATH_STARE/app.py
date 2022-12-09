@@ -5,6 +5,7 @@ import threading
 import april
 import color
 import numpy
+import threading
 
 app = Flask(__name__)
 
@@ -13,6 +14,7 @@ MAX_PORT_SCAN = 256
 cameraIds = [ 0 ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
+cameras = []
 
 #camera dimensions
 camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -39,6 +41,13 @@ def getCamIds():
         if camsFound >= CAM_COUNT:
             break;
 
+#Call this after getCamIds
+def getCams(): 
+    cameras = []
+    for i in range(len(cameraIds)):
+        cam = cv2.VideoCapture(cameraIds[i]) 
+        cameras.append(cam)
+    return cameras
 
 # This function gets called by the /video_feed route below
 def gen_frames():  # generate frame by frame from camera
@@ -153,49 +162,54 @@ def captureColor():
     cols[2] = [ cols[0][0] + 50, cols[0][1] + 50, cols[0][2] + 50 ]
     return redirect('/')
 
-@app.route('/all')
+@app.route('/goto_allcam')
+def gotoAllCam():
+    global cameras
+    camera.release()
+    cameras = getCams()
+    return redirect('/allcam')
+
+@app.route('/goback')
+def goBack():
+    global cameras
+    global camera
+    for c in cameras:
+        c.release()
+    cameras = []
+    camera = cv2.VideoCapture(cameraIds[currentCam])
+    return redirect('/')
+
+@app.route('/allcam')
 def all():
+    return render_template("allcam.html")
+
+def showAllCams():
     # We want to loop this forever
-    """
     while True:
-        allCamFrames = ""
-        for i in range(CAM_COUNT):
-            cam = cv2.VideoCapture(cameraIds[i])
+        imageHoriz = []
+        for c in cameras:
             # Capture frame-by-frame
-            success, frame = cam.read()  # read the camera frame
+            success, frame = c.read()  # read the camera frame
+            if not success:
+                continue
+            frame = cv2.resize(frame, (int(c.get(cv2.CAP_PROP_FRAME_WIDTH) / 2), int(c.get(cv2.CAP_PROP_FRAME_HEIGHT) / 2)), interpolation=cv2.INTER_LINEAR)
+            imageHoriz.append(frame)
 
-            # This step encodes the data into a jpeg image
-            ret, buffer = cv2.imencode('.jpg', frame)
-
-            # We have to return bytes to the user
-            frame = buffer.tobytes() 
-            allCams += frame 
-            cam.release()
-
-        # Return the image to the browser
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + allCamFrames + b'\r\n')  # concat frame one by one and show result
-    """
-    # We want to loop this forever
-    while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-
-        # If something goes wrong with the camera, exit the function
-        if not success:
-            break
-        
-        currentFrame = frame;
+        allImages = cv2.hconcat(imageHoriz)
 
         # This step encodes the data into a jpeg image
-        ret, buffer = cv2.imencode('.jpg', frame)
+        ret, buffer = cv2.imencode('.jpg', allImages)
 
         # We have to return bytes to the user
-        frame = buffer.tobytes() 
+        allImages = buffer.tobytes() 
 
         # Return the image to the browser
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+                b'Content-Type: image/jpeg\r\n\r\n' + allImages + b'\r\n')  # concat frame one by one and show result
+
+@app.route('/allCamsImage')
+def allCamsImage():
+    return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     getCamIds()
