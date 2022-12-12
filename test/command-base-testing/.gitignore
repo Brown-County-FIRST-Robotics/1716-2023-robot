@@ -1,0 +1,8 @@
+.gradle
+build/
+
+
+simgui-ds.json
+simgui-window.json
+simgui.json
+.vscode/settings.json
