@@ -14,6 +14,7 @@ MAX_PORT_SCAN = 256
 cameraIds = [ 0 ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
+
 cameras = []
 
 #camera dimensions
@@ -161,6 +162,7 @@ def captureColor():
     cols[1] = [ cols[0][0] - 50, cols[0][1] - 50, cols[0][2] - 50 ]
     cols[2] = [ cols[0][0] + 50, cols[0][1] + 50, cols[0][2] + 50 ]
     return redirect('/')
+
 
 @app.route('/goto_allcam')
 def gotoAllCam():
