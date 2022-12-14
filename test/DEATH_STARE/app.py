@@ -9,11 +9,11 @@ import threading
 
 app = Flask(__name__)
 
-CAM_COUNT = 2
-MAX_PORT_SCAN = 256
-cameraIds = [ 0 ]
+CAM_COUNT = 3
+cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
+camera.open(cameraDev[0])
 cameras = []
 
 #camera dimensions
@@ -28,24 +28,14 @@ displayColor = True
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
 currentFrame = camera.read();
 
-def getCamIds():
-    #Attempt to scan all dev ports
-    camsFound = 0
-    for i in range(MAX_PORT_SCAN):
-        tempCam = cv2.VideoCapture(i)
-        #Found camera 
-        if tempCam.isOpened():
-            cameraIds.append(i)
-            camsFound += 1
-
-        if camsFound >= CAM_COUNT:
-            break;
-
 #Call this after getCamIds
 def getCams(): 
     cameras = []
-    for i in range(len(cameraIds)):
-        cam = cv2.VideoCapture(cameraIds[i]) 
+    for i in range(len(cameraDev)):
+        cam = cv2.VideoCapture()
+        cam.open(cameraDev[i])
+        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 120) 
         cameras.append(cam)
     return cameras
 
@@ -114,7 +104,8 @@ def next():
     currentCam += 1
     currentCam %= CAM_COUNT
     camera.release();
-    camera = cv2.VideoCapture(cameraIds[currentCam]);
+    camera = cv2.VideoCapture()
+    camera.open(cameraDev[currentCam])
     print(currentCam) 
     
     camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -146,7 +137,8 @@ def prev():
         currentCam = CAM_COUNT - 1 
     print(currentCam)
     camera.release();
-    camera = cv2.VideoCapture(cameraIds[currentCam]); 
+    camera = cv2.VideoCapture();
+    camera.open(cameraDev[currentCam])
     
     camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
     camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -176,7 +168,8 @@ def goBack():
     for c in cameras:
         c.release()
     cameras = []
-    camera = cv2.VideoCapture(cameraIds[currentCam])
+    camera = cv2.VideoCapture()
+    camera.open(cameraDev[currentCam])
     return redirect('/')
 
 @app.route('/allcam')
@@ -192,7 +185,9 @@ def showAllCams():
             success, frame = c.read()  # read the camera frame
             if not success:
                 continue
-            frame = cv2.resize(frame, (int(c.get(cv2.CAP_PROP_FRAME_WIDTH) / 2), int(c.get(cv2.CAP_PROP_FRAME_HEIGHT) / 2)), interpolation=cv2.INTER_LINEAR)
+            frame = cv2.resize(frame, 
+                    (int(240 / c.get(cv2.CAP_PROP_FRAME_HEIGHT) * c.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
+                    interpolation=cv2.INTER_LINEAR)
             imageHoriz.append(frame)
 
         allImages = cv2.hconcat(imageHoriz)
@@ -212,6 +207,4 @@ def allCamsImage():
     return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    getCamIds()
-    print(cameraIds)
     app.run(threaded=True)
