@@ -1,0 +1,47 @@
+#cam
+{
+	max-height: 500px;
+	display: block;
+	margin: auto;
+	width: auto;
+	height: auto;
+}
+
+#all_cams
+{
+
+	max-height: 500px;
+	display: block;
+	margin: auto;
+	width: auto;
+	height: auto;
+}
+
+#logo
+{
+	max-height: 64px;
+}
+
+.mt-5
+{
+	color: #FF4444;
+	text-align: center;
+}
+
+body
+{
+	background-color: #222222;
+}
+
+button
+{
+	background-color: #FF4444;
+	color: #FFFFFF;
+	margin: auto;
+	border-color: #FF0000;
+}
+
+#buttons
+{
+	text-align: center;
+}
