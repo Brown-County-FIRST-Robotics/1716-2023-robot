@@ -9,14 +9,14 @@ import threading
 
 app = Flask(__name__)
 
-CAM_COUNT = 3
-cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
+cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video8" ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
 
 camera.open(cameraDev[0])
 
 cameras = []
+imageHoriz = []
 
 #camera dimensions
 camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -30,15 +30,20 @@ displayColor = True
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
 currentFrame = camera.read();
 
-#Call this after getCamIds
+def openCam(i, cameras):
+    cam = cv2.VideoCapture() 
+    cam.open(cameraDev[i]) 
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+    cameras.append(cam)
+
 def getCams(): 
     cameras = []
     for i in range(len(cameraDev)):
-        cam = cv2.VideoCapture()
-        cam.open(cameraDev[i])
-        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 120) 
-        cameras.append(cam)
+        th = threading.Thread(target=openCam, args=(i, cameras))
+        th.start()
+    while len(cameras) < len(cameraDev):
+        print("Capturing all cameras...")
     return cameras
 
 # This function gets called by the /video_feed route below
@@ -104,7 +109,7 @@ def next():
     global camHeight
 
     currentCam += 1
-    currentCam %= CAM_COUNT
+    currentCam %= len(cameraDev) 
     camera.release();
     camera = cv2.VideoCapture()
     camera.open(cameraDev[currentCam])
@@ -136,7 +141,7 @@ def prev():
 
     currentCam -= 1
     if currentCam < 0:
-        currentCam = CAM_COUNT - 1 
+        currentCam = len(cameraDev) - 1 
     print(currentCam)
     camera.release();
     camera = cv2.VideoCapture();
@@ -179,10 +184,25 @@ def goBack():
 def all():
     return render_template("allcam.html")
 
+def readCam(cam, frames, ind):
+    while True:
+        ret, frame = cam.read()
+        if not ret:
+            break
+        resized = cv2.resize(frame, 
+                    (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
+                    interpolation=cv2.INTER_LINEAR)
+        frames[ind] = resized
+
 def showAllCams():
+    global imageHoriz 
+    for i in range(len(cameraDev)):
+        th = threading.Thread(target=readCam, args=(cameras[i], imageHoriz, i))
+        th.start()
+
     # We want to loop this forever
     while True:
-        imageHoriz = []
+        """
         for c in cameras:
             # Capture frame-by-frame
             success, frame = c.read()  # read the camera frame
@@ -192,6 +212,7 @@ def showAllCams():
                     (int(240 / c.get(cv2.CAP_PROP_FRAME_HEIGHT) * c.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
                     interpolation=cv2.INTER_LINEAR)
             imageHoriz.append(frame)
+        """
 
         allImages = cv2.hconcat(imageHoriz)
 
@@ -210,4 +231,6 @@ def allCamsImage():
     return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
+    for i in range(len(cameraDev)):
+        imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
     app.run(threaded=True)
