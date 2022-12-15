@@ -1,75 +1,104 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+#include <iostream>
+#include <string>
 
-#include "Robot.h"
+#include "frc/TimedRobot.h"
+#include "frc/Joystick.h"
+#include "frc/Solenoid.h"
+#include "ctre/Phoenix.h"
+#include "frc/motorcontrol/MotorControllerGroup.h"
+#include "frc/drive/MecanumDrive.h"
+#include "frc/DoubleSolenoid.h"
+#include "frc/Timer.h"
+#include "frc/PneumaticsControlModule.h"
+#include "frc/GenericHID.h"
+#include "units/time.h"
+#include "frc/XboxController.h"
+#include "frc/AnalogInput.h"
+#include "frc/AnalogOutput.h"
+#include "ctre/phoenix/sensors/WPI_Pigeon2.h"
 
-#include <fmt/core.h>
-
-#include <frc/smartdashboard/SmartDashboard.h>
-
-void Robot::RobotInit() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+double normalizeAngle(double ang){
+	if(ang<0){
+		return ang+360.0;
+	}
+	return ang;
 }
 
-/**
- * This function is called every robot packet, no matter the mode. Use
- * this for items like diagnostics that you want ran during disabled,
- * autonomous, teleoperated and test.
- *
- * <p> This runs after the mode specific periodic functions, but before
- * LiveWindow and SmartDashboard integrated updating.
- */
-void Robot::RobotPeriodic() {}
+using namespace frc;
 
-/**
- * This autonomous (along with the chooser code above) shows how to select
- * between different autonomous modes using the dashboard. The sendable chooser
- * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
- * remove all of the chooser code and uncomment the GetString line to get the
- * auto name from the text box below the Gyro.
- *
- * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using the SendableChooser
- * make sure to add them to the chooser code above as well.
- */
-void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  fmt::print("Auto selected: {}\n", m_autoSelected);
 
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
-}
+class Robot : public TimedRobot
+{
+public:
+	Pigeon2 pigeon{0};
 
-void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
-}
+	WPI_TalonFX back_left{1};
+	WPI_TalonFX front_left{0};
+	WPI_TalonFX front_right{2};
+	WPI_TalonFX back_right{3};
 
-void Robot::TeleopInit() {}
+	WPI_TalonFX shooter_top{6};
+	WPI_TalonFX shooter_bottom{7};
+	WPI_TalonSRX shooter_angle_1{10};
+	WPI_TalonSRX shooter_angle_2{11};
+	
+	WPI_TalonFX intake{12};
 
-void Robot::TeleopPeriodic() {}
+	DoubleSolenoid shooter_solenoid{PneumaticsModuleType::CTREPCM, 0, 1};
 
-void Robot::DisabledInit() {}
+	MotorControllerGroup shooter_angle{shooter_angle_2, shooter_angle_1};
 
-void Robot::DisabledPeriodic() {}
+	MotorControllerGroup shooter{shooter_bottom, shooter_top};
 
-void Robot::TestInit() {}
+	AnalogOutput debugging_out{0};
+	
+	XboxController controller{0};
+	
+	float driveSpeed = 0.5;
+	AnalogInput potentiometer{0};
 
-void Robot::TestPeriodic() {}
+	MecanumDrive mecDrive{front_left, back_left, front_right, back_right};
+
+	Timer autonomous_timer;
+	bool autonomous_shooting=false;
+
+	void TeleopPeriodic()
+	{
+		double joyX = -controller.GetLeftX();
+		double joyR = -controller.GetLeftY();
+		double joyY = controller.GetRightX();
+
+		/* deadband gamepad 5% */
+		if (fabs(joyR) < 0.2)
+			joyR = 0;
+		if (fabs(joyX) < 0.2)
+			joyX = 0;
+		if (fabs(joyY) < 0.2)
+			joyY = 0;
+
+		mecDrive.DriveCartesian(joyY*driveSpeed, joyX*driveSpeed, joyR*driveSpeed);
+	}
+
+	void RobotInit()
+	{
+		front_left.SetNeutralMode(Brake);
+		back_left.SetNeutralMode(Brake);
+		front_right.SetNeutralMode(Brake);
+		back_right.SetNeutralMode(Brake);
+		shooter_top.SetInverted(true);
+		shooter_angle_1.SetInverted(true);
+		shooter_angle_2.SetInverted(true);
+
+	}
+
+
+private:
+	
+};
 
 #ifndef RUNNING_FRC_TESTS
-int main() {
-  return frc::StartRobot<Robot>();
+int main()
+{
+	return frc::StartRobot<Robot>();
 }
 #endif
