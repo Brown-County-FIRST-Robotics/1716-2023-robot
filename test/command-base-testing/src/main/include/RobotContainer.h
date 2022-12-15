@@ -6,7 +6,9 @@
 #include "commands/SpinTfx.h"
 #include "commands/SpinTsrx.h"
 #include "commands/SpinAll.h"
+#include "commands/toggleSolenoid.h"
 #include "subsystems/Motors.h"
+#include "subsystems/Solenoid.h"
 
 class RobotContainer {
  public:
@@ -16,7 +18,8 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
   frc::XboxController controller{0};
   
-  Motors* p_motors;
+  Motors* motors_p;
+  Solenoid* solenoid_p;
 
   void ConfigureButtonBindings();
 };
