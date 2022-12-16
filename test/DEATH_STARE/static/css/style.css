@@ -32,6 +32,7 @@
 .sidediv
 {
 	display: table;
+	align-items: center;
 	width: 100%;
 	text-align: center;
 	justify-content: center;
@@ -39,10 +40,10 @@
 
 .side
 {
-	float: left;
+	display: table-cell;
 	height: 240px;
-	width: 300px;	
-	justify-content: center;
+	width: 300px;		
+	vertical-align: middle;
 }
 
 .mt-5
