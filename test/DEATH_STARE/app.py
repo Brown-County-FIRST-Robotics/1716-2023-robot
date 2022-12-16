@@ -230,6 +230,28 @@ def showAllCams():
 def allCamsImage():
     return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+#side camera view
+@app.route('/goto_sidecam')
+def gotoSideCam():
+    return redirect('/sidecam')
+
+@app.route('/sidecam')
+def sidecam():
+    return render_template("sidecam.html")
+
+@app.route('/side1')
+def side1():
+    return
+@app.route('/side2')
+def side2():
+    return
+@app.route('/side3')
+def side3():
+    return
+@app.route('/side4')
+def side4():
+    return
+
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
         imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))

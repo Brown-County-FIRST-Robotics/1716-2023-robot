@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">	
+
+    <title>Camera View</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8  offset-lg-2">
+			<h1 class="mt-5">Side Cameras <img src="{{ url_for('static', filename='images/plain-robot.svg') }}" id="logo"></h1>
+		
+			<div class="sidediv">
+				<img class="side" src="{{ url_for('side1') }}" width="100%">
+			<div>	
+
+			<br>
+			<div class="sidediv">
+				<img class="side" src="{{ url_for('side2') }}" width="100%">
+				<img class="side" id="robot" src="{{ url_for('static', filename='images/robot.jpg') }}" width="100%">		
+				<img class="side" src="{{ url_for('side3') }}" width="100%">	
+			</div>
+
+			<br>
+			<div class="sidediv">
+				<img class="side" src="{{ url_for('side4') }}" width="100%">
+			</div>
+
+		</div>	
+	</div>
+
+	<div id="buttons">
+		<button onclick="window.location.href='/goback'">Return To Main Camera</button>	
+	</div>	
+</div>
+</body>
+</html>
