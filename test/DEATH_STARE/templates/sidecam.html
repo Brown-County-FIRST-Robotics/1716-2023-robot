@@ -10,25 +10,45 @@
     <title>Camera View</title>
 </head>
 <body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+	
+	socket = io();
+	socket.binaryType = "arraybuffer";
+	socket.connect("http://127.0.0.1:5000/sidecam")
+	
+	socket.on("connect", function() {
+			console.log("connected!\n");
+			socket.send("a");
+		})
+	socket.on("message", function(msg) {
+			//document.getElementsByClassName("side")[0].src = msg; 
+			console.log(msg);
+			socket.send("a");	
+		})
+</script>
+
 <div class="container">
+
     <div class="row">
         <div class="col-lg-8  offset-lg-2">
 			<h1 class="mt-5">Side Cameras <img src="{{ url_for('static', filename='images/plain-robot.svg') }}" id="logo"></h1>
 		
 			<div class="sidediv">
-				<img class="side" src="{{ url_for('side1') }}" width="100%">
+				<img class="side" width="100%">
 			<div>	
 
 			<br>
 			<div class="sidediv">
-				<img class="side" src="{{ url_for('side2') }}" width="100%">
+				<img class="side" width="100%">
 				<img class="side" id="robot" src="{{ url_for('static', filename='images/robot.jpg') }}" width="100%">		
-				<img class="side" src="{{ url_for('side3') }}" width="100%">	
+				<img class="side" width="100%">	
 			</div>
 
 			<br>
 			<div class="sidediv">
-				<img class="side" src="{{ url_for('side4') }}" width="100%">
+				<img class="side" width="100%">
 			</div>
 
 		</div>	

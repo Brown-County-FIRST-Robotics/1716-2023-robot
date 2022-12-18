@@ -1,5 +1,6 @@
 #flask is the web server so we can run this app in the browser 
-from flask import Flask, render_template, Response, redirect
+from flask import Flask, render_template, Response, redirect, request
+from flask_socketio import SocketIO, emit
 import cv2
 import threading
 import april
@@ -8,8 +9,11 @@ import numpy
 import threading
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "1716robotics"
+sock = SocketIO(app)
 
-cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video8" ]
+#cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video8" ]
+cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
 
@@ -30,6 +34,16 @@ displayColor = True
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
 currentFrame = camera.read();
 
+def readCam(cam, frames, ind):
+    while True:
+        ret, frame = cam.read()
+        if not ret:
+            break
+        resized = cv2.resize(frame, 
+                    (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
+                    interpolation=cv2.INTER_LINEAR)
+        frames[ind] = resized
+
 def openCam(i, cameras):
     cam = cv2.VideoCapture() 
     cam.open(cameraDev[i]) 
@@ -45,6 +59,19 @@ def getCams():
     while len(cameras) < len(cameraDev):
         print("Capturing all cameras...")
     return cameras
+
+def getSpecificCams(indices):
+    global imageHoriz
+    cams = []
+    for i in range(len(indices)):
+        th = threading.Thread(target=openCam, args=(indices[i], cams))
+        th.start()
+    while len(cams) < len(indices):
+        print("Capturing cameras...")
+    for i in range(len(cams)):
+        th = threading.Thread(target=readCam, args=(cams[i], imageHoriz, i))
+        th.start()
+    return cams
 
 # This function gets called by the /video_feed route below
 def gen_frames():  # generate frame by frame from camera
@@ -173,26 +200,18 @@ def gotoAllCam():
 def goBack():
     global cameras
     global camera
+    global currentCam
     for c in cameras:
         c.release()
     cameras = []
     camera = cv2.VideoCapture()
+    currentCam = 0
     camera.open(cameraDev[currentCam])
     return redirect('/')
 
 @app.route('/allcam')
 def all():
     return render_template("allcam.html")
-
-def readCam(cam, frames, ind):
-    while True:
-        ret, frame = cam.read()
-        if not ret:
-            break
-        resized = cv2.resize(frame, 
-                    (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
-                    interpolation=cv2.INTER_LINEAR)
-        frames[ind] = resized
 
 def showAllCams():
     global imageHoriz 
@@ -233,26 +252,28 @@ def allCamsImage():
 #side camera view
 @app.route('/goto_sidecam')
 def gotoSideCam():
+    global cameras
+    camera.release()
+    cameras = getSpecificCams([ 0, 1, 2 ])
     return redirect('/sidecam')
 
 @app.route('/sidecam')
 def sidecam():
     return render_template("sidecam.html")
 
-@app.route('/side1')
-def side1():
-    return
-@app.route('/side2')
-def side2():
-    return
-@app.route('/side3')
-def side3():
-    return
-@app.route('/side4')
-def side4():
-    return
+def gen_frameIndexed(ind):
+    # We want to loop this forever
+    # This step encodes the data into a jpeg image
+    #cv2.imwrite("temp.jpg", imageHoriz[ind])
+    return imageHoriz[ind].tobytes()
 
+@sock.on("message")
+def updateCameras(msg):
+    gen_frameIndexed(0);
+    sock.send("message")
+            
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
         imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
-    app.run(threaded=True)
+    #app.run(threaded=True)
+    sock.run(app)
