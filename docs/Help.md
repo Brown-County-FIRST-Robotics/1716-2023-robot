@@ -92,8 +92,8 @@ public:
 
 private:
     //subsystem components such as motors:
-    WPI_TalonFX ExampleTalonFX;
-    WPI_TalonSRX ExampleTalonSRX;
+    WPI_TalonFX exampleTalonFX;
+    WPI_TalonSRX exampleTalonSRX;
 };
 ```
 
@@ -101,14 +101,14 @@ private:
 ```C++
 #include "subsystems/SubsytemName.h"
 
-SubsytemName::SubsytemName() : ExampleTalonFX{0}, ExampleTalonSRX{1} {} //constructor, make sure to include all components with their ids, separated by commas
+SubsytemName::SubsytemName() : exampleTalonFX{0}, exampleTalonSRX{1} {} //constructor, make sure to include all components with their ids, separated by commas
 
 void SubsytemName::ExampleMethod1() {
-  ExampleTalonFX.Set(0.5);
+  exampleTalonFX.Set(0.5);
 }
 
 double SubsytemName::ExampleMethod2(double exampleParameter) {
-  ExampleTalonSRX.Set(exampleParameter);
+  exampleTalonSRX.Set(exampleParameter);
   return 5;
 }
 ```
@@ -129,7 +129,7 @@ class RobotContainer {
  private:
   frc::XboxController controller{0}; //controller used for bindings
   
-  SubsytemName* p_subsytemName; //uses pascalCase as it is an instance, and has the p_ prefix as it is a pointer
+  SubsytemName* subsytemName_p; //uses pascalCase as it is an instance, and has the _p suffix as it is a pointer
 
   void ConfigureButtonBindings();
 };
@@ -214,15 +214,15 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {
     // Configure your button bindings to commands here
-	JoystickButton(&controller, XboxController::Button::kA).WhenHeld(CommandName(p_subsystemName)); //declare a joystick button using the enumerator of the a button of `controller` (remember the &), then call `.WhenHeld()`, a binding that schedules the command when you hit the button and cancels it when you release it, `.WhenHeld()` takes a command, which takes subsytem pointers according to its constructor, the subsytems should be declared in the header already
+	JoystickButton(&controller, XboxController::Button::kA).WhenHeld(CommandName{subsystemName_p}); //declare a joystick button using the enumerator of the a button of `controller` (remember the &), then call `.WhenHeld()`, a binding that schedules the command when you hit the button and cancels it when you release it, `.WhenHeld()` takes a command, which takes subsytem pointers according to its constructor, the subsytems should be declared in the header already
 
     JoystickButton(&controller, XboxController::Button::kB)
-        .WhenActive(CommandName(p_subsytemName))
-        .WhileHeld(CommandName2(p_subsystemName)); //bindings return the original button, so they can be chained together
+        .WhenActive(CommandName{subsytemName_p})
+        .WhileHeld(CommandName2{subsystemName_p}); //bindings return the original button, so they can be chained together
 
     (JoystickButton(&controller, XboxController::Button::kX)
         || JoystickButton(&controller, XboxController::Button::kY))
-        .WhileActiveOnce(CommandName(p_subsystemName)); //trigger composition, if either is pressed, CommandName will be scheduled (must use WhileActiveOnce() rather than whenHeld() because composition returns a trigger, not a button)
+        .WhileActiveOnce(CommandName{subsystemName_p}); //trigger composition, if either is pressed, CommandName will be scheduled (must use WhileActiveOnce() rather than whenHeld() because composition returns a trigger, not a button)
 }
 ```
 
