@@ -22,6 +22,30 @@
 	max-height: 64px;
 }
 
+#robot
+{
+	height: 240px;
+	width: 300px;
+	justify-content: center;
+}
+
+.sidediv
+{
+	display: table;
+	align-items: center;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+}
+
+.side
+{
+	display: table-cell;
+	height: 240px;
+	width: 300px;		
+	vertical-align: middle;
+}
+
 .mt-5
 {
 	color: #FF4444;

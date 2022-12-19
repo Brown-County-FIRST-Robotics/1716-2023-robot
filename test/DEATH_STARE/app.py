@@ -1,5 +1,5 @@
 #flask is the web server so we can run this app in the browser 
-from flask import Flask, render_template, Response, redirect
+from flask import Flask, render_template, Response, redirect, request
 import cv2
 import threading
 import april
@@ -8,15 +8,17 @@ import numpy
 import threading
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "1716robotics"
 
-CAM_COUNT = 3
-cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
+cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
+#cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
 
 camera.open(cameraDev[0])
 
 cameras = []
+imageHoriz = []
 
 #camera dimensions
 camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -30,16 +32,46 @@ displayColor = True
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
 currentFrame = camera.read();
 
-#Call this after getCamIds
+def readCam(cam, frames, ind):
+    while True:
+        ret, frame = cam.read()
+        if not ret:
+            break
+        resized = cv2.resize(frame, 
+                    (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
+                    interpolation=cv2.INTER_LINEAR)
+        frames[ind] = resized
+
+def openCam(i, cameras):
+    cam = cv2.VideoCapture() 
+    cam.open(cameraDev[i]) 
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+    cameras.append(cam)
+
 def getCams(): 
     cameras = []
     for i in range(len(cameraDev)):
-        cam = cv2.VideoCapture()
-        cam.open(cameraDev[i])
-        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 120) 
-        cameras.append(cam)
+        th = threading.Thread(target=openCam, args=(i, cameras))
+        th.start()
+    while len(cameras) < len(cameraDev):
+        print("Capturing all cameras...")
     return cameras
+
+"""
+def getSpecificCams(indices):
+    global imageHoriz
+    cams = []
+    for i in range(len(indices)):
+        th = threading.Thread(target=openCam, args=(indices[i], cams))
+        th.start()
+    while len(cams) < len(indices):
+        print("Capturing cameras...")
+    for i in range(len(cams)):
+        th = threading.Thread(target=readCam, args=(cams[i], imageHoriz, i))
+        th.start()
+    return cams
+"""
 
 # This function gets called by the /video_feed route below
 def gen_frames():  # generate frame by frame from camera
@@ -104,7 +136,7 @@ def next():
     global camHeight
 
     currentCam += 1
-    currentCam %= CAM_COUNT
+    currentCam %= len(cameraDev) 
     camera.release();
     camera = cv2.VideoCapture()
     camera.open(cameraDev[currentCam])
@@ -136,7 +168,7 @@ def prev():
 
     currentCam -= 1
     if currentCam < 0:
-        currentCam = CAM_COUNT - 1 
+        currentCam = len(cameraDev) - 1 
     print(currentCam)
     camera.release();
     camera = cv2.VideoCapture();
@@ -168,10 +200,12 @@ def gotoAllCam():
 def goBack():
     global cameras
     global camera
+    global currentCam
     for c in cameras:
         c.release()
     cameras = []
     camera = cv2.VideoCapture()
+    currentCam = 0
     camera.open(cameraDev[currentCam])
     return redirect('/')
 
@@ -180,22 +214,17 @@ def all():
     return render_template("allcam.html")
 
 def showAllCams():
+    global imageHoriz 
+    for i in range(len(cameraDev)):
+        th = threading.Thread(target=readCam, args=(cameras[i], imageHoriz, i))
+        th.start()
+
     # We want to loop this forever
     while True:
-        imageHoriz = []
-        for c in cameras:
-            # Capture frame-by-frame
-            success, frame = c.read()  # read the camera frame
-            if not success:
-                continue
-            frame = cv2.resize(frame, 
-                    (int(240 / c.get(cv2.CAP_PROP_FRAME_HEIGHT) * c.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
-                    interpolation=cv2.INTER_LINEAR)
-            imageHoriz.append(frame)
 
         allImages = cv2.hconcat(imageHoriz)
 
-        # This step encodes the data into a jpeg image
+        # This step encodes the data into a jpeg image 
         ret, buffer = cv2.imencode('.jpg', allImages)
 
         # We have to return bytes to the user
@@ -209,5 +238,52 @@ def showAllCams():
 def allCamsImage():
     return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+def readImg(ind):
+    cam = cv2.VideoCapture() 
+    cam.open(cameraDev[ind])
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+    cameras.append(cam)
+    while True:
+        ret, frame = cam.read()
+        # This step encodes the data into a jpeg image 
+        ret, buffer = cv2.imencode('.jpg', frame)
+
+        # We have to return bytes to the user
+        img = buffer.tobytes() 
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n') 
+
+#side camera view
+@app.route('/goto_sidecam')
+def gotoSideCam():
+    global cameras
+    camera.release()
+    #indices = [ 0, 1, 2 ]
+    #cameras = getSpecificCams(indices)
+    return redirect('/sidecam')
+
+@app.route("/side1")
+def side1():
+    return Response(readImg(0), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side2")
+def side2():
+    return Response(readImg(1), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side3")
+def side3():
+    return Response(readImg(2), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side4")
+def side4():
+    return Response(readImg(3), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/sidecam')
+def sidecam():
+    return render_template("sidecam.html")
+
 if __name__ == '__main__':
+    for i in range(len(cameraDev)):
+        imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
     app.run(threaded=True)
