@@ -5,7 +5,6 @@ import threading
 import april
 import color
 import numpy
-import threading
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
@@ -13,9 +12,10 @@ app.config["SECRET_KEY"] = "1716robotics"
 cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
 #cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
 camIndex = 0
-camera = cv2.VideoCapture(0)
-
+camera = cv2.VideoCapture()
 camera.open(cameraDev[0])
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
 
 cameras = []
 imageHoriz = []
@@ -207,6 +207,8 @@ def goBack():
     camera = cv2.VideoCapture()
     currentCam = 0
     camera.open(cameraDev[currentCam])
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
     return redirect('/')
 
 @app.route('/allcam')
@@ -286,4 +288,4 @@ def sidecam():
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
         imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
-    app.run(threaded=True)
+    app.run(threaded=True, host="0.0.0.0")
