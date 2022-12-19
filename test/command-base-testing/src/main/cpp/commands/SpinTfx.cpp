@@ -1,8 +1,7 @@
 #include "commands/SpinTfx.h"
 
-SpinTfx::SpinTfx(Motors* subsystem){
+SpinTfx::SpinTfx(Motors* subsystem) : motors(subsystem) {
 	AddRequirements(subsystem);
-	motors = new Motors();
 }
 
 void SpinTfx::Initialize() {

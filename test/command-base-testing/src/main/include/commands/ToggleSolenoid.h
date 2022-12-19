@@ -3,17 +3,17 @@
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 
-#include "subsystems/Solenoid.h"
+#include "subsystems/SolenoidSubsystem.h"
 
 class ToggleSolenoid : public frc2::CommandHelper<frc2::CommandBase, ToggleSolenoid> {
 public:
-	explicit ToggleSolenoid(Solenoid* subsystem);
+	explicit ToggleSolenoid(SolenoidSubsystem* subsystem);
 
 	void Initialize() override;
   
     void End(bool interrupted) override;
   	
 private:
-	Solenoid* solenoid;
+	SolenoidSubsystem* solenoidSubsystem;
 	frc::DoubleSolenoid::Value currentPosition;
 };
