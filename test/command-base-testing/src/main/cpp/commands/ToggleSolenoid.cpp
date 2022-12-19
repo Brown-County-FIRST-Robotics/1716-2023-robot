@@ -1,25 +1,24 @@
 #include "commands/ToggleSolenoid.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
-ToggleSolenoid::ToggleSolenoid(Solenoid* subsystem){
+ToggleSolenoid::ToggleSolenoid(SolenoidSubsystem* subsystem) : solenoidSubsystem(subsystem) {
 	AddRequirements(subsystem);
-	solenoid = new Solenoid();
-	currentPosition = frc::DoubleSolenoid::Value::kReverse;
+	currentPosition = frc::DoubleSolenoid::Value::kReverse; //solenoidSubsystem->GetPosition();
 }
 
 void ToggleSolenoid::Initialize() {
 	if (currentPosition == frc::DoubleSolenoid::Value::kReverse) {
-		solenoid->SetPosition(frc::DoubleSolenoid::Value::kForward);
+		solenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kForward);
 		currentPosition = frc::DoubleSolenoid::Value::kForward;
 		frc::SmartDashboard::PutBoolean("Solenoid", true);
 	}
 	else { //if not reverse, set to reverse
-		solenoid->SetPosition(frc::DoubleSolenoid::Value::kReverse);
+		solenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kReverse);
 		currentPosition = frc::DoubleSolenoid::Value::kReverse;
 		frc::SmartDashboard::PutBoolean("Solenoid", false);
 	}
 }
 
 void ToggleSolenoid::End(bool interrupted) {
-	solenoid->SetPosition(frc::DoubleSolenoid::Value::kOff);
+	solenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kOff);
 }
