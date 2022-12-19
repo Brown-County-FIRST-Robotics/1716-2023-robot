@@ -226,5 +226,24 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 ```
 
+## Component Reference:
 
-TODO: common component references, structure of subsystems commands and `RobotContainer` 
+|Class Name|Include|Notes|
+|--|--|--|
+|`WPI_TalonFX`|`<ctre/Phoenix.h>`|-|
+|`WPI_TalonSRX`|`<ctre/Phoenix.h>`|-|
+
+## Naming Conventions:
+
+CC is camelCase, PC is PaskalCase  
+> ***Note:*** *If a single instance of a class is being used, it should be named the same as its class, but in camelCase, assuming this causes no conflicts.*
+
+|Structure|Convention|Suffix|
+|-|-|-|
+|Class|PC||
+|Method/Function|PC||
+|General Variable|CC||
+|Parameter|CC|If a conflict is caused with a normal variable, add an `_a` suffix|
+|Pointer|CC|`_p`|
+
+TODO: solenoid stuff, multiple files
