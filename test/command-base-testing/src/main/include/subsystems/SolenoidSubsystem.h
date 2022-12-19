@@ -3,9 +3,9 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DoubleSolenoid.h>
 
-class Solenoid : public frc2::SubsystemBase {
+class SolenoidSubsystem : public frc2::SubsystemBase {
 public:
-    Solenoid();
+    SolenoidSubsystem();
 
     void SetPosition(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetPosition();

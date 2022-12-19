@@ -17,15 +17,15 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings to commands here
 	(JoystickButton(&controller, XboxController::Button::kA)
 		&& JoystickButton(&controller, XboxController::Button::kB))
-		.WhileActiveOnce(SpinAll{motors_p}); //if both are held, spin both
+		.WhileActiveOnce(SpinAll{&motors}); //if both are held, spin both
 	
 	(JoystickButton(&controller, XboxController::Button::kA)
 		&& (!JoystickButton(&controller, XboxController::Button::kB)))
-		.WhileActiveOnce(SpinTfx{motors_p}); //if a is held, but not b, spin Tfx
+		.WhileActiveOnce(SpinTfx{&motors}); //if a is held, but not b, spin Tfx
 
 	(JoystickButton(&controller, XboxController::Button::kB)
 		&& (!JoystickButton(&controller, XboxController::Button::kA)))
-		.WhileActiveOnce(SpinTsrx{motors_p}); //if b is held, but not a, spin Tsrx
+		.WhileActiveOnce(SpinTsrx{&motors}); //if b is held, but not a, spin Tsrx
 
-	JoystickButton(&controller, XboxController::Button::kY).WhenActive(ToggleSolenoid{solenoid_p}.WithTimeout(SOLENOIDSETLENGTH));
+	JoystickButton(&controller, XboxController::Button::kY).WhenActive(ToggleSolenoid{&solenoidSubsystem}.WithTimeout(SOLENOIDSETLENGTH));
 }
