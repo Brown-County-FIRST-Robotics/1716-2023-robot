@@ -10,6 +10,7 @@
     <title>Camera View</title>
 </head>
 <body>
+<!--
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
 <script>
@@ -28,6 +29,7 @@
 			socket.send("a");	
 		})
 </script>
+-->
 
 <div class="container">
 
@@ -36,19 +38,19 @@
 			<h1 class="mt-5">Side Cameras <img src="{{ url_for('static', filename='images/plain-robot.svg') }}" id="logo"></h1>
 		
 			<div class="sidediv">
-				<img class="side" width="100%">
+				<img class="side" width="100%" src="{{ url_for('side1') }}">
 			<div>	
 
 			<br>
 			<div class="sidediv">
-				<img class="side" width="100%">
+				<img class="side" width="100%" src="{{ url_for('side2') }}">
 				<img class="side" id="robot" src="{{ url_for('static', filename='images/robot.jpg') }}" width="100%">		
-				<img class="side" width="100%">	
+				<img class="side" width="100%" src="{{ url_for('side3') }}">	
 			</div>
 
 			<br>
 			<div class="sidediv">
-				<img class="side" width="100%">
+				<img class="side" width="100%" src="{{ url_for('side4') }}">
 			</div>
 
 		</div>	

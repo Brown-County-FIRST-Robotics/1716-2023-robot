@@ -1,6 +1,5 @@
 #flask is the web server so we can run this app in the browser 
 from flask import Flask, render_template, Response, redirect, request
-from flask_socketio import SocketIO, emit
 import cv2
 import threading
 import april
@@ -10,10 +9,9 @@ import threading
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
-sock = SocketIO(app)
 
-#cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video8" ]
-cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
+cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
+#cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
 camIndex = 0
 camera = cv2.VideoCapture(0)
 
@@ -60,6 +58,7 @@ def getCams():
         print("Capturing all cameras...")
     return cameras
 
+"""
 def getSpecificCams(indices):
     global imageHoriz
     cams = []
@@ -72,6 +71,7 @@ def getSpecificCams(indices):
         th = threading.Thread(target=readCam, args=(cams[i], imageHoriz, i))
         th.start()
     return cams
+"""
 
 # This function gets called by the /video_feed route below
 def gen_frames():  # generate frame by frame from camera
@@ -221,21 +221,10 @@ def showAllCams():
 
     # We want to loop this forever
     while True:
-        """
-        for c in cameras:
-            # Capture frame-by-frame
-            success, frame = c.read()  # read the camera frame
-            if not success:
-                continue
-            frame = cv2.resize(frame, 
-                    (int(240 / c.get(cv2.CAP_PROP_FRAME_HEIGHT) * c.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
-                    interpolation=cv2.INTER_LINEAR)
-            imageHoriz.append(frame)
-        """
 
         allImages = cv2.hconcat(imageHoriz)
 
-        # This step encodes the data into a jpeg image
+        # This step encodes the data into a jpeg image 
         ret, buffer = cv2.imencode('.jpg', allImages)
 
         # We have to return bytes to the user
@@ -249,31 +238,52 @@ def showAllCams():
 def allCamsImage():
     return Response(showAllCams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+def readImg(ind):
+    cam = cv2.VideoCapture() 
+    cam.open(cameraDev[ind])
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+    cameras.append(cam)
+    while True:
+        ret, frame = cam.read()
+        # This step encodes the data into a jpeg image 
+        ret, buffer = cv2.imencode('.jpg', frame)
+
+        # We have to return bytes to the user
+        img = buffer.tobytes() 
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n') 
+
 #side camera view
 @app.route('/goto_sidecam')
 def gotoSideCam():
     global cameras
     camera.release()
-    cameras = getSpecificCams([ 0, 1, 2 ])
+    #indices = [ 0, 1, 2 ]
+    #cameras = getSpecificCams(indices)
     return redirect('/sidecam')
+
+@app.route("/side1")
+def side1():
+    return Response(readImg(0), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side2")
+def side2():
+    return Response(readImg(1), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side3")
+def side3():
+    return Response(readImg(2), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route("/side4")
+def side4():
+    return Response(readImg(3), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/sidecam')
 def sidecam():
     return render_template("sidecam.html")
 
-def gen_frameIndexed(ind):
-    # We want to loop this forever
-    # This step encodes the data into a jpeg image
-    #cv2.imwrite("temp.jpg", imageHoriz[ind])
-    return imageHoriz[ind].tobytes()
-
-@sock.on("message")
-def updateCameras(msg):
-    gen_frameIndexed(0);
-    sock.send("message")
-            
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
         imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
-    #app.run(threaded=True)
-    sock.run(app)
+    app.run(threaded=True)
