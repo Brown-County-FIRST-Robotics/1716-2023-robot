@@ -36,8 +36,16 @@ using namespace frc;
 class Robot : public TimedRobot
 {
 public:
-	WPI_TalonFX back_left{0};
-	nt::NetworkTableEntry robotNumEntry;
+
+	WPI_TalonFX back_left{1};
+	WPI_TalonFX front_left{0};
+	WPI_TalonFX front_right{2};
+	WPI_TalonFX back_right{3};
+
+	MecanumDrive mecDrive{front_left, back_left, front_right, back_right};
+
+	nt::NetworkTableEntry rollEntry;
+	nt::NetworkTableEntry distanceEntry;
 	double robotNumber;
 
 	void SimulationPeriodic()
@@ -46,25 +54,16 @@ public:
 
 	void TeleopPeriodic()
 	{	
-		double val = robotNumEntry.GetDouble(0.0);
-	//std::cout << "Robot Number: " << val << '\n';
-	//std::cout << "Client number: " << robotNumber << '\n';
-		back_left.Set(val/3.14);
+		mecDrive.DriveCartesian((distanceEntry.GetDouble(0.0)-16.0)/4.0,0,rollEntry.GetDouble(0.0)/3.14);
 	
 		
 	}
 
 	void TeleopInit(){
-	auto inst = nt::NetworkTableInstance::GetDefault();
-	auto table = inst.GetTable("apriltag");
-	robotNumEntry = table->GetEntry("roll");
-	robotNumber = (double)(rand() % 100 + 1);
-	robotNumEntry.SetDouble(robotNumber);
-	robotNumEntry.AddListener(
-		[](const nt::EntryNotification &event)
-		{
-			std::cout << "Hello World\n";
-		}, NT_NOTIFY_UPDATE | NT_NOTIFY_NEW);
+		auto inst = nt::NetworkTableInstance::GetDefault();
+		auto table = inst.GetTable("apriltag");
+		rollEntry = table->GetEntry("roll");
+		distanceEntry = table->GetEntry("distance");
 	}
 
 
