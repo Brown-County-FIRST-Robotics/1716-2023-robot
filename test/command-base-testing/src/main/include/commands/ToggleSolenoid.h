@@ -10,9 +10,9 @@ public:
 	explicit ToggleSolenoid(SolenoidSubsystem* subsystem);
 
 	void Initialize() override;
-  
-    void End(bool interrupted) override;
-  	
+	
+		void End(bool interrupted) override;
+		
 private:
 	SolenoidSubsystem* solenoidSubsystem;
 	frc::DoubleSolenoid::Value currentPosition;

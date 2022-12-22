@@ -5,9 +5,9 @@
 
 class SolenoidSubsystem : public frc2::SubsystemBase {
 public:
-    SolenoidSubsystem();
+		SolenoidSubsystem();
 
-    void SetPosition(frc::DoubleSolenoid::Value position);
+		void SetPosition(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetPosition();
 
 private:
