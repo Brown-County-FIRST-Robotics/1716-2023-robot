@@ -69,13 +69,6 @@ def findColor(image, cam, lowerColor, upperColor):
             rectangle["w"] = w;
             rectangle["h"] = h;
 
-        #Outline the rectangle
-        cv2.rectangle(image, 
-                     (x, y),
-                     (x + w, y + h),
-                     [0, 0, 0],
-                     1)
-
     #Outline the rectangle
     cv2.rectangle(image, 
                  (rectangle["x"], rectangle["y"]),
