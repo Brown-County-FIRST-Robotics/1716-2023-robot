@@ -11,7 +11,6 @@ app.config["SECRET_KEY"] = "1716robotics"
 
 cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
 #cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4" ]
-camIndex = 0
 camera = cv2.VideoCapture()
 camera.open(cameraDev[0])
 camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
@@ -26,11 +25,11 @@ camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 currentCam = 0
 
-displayApril = True
-displayColor = True
+displayApril = False 
+displayColor = False
 
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
-currentFrame = camera.read();
+currentFrame = camera.read()
 
 def readCam(cam, frames, ind):
     while True:
@@ -104,7 +103,7 @@ def gen_frames():  # generate frame by frame from camera
         if not success:
             break
         
-        currentFrame = frame;
+        currentFrame = frame
 
         # This step encodes the data into a jpeg image
         ret, buffer = cv2.imencode('.jpg', frame)
@@ -137,9 +136,12 @@ def next():
 
     currentCam += 1
     currentCam %= len(cameraDev) 
-    camera.release();
+    camera.release()
     camera = cv2.VideoCapture()
     camera.open(cameraDev[currentCam])
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+
     print(currentCam) 
     
     camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -151,13 +153,13 @@ def next():
 def toggle_april():
     global displayApril
     displayApril = not displayApril
-    return redirect('/');
+    return redirect('/')
 
 @app.route('/toggle_color_detection')
 def toggle_color():
     global displayColor
     displayColor = not displayColor
-    return redirect('/');
+    return redirect('/')
 
 @app.route('/prev')
 def prev():
@@ -170,10 +172,12 @@ def prev():
     if currentCam < 0:
         currentCam = len(cameraDev) - 1 
     print(currentCam)
-    camera.release();
-    camera = cv2.VideoCapture();
+    camera.release()
+    camera = cv2.VideoCapture()
     camera.open(cameraDev[currentCam])
-    
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15) 
+
     camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
     camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
@@ -209,6 +213,7 @@ def goBack():
     camera.open(cameraDev[currentCam])
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+    
     return redirect('/')
 
 @app.route('/allcam')
