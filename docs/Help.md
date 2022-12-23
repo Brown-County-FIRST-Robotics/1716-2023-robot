@@ -63,13 +63,95 @@ flowchart BT
 
 ## Solenoids
 
-Solenoids are the controllers for air-powered devices, generally pistons. They require an air compressor, which is automatically handled by WPILib (if a solenoid is declared) REFERENCE REQUIRED. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second INSERT APPROXIMATE TIME HERE(ASK OLI), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston (ask Oli). An example of a Double Solenoid Subsystem and Command is below:
-INSERT EXAMPLE HERE
+Solenoids are the controllers for air-powered devices, generally pistons. They require an air compressor, which is automatically activated if a solenoid is declared. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second (about 3 ms), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston (ask Oli if you want). Most solenoids should be able to function using basically the same subsystem and command, though you may want to add the solenoid to another subsystem. Below is a general use command and subsystem to toggle a solenoid.  
+**NOTE: The below command must be bound to a trigger with the `WithTimeout(3_ms)` decorator. Failure to do so may result in damage to the solenoid and a nonfunctional command.**
 
+`SubsystemName.h`:
+```C++
+#pragma once
+
+#include <frc2/command/SubsystemBase.h>
+#include <frc/DoubleSolenoid.h>
+
+class SubsystemName : public frc2::SubsystemBase {
+public:
+	SubsystemName();
+
+	void SetPosition(frc::DoubleSolenoid::Value position);
+	frc::DoubleSolenoid::Value GetPosition();
+
+private:
+ 	frc::DoubleSolenoid solenoidName; //it is ill-advised to name your solenoid `solenoid`, as it may not interact well with wpilib
+};
+```
+
+`SubsystemName.cpp`:
+```C++
+#include "subsystems/SubsystemName.h"
+
+SubsystemName::SubsystemName() : solenoidName{frc::PneumaticsModuleType::CTREPCM, [reverseId], [forwardId]} {} //declares the solenoid to use ctre control and the two provided ids as ints. Generally the smaller number should go first, test to see what works correctly.
+
+void SubsystemName::SetPosition(frc::DoubleSolenoid::Value position) {
+	solenoidName.Set(position);
+}
+
+frc::DoubleSolenoid::Value SubsystemName::GetPosition() {
+	return solenoidName.Get();
+}
+```
+
+`CommandName.h`(name should probably mention toggling the solenoid):
+```C++
+#pragma once
+
+#include <frc2/command/CommandBase.h>
+#include <frc2/command/CommandHelper.h>
+
+#include "subsystems/SubsystemName.h"
+
+class CommandName : public frc2::CommandHelper<frc2::CommandBase, CommandName> {
+public:
+	explicit CommandName(SubsystemName* subsystem);
+
+	void Initialize() override;
+	void End(bool interrupted) override;
+
+private:
+	SubsystemName* subsystemName;
+	frc::DoubleSolenoid::Value currentPosition;
+};
+```
+
+`CommandName.cpp`:
+```C++
+#include "commands/CommandName.h"
+#include <frc/smartdashboard/SmartDashboard.h>
+
+CommandName::CommandName(SubsystemName* subsystem) : subsystemName(subsystem) {
+	AddRequirements(subsystem);
+	currentPosition = frc::DoubleSolenoid::Value::kReverse; //set the initial position to retracted
+}
+
+void CommandName::Initialize() {
+	if (currentPosition == frc::DoubleSolenoid::Value::kReverse) {
+		SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kForward);
+		currentPosition = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kReverse);
+		currentPosition = frc::DoubleSolenoid::Value::kReverse;
+	}
+}
+
+void CommandName::End(bool interrupted) { //should be called 3 ms after `Initialize()`
+	SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kOff);
+}
+```
 
 ## How to make a...
 
 This section covers how to write a new subsytem, command, and how to bind a command to a trigger. All file paths are in `src > main`
+
 ### Subsystem:
 
 1. Ensure that you need a subsytem: a subsystem should be a specific section of a robot. It is used to interface the components included in it. It should generally use all of the included components at once, since it's difficult to use different ones for different purposes at once.
@@ -129,7 +211,7 @@ class RobotContainer {
  private:
   frc::XboxController controller{0}; //controller used for bindings
   
-  SubsytemName* subsytemName_p; //uses pascalCase as it is an instance, and has the _p suffix as it is a pointer
+  SubsytemName subsytemName; //uses pascalCase as it is an instance
 
   void ConfigureButtonBindings();
 };
@@ -171,9 +253,8 @@ class CommandName : public frc2::CommandHelper<frc2::CommandBase, CommandName> {
 ```C++
 #include "commands/CommandName.h"
 
-CommandName::CommandName(SubsytemName* subsystem){ //constructor, takes all required subsystems and adds them to command requirements
+CommandName::CommandName(SubsytemName* subsystem) : subsystemName(subsystem) { //constructor, takes all required subsystems and adds them to command requirements
 	AddRequirements(subsystem); //subsystems must be added to the command's requirements
-	subsytemName = new SubsytemName(); //required for each subsystem
 }
 
 void CommandName::Initialize() {
@@ -214,15 +295,15 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {
     // Configure your button bindings to commands here
-	JoystickButton(&controller, XboxController::Button::kA).WhenHeld(CommandName{subsystemName_p}); //declare a joystick button using the enumerator of the a button of `controller` (remember the &), then call `.WhenHeld()`, a binding that schedules the command when you hit the button and cancels it when you release it, `.WhenHeld()` takes a command, which takes subsytem pointers according to its constructor, the subsytems should be declared in the header already
+	JoystickButton(&controller, XboxController::Button::kA).WhenHeld(CommandName{&subsystemName}); //declare a joystick button using the enumerator of the a button of `controller` (remember the &), then call `.WhenHeld()`, a binding that schedules the command when you hit the button and cancels it when you release it, `.WhenHeld()` takes a command, which takes subsytem pointers according to its constructor, the subsytems should be declared in the header already
 
     JoystickButton(&controller, XboxController::Button::kB)
-        .WhenActive(CommandName{subsytemName_p})
-        .WhileHeld(CommandName2{subsystemName_p}); //bindings return the original button, so they can be chained together
+        .WhenActive(CommandName{&subsytemName})
+        .WhileHeld(CommandName2{&subsystemName}); //bindings return the original button, so they can be chained together
 
     (JoystickButton(&controller, XboxController::Button::kX)
         || JoystickButton(&controller, XboxController::Button::kY))
-        .WhileActiveOnce(CommandName{subsystemName_p}); //trigger composition, if either is pressed, CommandName will be scheduled (must use WhileActiveOnce() rather than whenHeld() because composition returns a trigger, not a button)
+        .WhileActiveOnce(CommandName{&subsystemName}); //trigger composition, if either is pressed, CommandName will be scheduled (must use WhileActiveOnce() rather than whenHeld() because composition returns a trigger, not a button)
 }
 ```
 
@@ -232,6 +313,7 @@ void RobotContainer::ConfigureButtonBindings() {
 |--|--|--|
 |`WPI_TalonFX`|`<ctre/Phoenix.h>`|-|
 |`WPI_TalonSRX`|`<ctre/Phoenix.h>`|-|
+|`frc::DoubleSolenoid`|`<frc/DoubleSolenoid.h>`|Positions can be accessed at `frc::DoubleSolenoid::Value::kForward`/`kReverse`/`kOff`. It should only be left on for a fraction of a second.|
 
 ## Naming Conventions:
 
@@ -244,6 +326,95 @@ CC is camelCase, PC is PaskalCase
 |Method/Function|PC||
 |General Variable|CC||
 |Parameter|CC|If a conflict is caused with a normal variable, add an `_a` suffix|
-|Pointer|CC|`_p`|
 
-TODO: solenoid stuff, multiple files
+## Smartdashboard/Shuffleboard Values:
+
+One very useful feature is that you can post values to a driver station dashboard. This can be used to show values for debugging, or just display useful information while driving. We use shuffleboard for this, as it looks nice, is simple to use, and is feature rich. There are two methods for putting values on shuffleboard: through smartdashboard's API, which shuffleboard can read, or through shuffleboard's own API. Smartdashboard is simpler, and should be used as of now (though shuffleboard's API supports more features such as tabs, and so may be switched to in the future).
+
+### Smartdashboard:
+
+You can put Boolean, Numeric, or String values on smartdashboard very simply by including `<frc/smartdashboard/SmartDashboard.h>` and calling `frc::SmartDashboard::PutBoolean`/`PutNumber`/`PutString("Displayed Name", [value])`. The value should appear on shuffleboard on the `SmartDashbaord` tab. ([docs](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/displaying-expressions.html))
+
+## Decorators:
+
+Decorators are a sort of addon to any commands you may have that are applied during binding. They add additional functionality, such as ending a command after a certain amount of time. They can be used by including `<frc2/command/ParallelRaceGroup.h>`, which is their return type, and calling the decorator method on the command of choice inside of the binding method. So, for example:
+```C++
+JoystickButton(&controller, XboxController::Button::kY).WhenActive(ToggleSolenoid{&solenoidSubsystem}.WithTimeout(3_ms));
+```
+One of the more useful decorators is `WithTimeout()`, which takes a `units::second_t` as a perameter. To use this, you'll need the `<units/time.h>` header. Read more about types of decorators on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html#command-decorator-methods).
+
+## Command Composition:
+
+Command can be made using other commands. This is called command composition. There are two main options: the `SequentialCommandGroup`, which runs each command one after another, and the `ParallelCommandGroup`, which runs all the commands at the same time. There are also two other types of `ParallelCommandGroup` which are used for more specific use cases (read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html#types-of-command-groups)). If you need a more complex command structure, it can be built by composing command compositions, making command groups out of command groups. Commands can be composed like so:  
+
+`ComposedCommandName.h`:
+```C++
+#pragma once
+
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/SequentialCommandGroup.h> //or any other command group
+
+#include "Command1.h"
+#include "Command2.h"
+#include "Command3.h"
+
+class ComposedCommandName : public frc2::CommandHelper<frc2::SequentialCommandGroup, ComposedCommandName> {
+public:
+	ComposedCommandName(SubsystemName* subsystem);
+
+private:
+	SubsystemName* subsystemName;
+};
+```
+
+`ComposedCommandName.cpp`:
+```C++
+#include "commands/ComposedCommandName.h"
+
+ComposedCommandName::ComposedCommandName(Motors* subsystem) : subsystemName(subsystem) {
+	AddCommands(Command1{subsystemName}, Command2{subsystemName}, Command3{subsystemName});
+}
+```
+
+Commands can also be composed inline, however this is more difficult. Read more about it here: [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html#inline-command-groups).
+
+## Autonomous:
+
+This guide is based off of this one: [guide](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html).
+1. Include `<frc/smartdashboard/SendableChooser.h>`
+2. In `RobotContainer.h` `private`, declare a variable of `SendableChooser`, which is able to be sent to the dashboard and allows you to choose an option from a list during runtime: `frc::SendableChooser<frc2::Command*> autonomousChooser;`
+3. Declare a variable of each command you would like to add to the chooser: `CommandName1 commandName1{&subsystemName};` (subsystemName must already be declared)
+4. In the `RobotContainer.cpp` constructor, set your default command and add the others:
+	- For the first command, use `SetDefaultOption()`: `autonomousChooser.SetDefaultOption("Display Name", &commandName1);`\
+	- For all others, use `AddOption()`: `autonomousChooser.AddOption("Display Name", &commandName2);`
+5. Put this method at the end of your `RobotContainer.cpp` (remember the corrosponding public `frc2::Command* GetAutonomousCommand();` in the header): 
+```C++
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+return autonomousChooser.GetSelected();
+}
+```
+6. In `Robot.cpp` `AutonomousInit()` schedule the command if it is available (remember public `void AutonomousInit() override;`in `Robot.h`): 
+```C++
+void Robot::AutonomousInit() {
+  autonomousCommand = robotContainer.GetAutonomousCommand();
+
+  if (autonomousCommand != nullptr) {
+    autonomousCommand->Schedule();
+  }
+}
+```
+7. Check that the scheduler is called in `RobotPeriodic()` (`Robot.cpp`):
+```C++
+void Robot::RobotPeriodic() {
+	frc2::CommandScheduler::GetInstance().Run();
+}
+```
+8. Cancel the autonomous command in `TeleopInit()`:
+```C++
+void Robot::TeleopInit() {
+	if (autonomousCommand != nullptr) {
+		autonomousCommand->Cancel();
+		autonomousCommand = nullptr;
+	}
+}
+```
