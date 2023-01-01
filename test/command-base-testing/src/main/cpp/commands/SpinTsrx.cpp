@@ -1,8 +1,7 @@
 #include "commands/SpinTsrx.h"
 
-SpinTsrx::SpinTsrx(Motors* subsystem){
+SpinTsrx::SpinTsrx(Motors* subsystem) : motors(subsystem) {
 	AddRequirements(subsystem);
-	motors = new Motors();
 }
 
 void SpinTsrx::Initialize() {

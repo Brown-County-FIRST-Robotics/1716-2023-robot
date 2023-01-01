@@ -1,6 +1,6 @@
 #include "commands/SpinAll.h"
 
-SpinAll::SpinAll(Motors* subsystem){
+SpinAll::SpinAll(Motors* subsystem) : motors(subsystem) {
 	AddRequirements(subsystem);
 	motors = new Motors();
 }
