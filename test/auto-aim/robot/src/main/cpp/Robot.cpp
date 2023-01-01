@@ -86,6 +86,8 @@ public:
 	double target_distance;
 	double final_angle;
 	bool firing = false;
+	bool aiming=false;
+	bool hasBall = false;
 
 	void SimulationPeriodic()
 	{
@@ -93,63 +95,73 @@ public:
 
 	void TeleopPeriodic()
 	{	
-		if(firing){
-			if(shooter_solenoid_timer.HasElapsed(.1_s) && .2_s>shooter_solenoid_timer.Get()){
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-			}
+		if(hasBall) {
+			if(firing){
+				if(shooter_solenoid_timer.HasElapsed(.1_s) && .2_s>shooter_solenoid_timer.Get()){
+					shooter_solenoid.Set(DoubleSolenoid::kOff);
+				}
 
-			if(shooter_solenoid_timer.HasElapsed(.5_s) && .55_s>shooter_solenoid_timer.Get()){
-				shooter_solenoid.Set(DoubleSolenoid::kReverse);
-			}
+				if(shooter_solenoid_timer.HasElapsed(.5_s) && .55_s>shooter_solenoid_timer.Get()){
+					shooter_solenoid.Set(DoubleSolenoid::kReverse);
+				}
 
-			if(shooter_solenoid_timer.HasElapsed(.6_s) && .7_s>shooter_solenoid_timer.Get()){
-				shooter_solenoid_timer.Stop();
-				shooter_solenoid_timer.Reset();
-				shooter_solenoid.Set(DoubleSolenoid::kOff);
-				firing=false;
-				shooting=false;
-				pigeon_target = -100;
-				last_token = -1;
-			}
-		}
-
-		if(shooting){
-			if(((potentiometer.GetVoltage()*pot_m)+pot_b)-final_angle<angle_threshold){
-				firing=true;
-				shooter_solenoid_timer.Start();
-				shooter_solenoid.Set(DoubleSolenoid::kForward);
-			}else{
-				shooter_angle.Set((((potentiometer.GetVoltage()*pot_m)+pot_b)-final_angle)/30);
-			}
-			return;
-		}
-
-		// check if shooting is possible
-		if(last_token!=token.GetDouble(0.0)){ // check for new value
-			if(atan2(left_right.GetDouble(0.0),distance.GetDouble(0.0)) < angle_threshold){ //check if angle is accurate enough
-				mecDrive.DriveCartesian(0,0,0);
-				shooting=true;
-				target_distance=distance.GetDouble(0.0); // x
-				target_height=up_down.GetDouble(0.0); // y
-				final_angle=atan((pow(velocity,2)+pow(pow(velocity,4)-(g*(g*pow(target_distance,2)+2*target_height*pow(velocity,2))),0.5))/(g*target_distance));
+				if(shooter_solenoid_timer.HasElapsed(.6_s) && .7_s>shooter_solenoid_timer.Get()){
+					shooter_solenoid_timer.Stop();
+					shooter_solenoid_timer.Reset();
+					shooter_solenoid.Set(DoubleSolenoid::kOff);
+					firing=false;
+					shooting=false;
+					pigeon_target = -100;
+					last_token = -1;
+				}
 				return;
-			} 
-		}
+			}
 
-		if(last_token==token.GetDouble(0.0) && pigeon_target!=-100){ // no new value and pigeon has target
-			mecDrive.DriveCartesian(0,0,(pigeon_target-(pigeon.GetYaw()*3.1415/180))/10);
-		}else if(last_token!=token.GetDouble(0.0)){ //new value
-			std::cout << "Apriltag found\n";
-			double dist = distance.GetDouble(0.0);
-			double lr = left_right.GetDouble(0.0);
-			double theta = atan2(lr,dist);
-			pigeon_target = int(pigeon.GetYaw() + 360.0 + theta) % 360;
-			last_token=token.GetDouble(0.0);
-			return;
-		}else if(pigeon_target==-100 && last_token==-1){ //no target and fiducial has not been seen
-			mecDrive.DriveCartesian(0,0,sweep_speed);
+			if(shooting){
+				if(((potentiometer.GetVoltage()*pot_m)+pot_b)-final_angle<angle_threshold){
+					firing=true;
+					shooter_solenoid_timer.Start();
+					shooter_solenoid.Set(DoubleSolenoid::kForward);
+				}else{
+					shooter_angle.Set((((potentiometer.GetVoltage()*pot_m)+pot_b)-final_angle)/30);
+				}
+				return;
+			}
+			if(aiming){
+				// check if shooting is possible
+				if(last_token!=token.GetDouble(0.0)){ // check for new value
+					if(atan2(left_right.GetDouble(0.0),distance.GetDouble(0.0)) < angle_threshold){ //check if angle is accurate enough
+						mecDrive.DriveCartesian(0,0,0);
+						shooting=true;
+						target_distance=distance.GetDouble(0.0); // x
+						target_height=up_down.GetDouble(0.0); // y
+						final_angle=atan((pow(velocity,2)+pow(pow(velocity,4)-(g*(g*pow(target_distance,2)+2*target_height*pow(velocity,2))),0.5))/(g*target_distance)); // from: https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)
+						return;
+					} 
+				}
+
+				if(last_token==token.GetDouble(0.0) && pigeon_target!=-100){ // no new value and pigeon has target
+					mecDrive.DriveCartesian(0,0,(pigeon_target-(pigeon.GetYaw()*3.1415/180))/10);
+				}else if(last_token!=token.GetDouble(0.0)){ //new value
+					std::cout << "Apriltag found\n";
+					double dist = distance.GetDouble(0.0);
+					double lr = left_right.GetDouble(0.0);
+					double theta = atan2(lr,dist);
+					pigeon_target = int(pigeon.GetYaw() + 360.0 + theta) % 360;
+					last_token=token.GetDouble(0.0);
+					return;
+				}else if(pigeon_target==-100 && last_token==-1){ //no target and fiducial has not been seen
+					mecDrive.DriveCartesian(0,0,sweep_speed);
+				}
+				return;
+			}
+		}else{
+			
 		}
 	}
+		
+
+	
 
 	void RobotInit()
 	{

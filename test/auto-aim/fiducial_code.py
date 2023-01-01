@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import sys, os
 from networktables import NetworkTables
-
+import random
 
 # I am getting the tag sizes from a json file for all apriltags
 
@@ -142,5 +142,6 @@ while True:
                 table.putNumber("roll", prvecs[2])
                 table.putNumber("pitch", prvecs[0])
                 table.putNumber("yaw", prvecs[1])
+                table.putNumber("random", random.randint(1,1000)
 
                 #sys.stdout.write('\a')
