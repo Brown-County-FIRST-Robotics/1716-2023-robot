@@ -6,16 +6,16 @@
 
 class Motors : public frc2::SubsystemBase {
  public:
-  //Method declarations go here
-  Motors(); //Constructor
+	//Method declarations go here
+	Motors(); //Constructor
 
-  //void Periodic() override; //there are built in methods such as this, which is called once per frame
+	//void Periodic() override; //there are built in methods such as this, which is called once per frame
 
-  void SetTfx(double speed); //Declare your own methods like so
-  void SetTsrx(double speed);
+	void SetTfx(double speed); //Declare your own methods like so
+	void SetTsrx(double speed);
 
-  private:
-    //subsystem components such as motors
-    WPI_TalonFX tfx;
-    WPI_TalonSRX tsrx;
+	private:
+		//subsystem components such as motors
+		WPI_TalonFX tfx;
+		WPI_TalonSRX tsrx;
 };

@@ -7,7 +7,11 @@
 
 class Robot : public frc::TimedRobot {
  public:
-  void RobotPeriodic() override;
-  
-  RobotContainer m_container;
+	void RobotPeriodic() override;
+	void AutonomousInit() override;
+	void TeleopInit() override;
+	
+private:
+	frc2::Command* autonomousCommand = nullptr;
+	RobotContainer robotContainer;
 };
