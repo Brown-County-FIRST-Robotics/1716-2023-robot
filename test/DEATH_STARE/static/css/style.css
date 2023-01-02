@@ -1,22 +1,49 @@
 #cam
 {
-	max-height: 700px;
-	max-width: 1000px;
+	max-height: 500px;
 	display: block;
 	margin: auto;
+	width: auto;
+	height: auto;
 }
 
 #all_cams
 {
-	max-height: 700px;
-	max-width: 1000px;
+
+	max-height: 500px;
 	display: block;
 	margin: auto;
+	width: auto;
+	height: auto;
 }
 
 #logo
 {
 	max-height: 64px;
+}
+
+#robot
+{
+	height: 240px;
+	width: 300px;
+	justify-content: center;
+}
+
+.sidediv
+{
+	display: table;
+	align-items: center;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+}
+
+.side
+{
+	display: table-cell;
+	height: 240px;
+	width: 300px;		
+	vertical-align: middle;
 }
 
 .mt-5
