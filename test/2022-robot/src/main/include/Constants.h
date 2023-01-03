@@ -1,15 +1,27 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #pragma once
+#include <units/time.h>
 
-/**
- * The Constants header provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants.  This should not be used for any other
- * purpose.
- *
- * It is generally a good idea to place constants into subsystem- or
- * command-specific namespaces within this header, which can then be used where
- * they are needed.
- */
+#define SOLENOIDSETLENGTH 3_ms;
+
+enum ArmConstants {
+	SHOOTERMOTOR1ID = 6,
+	SHOOTERMOTOR2ID = 7,
+
+	SHOOTERSOLENOIDFORWARDID = 0,
+	SHOOTERSOLENOIDREVERSEID = 1,
+
+	CLIMBERSOLENOIDFORWARDID = 4,
+	CLIMBERSOLENOIDREVERSEID = 5
+};
+
+enum ArmAngleConstants {
+	ANGLEMOTOR1ID = 10,
+	ANGLEMOTOR2ID = 11
+};
+
+enum DrivetrainConstants {
+	FRONTRIGHTID = 2,
+	FRONTLEFTID = 1,
+	BACKRIGHTID = 3,
+	BACKLEFTID = 0
+};
