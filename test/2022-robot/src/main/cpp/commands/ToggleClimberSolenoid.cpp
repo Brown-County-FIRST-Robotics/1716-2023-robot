@@ -3,17 +3,20 @@
 
 ToggleClimberSolenoid::ToggleClimberSolenoid(Arm* subsystem) : arm(subsystem) {
 	AddRequirements(subsystem);
-	currentPosition = arm->GetClimberSolenoid();
+	currentPosition = frc::DoubleSolenoid::Value::kReverse;
+	//currentPosition = arm->GetClimberSolenoid();
 }
 
 void ToggleClimberSolenoid::Initialize() {
 	if (currentPosition == frc::DoubleSolenoid::Value::kReverse) {
 		arm->SetClimberSolenoid(frc::DoubleSolenoid::Value::kForward);
 		currentPosition = frc::DoubleSolenoid::Value::kForward;
+		frc::SmartDashboard::PutBoolean("Climber Solenoid", true);
 	}
 	else { //if not reverse, set to reverse
 		arm->SetClimberSolenoid(frc::DoubleSolenoid::Value::kReverse);
 		currentPosition = frc::DoubleSolenoid::Value::kReverse;
+		frc::SmartDashboard::PutBoolean("Climber Solenoid", false);
 	}
 }
 

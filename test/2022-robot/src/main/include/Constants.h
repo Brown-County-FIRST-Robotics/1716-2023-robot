@@ -1,7 +1,9 @@
 #pragma once
 #include <units/time.h>
 
-#define SOLENOIDSETLENGTH 3_ms;
+namespace SolenoidConstants {
+	const units::second_t SOLENOIDSETLENGTH = 3_ms;
+}
 
 enum ArmConstants {
 	SHOOTERMOTOR1ID = 6,
@@ -10,8 +12,8 @@ enum ArmConstants {
 	SHOOTERSOLENOIDFORWARDID = 0,
 	SHOOTERSOLENOIDREVERSEID = 1,
 
-	CLIMBERSOLENOIDFORWARDID = 4,
-	CLIMBERSOLENOIDREVERSEID = 5
+	CLIMBERSOLENOIDFORWARDID = 2,
+	CLIMBERSOLENOIDREVERSEID = 3
 };
 
 enum ArmAngleConstants {

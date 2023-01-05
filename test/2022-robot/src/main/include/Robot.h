@@ -14,6 +14,8 @@ public:
 	void RobotPeriodic() override;
 	// void AutonomousInit() override;
 	// void TeleopInit() override;
+	void DisabledPeriodic() override;
+	void TeleopPeriodic() override;
 
 //private:
 };

@@ -4,8 +4,12 @@
 #include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotPeriodic() {
-  frc2::CommandScheduler::GetInstance().Run();
+	frc2::CommandScheduler::GetInstance().Run();
 }
+
+void Robot::DisabledPeriodic() { }
+
+void Robot::TeleopPeriodic() { }
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
