@@ -5,12 +5,11 @@
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/DoubleSolenoid.h>
 
-
 class Arm : public frc2::SubsystemBase {
-public:
-    Arm();
+ public:
+	Arm();
 
-    void SetShooter(double speed);
+	void SetShooter(double speed);
 
 	void SetShooterSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetShooterSolenoid();
@@ -18,12 +17,12 @@ public:
 	void SetClimberSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetClimberSolenoid();
 
-private:
-    WPI_TalonFX shooterMotor1;
-    WPI_TalonFX shooterMotor2;
-	frc::MotorControllerGroup shooterMotors;
+	private:
+		WPI_TalonFX shooterMotor1;
+		WPI_TalonFX shooterMotor2;
+		frc::MotorControllerGroup shooterMotors;
 
-	frc::DoubleSolenoid shooterSolenoid;
+ 		frc::DoubleSolenoid shooterSolenoid;
 
-	frc::DoubleSolenoid climberSolenoid; //birb
+ 		frc::DoubleSolenoid climberSolenoid; //birb
 };
