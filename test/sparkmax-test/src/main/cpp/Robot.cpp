@@ -6,15 +6,17 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include <rev/CANSparkMax.h>
+#include "rev/CANSparkMax.h"
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <iostream>
 
-#define MOTOR_ID 0
-rev::CANSparkMax motor{MOTOR_ID, rev::CANSparkMax::MotorType::kBrushed};
+#define MOTOR_ID 31
+rev::CANSparkMax motor{ MOTOR_ID, rev::CANSparkMax::MotorType::kBrushless };
 frc::XboxController xbox{0};
 
 void Robot::RobotInit() {
+  motor.RestoreFactoryDefaults();
 }
 
 /**
@@ -70,6 +72,7 @@ void Robot::TeleopInit() {
  */
 void Robot::TeleopPeriodic() {
   motor.Set(0.7); 
+  std::cout << motor.Get() << '\n';
 }
 
 /**
