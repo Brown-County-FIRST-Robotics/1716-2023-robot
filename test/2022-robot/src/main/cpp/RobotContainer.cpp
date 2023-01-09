@@ -7,6 +7,9 @@
 #include "RobotContainer.h"
 #include "Constants.h"
 
+#include "commands/ToggleClimberSolenoid.h"
+#include "commands/Shoot.h"
+
 using frc::XboxController;
 using namespace frc2;
 
