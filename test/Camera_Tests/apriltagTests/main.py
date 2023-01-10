@@ -32,7 +32,7 @@ print(video_size)
 #focal_length = video_size[1]
 #camera_center = (video_size[1] / 2, video_size[0] / 2)
 
-f=open('logi.json','r')
+f=open('camera_calibrations/ms.json','r')
 mtx,dist=json.loads(f.read())
 print(mtx)
 mtx=np.array(mtx)
