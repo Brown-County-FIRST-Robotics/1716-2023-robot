@@ -43,7 +43,8 @@ def getCameraError(pos, error):  # pos is [pitch, yaw, left_right, up_down, dist
     for i, canidate in enumerate([i1[0] for i1 in error]):
         if sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]) < lowest[1]:
             lowest = (i, sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]))
-    return error[i][1]
+    
+    return error[lowest[0]][1]
 
 
 while True:
@@ -78,66 +79,60 @@ while True:
         for i, detection in enumerate(detection_results):
             if detection.tag_id > 8:
                 continue
-            ptA, ptB, ptC, ptD = detection.corners
-            ptA = convert(ptA)
-            ptB = convert(ptB)
-            ptC = convert(ptC)
-            ptD = convert(ptD)
 
-            if mtx is not None:
-                imagePoints = detection.corners.reshape(1, 4, 2)
+            imagePoints = detection.corners.reshape(1, 4, 2)
 
-                # Get the tag size from .json file
+            # Get the tag size from .json file
 
-                ob_pt1 = [-tag_size / 2, -tag_size / 2, 0.0]
-                ob_pt2 = [tag_size / 2, -tag_size / 2, 0.0]
-                ob_pt3 = [tag_size / 2, tag_size / 2, 0.0]
-                ob_pt4 = [-tag_size / 2, tag_size / 2, 0.0]
-                ob_pts = ob_pt1 + ob_pt2 + ob_pt3 + ob_pt4
-                object_pts = np.array(ob_pts).reshape(4, 3)
+            ob_pt1 = [-tag_size / 2, -tag_size / 2, 0.0]
+            ob_pt2 = [tag_size / 2, -tag_size / 2, 0.0]
+            ob_pt3 = [tag_size / 2, tag_size / 2, 0.0]
+            ob_pt4 = [-tag_size / 2, tag_size / 2, 0.0]
+            ob_pts = ob_pt1 + ob_pt2 + ob_pt3 + ob_pt4
+            object_pts = np.array(ob_pts).reshape(4, 3)
 
-                opoints = np.array([
-                    -1, -1, 0,
-                    1, -1, 0,
-                    1, 1, 0,
-                    -1, 1, 0,
-                    -1, -1, -2 * 1,
-                    1, -1, -2 * 1,
-                    1, 1, -2 * 1,
-                    -1, 1, -2 * 1,
-                ]).reshape(-1, 1, 3) * 0.5 * tag_size
+            opoints = np.array([
+                -1, -1, 0,
+                1, -1, 0,
+                1, 1, 0,
+                -1, 1, 0,
+                -1, -1, -2 * 1,
+                1, -1, -2 * 1,
+                1, 1, -2 * 1,
+                -1, 1, -2 * 1,
+            ]).reshape(-1, 1, 3) * 0.5 * tag_size
 
-                imgPointsArr.append(imagePoints)
-                objPointsArr.append(object_pts)
-                opointsArr.append(opoints)
+            imgPointsArr.append(imagePoints)
+            objPointsArr.append(object_pts)
+            opointsArr.append(opoints)
 
-                # mtx - the camera calibration's intrinsics
-                _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, mtx, dist, flags=cv2.SOLVEPNP_ITERATIVE)
+            # mtx - the camera calibration's intrinsics
+            _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, mtx, dist, flags=cv2.SOLVEPNP_ITERATIVE)
 
-                # Draws the edges of the pose onto the image
-                pitch = prvecs[0]
-                yaw = prvecs[1]
-                roll = prvecs[2]
+            # Draws the edges of the pose onto the image
+            pitch = prvecs[0]
+            yaw = prvecs[1]
+            roll = prvecs[2]
 
-                left_right = -ptvecs[0] - ptvecs[2] / 4
-                up_down = (ptvecs[1] + ptvecs[2] / 16) * 2
-                distance = ptvecs[2]
+            left_right = -ptvecs[0] - ptvecs[2] / 4
+            up_down = (ptvecs[1] + ptvecs[2] / 16) * 2
+            distance = ptvecs[2]
 
-                if math.fabs(roll) > roll_threshold:
-                    print('discarded a value')
-                    continue
+            if math.fabs(roll) > roll_threshold:
+                print('discarded a value')
+                continue
 
-                table.putNumber("april_number", detection.tag_id)
-                table.putNumber("distance", distance)
-                table.putNumber("up_down", up_down)
-                table.putNumber("left_right", left_right)
-                table.putNumber("pitch", pitch)
-                table.putNumber("yaw", yaw)
+            table.putNumber("april_number", detection.tag_id)
+            table.putNumber("distance", distance)
+            table.putNumber("up_down", up_down)
+            table.putNumber("left_right", left_right)
+            table.putNumber("pitch", pitch)
+            table.putNumber("yaw", yaw)
 
-                errors = getCameraError([pitch, yaw, left_right, up_down, distance], camera_error)
+            errors = getCameraError([pitch, yaw, left_right, up_down, distance], camera_error)
 
-                table.putNumber("distance_error", errors[4])
-                table.putNumber("up_down_error", errors[3])
-                table.putNumber("left_right_error", errors[2])
-                table.putNumber("pitch_error", errors[0])
-                table.putNumber("yaw_error", errors[1])
+            table.putNumber("distance_error", errors[4])
+            table.putNumber("up_down_error", errors[3])
+            table.putNumber("left_right_error", errors[2])
+            table.putNumber("pitch_error", errors[0])
+            table.putNumber("yaw_error", errors[1])
