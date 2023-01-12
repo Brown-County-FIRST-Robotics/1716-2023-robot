@@ -6,19 +6,16 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include <rev/CANSparkMax.h>
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
-
-#define MOTOR_ID 0
-rev::CANSparkMax motor{MOTOR_ID, rev::CANSparkMax::MotorType::kBrushed};
-frc::XboxController xbox{0};
+#include <iostream>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
 }
 
 /**
- * This function is called every robot packet, no matter the mode. Use
+ * This function is called every robot packet, n>o matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and test.
  *
@@ -48,10 +45,17 @@ void Robot::AutonomousInit() {
   if (m_autonomousCommand != nullptr) {
     m_autonomousCommand->Schedule();
   }
+
+  m_motorStart = std::chrono::system_clock::now();
 }
 
 void Robot::AutonomousPeriodic() {
-
+  std::chrono::time_point now = std::chrono::system_clock::now();
+  std::chrono::duration<double> timeSinceStart = now - m_motorStart;
+  double power = timeSinceStart.count() * 0.2;  
+  m_motor.Set((power) > MAX_POWER ? MAX_POWER : (power)); 
+  std::cout << m_motor.Get() << '\n';
+  frc::SmartDashboard::PutNumber("spark max power", m_motor.Get());
 }
 
 void Robot::TeleopInit() {
@@ -68,14 +72,16 @@ void Robot::TeleopInit() {
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {
-  motor.Set(0.7); 
+void Robot::TeleopPeriodic() { 
+  
 }
 
 /**
  * This function is called periodically during test mode.
  */
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic() {
+  
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
