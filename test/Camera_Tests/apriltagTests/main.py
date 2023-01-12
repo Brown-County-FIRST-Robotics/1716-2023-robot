@@ -7,6 +7,7 @@ y/roll
 . ____x/pitch
 z/yaw
 '''
+import math
 import time
 
 import apriltag
@@ -36,9 +37,7 @@ NetworkTables.initialize(server=sys.argv[3])
 #This will be the network table that will store the position of an april tag
 #will store the largest april tag
 table = NetworkTables.getTable("apriltag")
-table.putNumber("x", 0)
-table.putNumber("y", 0)
-table.putNumber("side", 0)
+
 
 
 cam = cv2.VideoCapture()
@@ -47,7 +46,7 @@ cam.open(f'/dev/video{sys.argv[1]}')
 tag_size = 8/2.54
 
 video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
+roll_threshold=0.3
 
 
 with open(sys.argv[2],'r') as f:
@@ -56,11 +55,18 @@ with open(sys.argv[2],'r') as f:
     dist=np.array(dist)
 
 with open('camera_error.json', 'r') as f:
-    camera_error=json.loads(f.read())[0]
+    camera_error=json.loads(f.read())
 
 
 def convert(pt):
-    return (int(pt[0]), int(pt[1]))
+    return (float(pt[0]), float(pt[1]))
+
+def getCameraError(pos, error): # pos is [pitch, yaw, left_right, up_down, distance]
+    lowest=(-1,1000000000) # (index, value)
+    for i,canidate in enumerate([i1[0] for i1 in error]):
+        if sum([math.fabs(iii-ii) for ii,iii in zip(canidate,pos)])<lowest[1]:
+            lowest=(i,sum([math.fabs(iii-ii) for ii,iii in zip(canidate,pos)]))
+    return error[i][1]
 
 
 while True:
@@ -103,10 +109,6 @@ while True:
             ptC = convert(ptC)
             ptD = convert(ptD)
 
-            #cv2.line(img, ptA, ptB, (0, 0, 255), 2)
-            #/cv2.line(img, ptB, ptC, (0, 0, 255), 2)
-            #cv2.line(img, ptC, ptD, (0, 0, 255), 2)
-            #cv2.line(img, ptD, ptA, (0, 0, 255), 2)
 
             if mtx is not None:
                 imagePoints = detection.corners.reshape(1,4,2)
@@ -142,13 +144,31 @@ while True:
 
                 # Draws the edges of the pose onto the image
                 #print(str(prvecs) + '\n' + str(ptvecs) + '\n\n\n')
-                os.system('clear')
-                print(f'pitch:{prvecs[0]}')
-                print(f'yaw:{prvecs[1]}')
-                print(f'roll:{prvecs[2]}') #
+                pitch=prvecs[0]
+                yaw=prvecs[1]
+                roll=prvecs[2]
 
-                print(f'left right:{-ptvecs[0]-ptvecs[2]/4}')
-                print(f'up down:{(ptvecs[1]+ptvecs[2]/16)*2}')
-                print(f'distance:{ptvecs[2]}')
-                print()
+                left_right=-ptvecs[0]-ptvecs[2]/4
+                up_down=(ptvecs[1]+ptvecs[2]/16)*2
+                distance=ptvecs[2]
+
+                if math.fabs(roll)>roll_threshold:
+                    print('discarded a value')
+                    continue
+
                 #sys.stdout.write("\a")
+
+                table.putNumber("april_number", detection.tag_id)
+                table.putNumber("distance", distance)
+                table.putNumber("up_down", up_down)
+                table.putNumber("left_right", left_right)
+                table.putNumber("pitch", pitch)
+                table.putNumber("yaw", yaw)
+
+                errors=getCameraError([pitch, yaw, left_right, up_down, distance],camera_error)
+
+                table.putNumber("distance_error", errors[4])
+                table.putNumber("up_down_error", errors[3])
+                table.putNumber("left_right_error", errors[2])
+                table.putNumber("pitch_error", errors[0])
+                table.putNumber("yaw_error", errors[1])
