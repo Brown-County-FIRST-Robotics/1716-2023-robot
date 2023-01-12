@@ -15,36 +15,55 @@ import numpy as np
 import sys, os
 import random
 import json
+from networktables import NetworkTables
+
 
 # I am getting the tag sizes from a json file for all apriltags
 
 # tag_sizes, tvecs, rvecs = get_extrinsics(json_file)
 
+
+if len(sys.argv)!=4:
+    print('Run "python3 main.py {camera number} {camera calibration filename} {server IP address}"')
+    print('')
+    print('The calibration files should be in the "camera_calibrations/" directory')
+    print('The IP address for the robot is 10.17.16.2, but if you are testing locally, use 127.0.0.1')
+    sys.exit()
+
+NetworkTables.initialize(server=sys.argv[3])
+
+
+#This will be the network table that will store the position of an april tag
+#will store the largest april tag
+table = NetworkTables.getTable("apriltag")
+table.putNumber("x", 0)
+table.putNumber("y", 0)
+table.putNumber("side", 0)
+
+
 cam = cv2.VideoCapture()
-cam.open('/dev/video3')
+cam.open(f'/dev/video{sys.argv[1]}')
 
 tag_size = 8/2.54
 
 video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-print(video_size)
 
-#focal_length = video_size[1]
-#camera_center = (video_size[1] / 2, video_size[0] / 2)
 
-f=open('camera_calibrations/ms.json','r')
-mtx,dist=json.loads(f.read())
-print(mtx)
-mtx=np.array(mtx)
-dist=np.array(dist)
+with open(sys.argv[2],'r') as f:
+    mtx,dist=json.loads(f.read())
+    mtx=np.array(mtx)
+    dist=np.array(dist)
+
+with open('camera_error.json', 'r') as f:
+    camera_error=json.loads(f.read())[0]
+
 
 def convert(pt):
     return (int(pt[0]), int(pt[1]))
 
 
-apriltags_found=0
-data=[]
-while apriltags_found<500:
+while True:
     img = cam.read()[1]
 
     # Convert Images to grayscale
@@ -76,7 +95,7 @@ while apriltags_found<500:
 
     if num_detections > 0:
         for i, detection in enumerate(detection_results):
-            if detection.tag_id!=3:
+            if detection.tag_id>8:
                 continue
             (ptA, ptB, ptC, ptD) = detection.corners
             ptA = convert(ptA)
@@ -123,7 +142,6 @@ while apriltags_found<500:
 
                 # Draws the edges of the pose onto the image
                 #print(str(prvecs) + '\n' + str(ptvecs) + '\n\n\n')
-                apriltags_found+=1
                 os.system('clear')
                 print(f'pitch:{prvecs[0]}')
                 print(f'yaw:{prvecs[1]}')
@@ -134,27 +152,3 @@ while apriltags_found<500:
                 print(f'distance:{ptvecs[2]}')
                 print()
                 #sys.stdout.write("\a")
-                data.append([prvecs[0],
-                             prvecs[1],
-                             prvecs[2],
-                             -ptvecs[0]-ptvecs[2]/4,
-                             (ptvecs[1]+ptvecs[2]/16)*2,
-                             ptvecs[2]])
-    #time.sleep(0.1)
-pitch=[float(i[0]) for i in data]
-yaw=[float(i[1]) for i in data]
-roll=[float(i[2]) for i in data]
-left_right=[float(i[3]) for i in data]
-up_down=[float(i[4]) for i in data]
-distance=[float(i[5]) for i in data]
-
-f=open('data.json','r')
-data=json.loads(f.read())
-f.close()
-data.append([
-    [np.average(pitch),np.average(yaw),np.average(left_right),np.average(up_down),np.average(distance)],
-    [np.std(pitch),np.std(yaw),np.std(left_right),np.std(up_down),np.std(distance)]
-])
-f=open('data.json','w')
-f.write(json.dumps(data))
-f.close()
