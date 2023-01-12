@@ -48,6 +48,11 @@ image_size = None # Determined at runtime
 
 
 #images = glob.glob('/tmp/2022*.jpg')
+if len(sys.argv)==1:
+    print('Run "python3 CalibrateCamera.py {image files}"')
+    print()
+    print('You should use a glob pattern for the files')
+    sys.exit()
 images = [cv2.imread(i) for i in sys.argv[1:]]
 image_count = 0
 
@@ -62,12 +67,8 @@ for img in images:
             image=gray,
             dictionary=ARUCO_DICT)
 
-#    cv2.imshow('Charuco board', img)
     if not corners: #didn't see board at all
-        print('no corners')
-        cv2.imshow('Charuco board', img)
         continue
-    print('found')
     # Outline the aruco markers found in our query image
     img = aruco.drawDetectedMarkers(
             image=img, 
@@ -83,7 +84,7 @@ for img in images:
     # If a Charuco board was found, let's collect image/corner points
     # Requiring at least 20 squares
     if response > 20:
-        print('runnning calibration math')
+        #print('runnning calibration math')
         # Add these corners and ids to our calibration arrays
         corners_all.append(charuco_corners)
         ids_all.append(charuco_ids)
@@ -102,11 +103,8 @@ for img in images:
         proportion = max(img.shape) / 1000.0
         img = cv2.resize(img, (int(img.shape[1]/proportion), int(img.shape[0]/proportion)))
         # Pause to display each image, waiting for key press
-        #cv2.imshow('Charuco board', img)
-        #cv2.waitKey(0)
         image_count+=1
-    else:
-        print(f"Not able to detect a charuco board in image")
+
 
 # Destroy any open CV windows
 cv2.destroyAllWindows()
@@ -137,15 +135,13 @@ calibration, cameraMatrix, distCoeffs, rvecs, tvecs = aruco.calibrateCameraCharu
         distCoeffs=None)
     
 # Print matrix and distortion coefficient to the console
-print(cameraMatrix)
-print(distCoeffs)
-    
+
 # Save values to be used where matrix+dist is required, for instance for posture estimation
 # I save files in a pickle file, but you can use yaml or whatever works for you
-f = open('calibration.pckl', 'w')
+f = open(f'camera_calibrations/{input("camera name:")}.json', 'w')
 json.dump(([list(i) for i in cameraMatrix], [list(i) for i in distCoeffs]), f)
 f.close()
     
 # Print to console our success
-print(f'Calibration successful. Calibration file used: calibration.pckl')
+print(f'Calibration successful.')
 
