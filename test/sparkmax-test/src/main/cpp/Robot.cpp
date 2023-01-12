@@ -9,13 +9,13 @@
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <iostream>
-
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
 }
 
 /**
- * This function is called every robot packet, no matter the mode. Use
+ * This function is called every robot packet, n>o matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and test.
  *
@@ -52,9 +52,10 @@ void Robot::AutonomousInit() {
 void Robot::AutonomousPeriodic() {
   std::chrono::time_point now = std::chrono::system_clock::now();
   std::chrono::duration<double> timeSinceStart = now - m_motorStart;
-  double power = timeSinceStart.count() * 0.3;  
+  double power = timeSinceStart.count() * 0.2;  
   m_motor.Set((power) > MAX_POWER ? MAX_POWER : (power)); 
   std::cout << m_motor.Get() << '\n';
+  frc::SmartDashboard::PutNumber("spark max power", m_motor.Get());
 }
 
 void Robot::TeleopInit() {
