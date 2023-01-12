@@ -1,30 +1,12 @@
-# (x,y,z, roll, pitch, yaw)
-'''
------- <default position
-y/roll
-|
-|
-. ____x/pitch
-z/yaw
-'''
-import math
-import time
-
+import math, time, sys, json
 import apriltag
 import cv2
 import numpy as np
-import sys, os
-import random
-import json
 from networktables import NetworkTables
 
 
-# I am getting the tag sizes from a json file for all apriltags
 
-# tag_sizes, tvecs, rvecs = get_extrinsics(json_file)
-
-
-if len(sys.argv)!=4:
+if len(sys.argv) != 4:
     print('Run "python3 main.py {camera number} {camera calibration filename} {server IP address}"')
     print('')
     print('The calibration files should be in the "camera_calibrations/" directory')
@@ -33,39 +15,34 @@ if len(sys.argv)!=4:
 
 NetworkTables.initialize(server=sys.argv[3])
 
-
-#This will be the network table that will store the position of an april tag
-#will store the largest april tag
 table = NetworkTables.getTable("apriltag")
 
-
-
 cam = cv2.VideoCapture()
-cam.open(f'/dev/video{sys.argv[1]}')
+cam.open(f'/dev/video{int(sys.argv[1])}')
 
-tag_size = 8/2.54
+tag_size = 8 / 2.54
 
 video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-roll_threshold=0.3
+roll_threshold = 0.3
 
-
-with open(sys.argv[2],'r') as f:
-    mtx,dist=json.loads(f.read())
-    mtx=np.array(mtx)
-    dist=np.array(dist)
+with open(sys.argv[2], 'r') as f:
+    mtx, dist = json.loads(f.read())
+    mtx = np.array(mtx)
+    dist = np.array(dist)
 
 with open('camera_error.json', 'r') as f:
-    camera_error=json.loads(f.read())
+    camera_error = json.loads(f.read())
 
 
 def convert(pt):
     return (float(pt[0]), float(pt[1]))
 
-def getCameraError(pos, error): # pos is [pitch, yaw, left_right, up_down, distance]
-    lowest=(-1,1000000000) # (index, value)
-    for i,canidate in enumerate([i1[0] for i1 in error]):
-        if sum([math.fabs(iii-ii) for ii,iii in zip(canidate,pos)])<lowest[1]:
-            lowest=(i,sum([math.fabs(iii-ii) for ii,iii in zip(canidate,pos)]))
+
+def getCameraError(pos, error):  # pos is [pitch, yaw, left_right, up_down, distance]
+    lowest = (-1, 1000000000)  # (index, value)
+    for i, canidate in enumerate([i1[0] for i1 in error]):
+        if sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]) < lowest[1]:
+            lowest = (i, sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]))
     return error[i][1]
 
 
@@ -77,22 +54,20 @@ while True:
 
     # AprilTag detector options
     options = apriltag.DetectorOptions(families='tag16h5',
-                                    border=1,
-                                    nthreads=4,
-                                    quad_decimate=1.0,
-                                    quad_blur=0.0,
-                                    refine_edges=True,
-                                    refine_decode=False,
-                                    refine_pose=True,
-                                    debug=False,
-                                    quad_contours=True)
+                                       border=1,
+                                       nthreads=4,
+                                       quad_decimate=1.0,
+                                       quad_blur=0.0,
+                                       refine_edges=True,
+                                       refine_decode=False,
+                                       refine_pose=True,
+                                       debug=False,
+                                       quad_contours=True)
 
     detector = apriltag.Detector(options)
 
-    # Detect the apriltags in the image
     detection_results = detector.detect(gray)
 
-    # Amount of april tags detected
     num_detections = len(detection_results)
 
     imgPointsArr = []
@@ -101,62 +76,56 @@ while True:
 
     if num_detections > 0:
         for i, detection in enumerate(detection_results):
-            if detection.tag_id>8:
+            if detection.tag_id > 8:
                 continue
-            (ptA, ptB, ptC, ptD) = detection.corners
+            ptA, ptB, ptC, ptD = detection.corners
             ptA = convert(ptA)
             ptB = convert(ptB)
             ptC = convert(ptC)
             ptD = convert(ptD)
 
-
             if mtx is not None:
-                imagePoints = detection.corners.reshape(1,4,2)
+                imagePoints = detection.corners.reshape(1, 4, 2)
 
                 # Get the tag size from .json file
 
-                ob_pt1 = [-tag_size/2, -tag_size/2, 0.0]
-                ob_pt2 = [ tag_size/2, -tag_size/2, 0.0]
-                ob_pt3 = [ tag_size/2,  tag_size/2, 0.0]
-                ob_pt4 = [-tag_size/2,  tag_size/2, 0.0]
+                ob_pt1 = [-tag_size / 2, -tag_size / 2, 0.0]
+                ob_pt2 = [tag_size / 2, -tag_size / 2, 0.0]
+                ob_pt3 = [tag_size / 2, tag_size / 2, 0.0]
+                ob_pt4 = [-tag_size / 2, tag_size / 2, 0.0]
                 ob_pts = ob_pt1 + ob_pt2 + ob_pt3 + ob_pt4
-                object_pts = np.array(ob_pts).reshape(4,3)
+                object_pts = np.array(ob_pts).reshape(4, 3)
 
                 opoints = np.array([
                     -1, -1, 0,
                     1, -1, 0,
-                    1,  1, 0,
-                    -1,  1, 0,
-                    -1, -1, -2*1,
-                    1, -1, -2*1,
-                    1,  1, -2*1,
-                    -1,  1, -2*1,
-                ]).reshape(-1, 1, 3) * 0.5*tag_size
-
+                    1, 1, 0,
+                    -1, 1, 0,
+                    -1, -1, -2 * 1,
+                    1, -1, -2 * 1,
+                    1, 1, -2 * 1,
+                    -1, 1, -2 * 1,
+                ]).reshape(-1, 1, 3) * 0.5 * tag_size
 
                 imgPointsArr.append(imagePoints)
                 objPointsArr.append(object_pts)
                 opointsArr.append(opoints)
 
                 # mtx - the camera calibration's intrinsics
-                good, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, mtx, dist, flags=cv2.SOLVEPNP_ITERATIVE)
-             #   imgpts, jac = cv2.projectPoints(opoints, prvecs, ptvecs, mtx, dcoeffs)
+                _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, mtx, dist, flags=cv2.SOLVEPNP_ITERATIVE)
 
                 # Draws the edges of the pose onto the image
-                #print(str(prvecs) + '\n' + str(ptvecs) + '\n\n\n')
-                pitch=prvecs[0]
-                yaw=prvecs[1]
-                roll=prvecs[2]
+                pitch = prvecs[0]
+                yaw = prvecs[1]
+                roll = prvecs[2]
 
-                left_right=-ptvecs[0]-ptvecs[2]/4
-                up_down=(ptvecs[1]+ptvecs[2]/16)*2
-                distance=ptvecs[2]
+                left_right = -ptvecs[0] - ptvecs[2] / 4
+                up_down = (ptvecs[1] + ptvecs[2] / 16) * 2
+                distance = ptvecs[2]
 
-                if math.fabs(roll)>roll_threshold:
+                if math.fabs(roll) > roll_threshold:
                     print('discarded a value')
                     continue
-
-                #sys.stdout.write("\a")
 
                 table.putNumber("april_number", detection.tag_id)
                 table.putNumber("distance", distance)
@@ -165,7 +134,7 @@ while True:
                 table.putNumber("pitch", pitch)
                 table.putNumber("yaw", yaw)
 
-                errors=getCameraError([pitch, yaw, left_right, up_down, distance],camera_error)
+                errors = getCameraError([pitch, yaw, left_right, up_down, distance], camera_error)
 
                 table.putNumber("distance_error", errors[4])
                 table.putNumber("up_down_error", errors[3])
