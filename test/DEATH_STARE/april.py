@@ -56,7 +56,6 @@ def displayApril(image, cam):
     detector = apriltag.Detector(options)
     results = detector.detect(gray)
     
-    print("Number of results: ", len(results))
     for r in results:
         #get bounding box of apriltag
         (ptA, ptB, ptC, ptD) = r.corners
