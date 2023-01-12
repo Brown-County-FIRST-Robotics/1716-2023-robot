@@ -38,10 +38,11 @@ print(video_size)
 #focal_length = video_size[1]
 #camera_center = (video_size[1] / 2, video_size[0] / 2)
 
-f=open(sys.argv[2],'r')
-mtx,dist=json.loads(f.read())
-mtx=np.array(mtx)
-dist=np.array(dist)
+
+with open(sys.argv[2],'r') as f:
+    mtx,dist=json.loads(f.read())
+    mtx=np.array(mtx)
+    dist=np.array(dist)
 
 def convert(pt):
     return (int(pt[0]), int(pt[1]))
@@ -153,13 +154,11 @@ left_right=[float(i[3]) for i in data]
 up_down=[float(i[4]) for i in data]
 distance=[float(i[5]) for i in data]
 
-f=open('camera_error.json','r')
-data=json.loads(f.read())
-f.close()
+with open('camera_error.json','r') as f:
+    data=json.loads(f.read())
 data.append([
     [np.average(pitch),np.average(yaw),np.average(left_right),np.average(up_down),np.average(distance)],
     [np.std(pitch),np.std(yaw),np.std(left_right),np.std(up_down),np.std(distance)]
 ])
-f=open('camera_error.json','w')
-f.write(json.dumps(data))
-f.close()
+with open('camera_error.json','w') as f:
+    f.write(json.dumps(data))

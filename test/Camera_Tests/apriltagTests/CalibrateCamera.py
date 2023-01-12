@@ -138,10 +138,9 @@ calibration, cameraMatrix, distCoeffs, rvecs, tvecs = aruco.calibrateCameraCharu
 
 # Save values to be used where matrix+dist is required, for instance for posture estimation
 # I save files in a pickle file, but you can use yaml or whatever works for you
-f = open(f'camera_calibrations/{input("camera name:")}.json', 'w')
-json.dump(([list(i) for i in cameraMatrix], [list(i) for i in distCoeffs]), f)
-f.close()
-    
+with open(f'camera_calibrations/{input("camera name:")}.json', 'w') as f:
+    json.dump(([list(i) for i in cameraMatrix], [list(i) for i in distCoeffs]), f)
+
 # Print to console our success
 print(f'Calibration successful.')
 
