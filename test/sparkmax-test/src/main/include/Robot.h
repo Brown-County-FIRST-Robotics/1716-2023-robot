@@ -9,6 +9,7 @@
 #include <chrono>
 #include "RobotContainer.h"
 #include "rev/CANSparkMax.h"
+#include <frc/XboxController.h>
 
 #define MOTOR_ID 31
 #define MAX_POWER 0.7
@@ -16,6 +17,7 @@
 class Robot : public frc::TimedRobot {
   std::chrono::time_point<std::chrono::system_clock> m_motorStart;
   rev::CANSparkMax m_motor{ MOTOR_ID, rev::CANSparkMax::MotorType::kBrushless };
+  frc::XboxController m_xbox{0};
  public:
   void RobotInit() override;
   void RobotPeriodic() override;

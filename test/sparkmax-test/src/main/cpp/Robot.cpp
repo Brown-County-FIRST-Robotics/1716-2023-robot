@@ -9,13 +9,13 @@
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <iostream>
-
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
 }
 
 /**
- * This function is called every robot packet, no matter the mode. Use
+ * This function is called every robot packet, n>o matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and test.
  *
@@ -47,17 +47,26 @@ void Robot::AutonomousInit() {
   }
 
   m_motorStart = std::chrono::system_clock::now();
+  m_motor.Set(0.0);
 }
 
 void Robot::AutonomousPeriodic() {
   std::chrono::time_point now = std::chrono::system_clock::now();
   std::chrono::duration<double> timeSinceStart = now - m_motorStart;
-  double power = timeSinceStart.count() * 0.3;  
+  double power = timeSinceStart.count() * 0.2;  
   m_motor.Set((power) > MAX_POWER ? MAX_POWER : (power)); 
   std::cout << m_motor.Get() << '\n';
+  frc::SmartDashboard::PutNumber("spark max power", m_motor.Get());
 }
 
 void Robot::TeleopInit() {
+  m_motor.Set(0.0);
+}
+
+/**
+ * This function is called periodically during operator control.
+ */
+void Robot::TeleopPeriodic() { 
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
@@ -66,13 +75,54 @@ void Robot::TeleopInit() {
     m_autonomousCommand->Cancel();
     m_autonomousCommand = nullptr;
   }
-}
 
-/**
- * This function is called periodically during operator control.
- */
-void Robot::TeleopPeriodic() { 
+  static bool pressed = false;
+
+  //If A is pressed, start spinning the motor
+  if(m_xbox.GetAButton())
+  {
+    if(!pressed)
+    {
+      m_motorStart = std::chrono::system_clock::now();
+      pressed = true;
+    }
+    std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+    std::chrono::duration<double> timeSinceStart = now - m_motorStart; 
+    double power = timeSinceStart.count() * 0.05;
+    if(power > MAX_POWER)
+      power = MAX_POWER; 
+    m_motor.Set(power);
+    frc::SmartDashboard::PutNumber("spark max power", m_motor.Get());
+    std::cout << m_motor.Get() << '\n';
+  }
+  else
+  {
+    static std::chrono::time_point<std::chrono::system_clock> 
+      start = std::chrono::system_clock::now(), 
+      end = std::chrono::system_clock::now();
+
+    if(pressed)
+      start = std::chrono::system_clock::now();
+
+    end = std::chrono::system_clock::now();
   
+    double currentPower = m_motor.Get();
+    //Slowly turn off the robot
+    if(currentPower > 0.0)
+    {
+      std::chrono::duration<double> timePassed = end - start;
+      currentPower -= 0.5 * timePassed.count();
+    }
+    else if(currentPower < 0.0)
+      currentPower = 0.0;
+    m_motor.Set(currentPower);
+
+    pressed = false;
+    frc::SmartDashboard::PutNumber("spark max power", m_motor.Get());
+    std::cout << m_motor.Get() << '\n';
+
+    start = std::chrono::system_clock::now(); 
+  }
 }
 
 /**
