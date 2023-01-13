@@ -39,3 +39,6 @@
   
  build/ 
  .gradle/
+
+__pycache__/
+venv/
