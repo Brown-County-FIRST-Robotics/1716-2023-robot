@@ -16,9 +16,9 @@ When you run the app it will print out the URL to access it
 ## How to use
 Click "Previous Camera" or "Next Camera" to cycle to the cameras.
 
-Click "Toggle April Tags" to toggle highlighting the april tags (on by default)
+Click "Toggle April Tags" to toggle highlighting the april tags (off by default)
 
-Click "Toggle Color Detection to toggle finding a specific color (on by default)
+Click "Toggle Color Detection to toggle finding a specific color (off by default)
 
 Click "Capture Color" to set the color to be searched for to the color that is being
 highlighted by the crosshairs
