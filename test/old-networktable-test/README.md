@@ -1,3 +1,5 @@
+# this code does not work anymore. please do not use it
+
 # NetworkTables test repo
 
 This is a test repo for NetworkTables for my robotics team.
