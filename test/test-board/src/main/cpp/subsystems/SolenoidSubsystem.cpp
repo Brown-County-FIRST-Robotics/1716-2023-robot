@@ -1,6 +1,8 @@
 #include "subsystems/SolenoidSubsystem.h"
 
-SolenoidSubsystem::SolenoidSubsystem() : piston{frc::PneumaticsModuleType::CTREPCM, 1, 2} {}
+SolenoidSubsystem::SolenoidSubsystem() {
+	hub.EnableCompressorDigital();
+}
 
 void SolenoidSubsystem::SetPosition(frc::DoubleSolenoid::Value position) {
 	piston.Set(position);
