@@ -8,8 +8,12 @@ TODO:move calibration files
 from flask import Flask, render_template, Response, redirect, request
 import cv2
 import threading
-import april
-import numpy
+#import april
+import numpy as np
+import json, sys
+
+if len(sys.argv)!=2:
+    print('Run "python3 main.py {config file name} {server IP address}"')
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
@@ -89,8 +93,8 @@ def gen_frames():  # generate frame by frame from camera
         if displayApril:
             april.displayApril(frame, camera)
         if displayColor:
-            color.findColor(frame, camera, numpy.array(cols[1], dtype=numpy.uint8), 
-                                           numpy.array(cols[2], dtype=numpy.uint8))
+            color.findColor(frame, camera, np.array(cols[1], dtype=np.uint8),
+                                           np.array(cols[2], dtype=np.uint8))
 
         
         #draw crosshairs
@@ -296,5 +300,5 @@ def sidecam():
 
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
-        imageHoriz.append(numpy.zeros((240, 240, 3), dtype=numpy.uint8))
+        imageHoriz.append(np.zeros((240, 240, 3), dtype=np.uint8))
     app.run(threaded=True, host="0.0.0.0")

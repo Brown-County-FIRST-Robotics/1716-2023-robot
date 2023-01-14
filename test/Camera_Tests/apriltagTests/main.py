@@ -48,7 +48,9 @@ def getCameraError(pos, error):  # pos is [pitch, yaw, left_right, up_down, dist
 
 
 while True:
-    img = cam.read()[1]
+    good, img = cam.read()
+
+    assert good
 
     # Convert Images to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
