@@ -1,6 +1,5 @@
 #include "subsystems/Motors.h"
 #include <iostream>
-#include <rev/CANSparkMax.h>
 
 Motors::Motors() : tfx{0}, tsrx{1} {} //constructor
 
