@@ -1,10 +1,10 @@
 #pragma once
 
 #include <frc2/command/Command.h>
-#include <frc/XboxController.h>
+#include <frc2/command/button/CommandXboxController.h>
 
-// #include "subsystems/Drivetrain.h"
-#include "subsystems/Arm.h"
+#include "subsystems/Drivetrain.h"
+// #include "subsystems/Arm.h"
 // #include "subsystems/ArmAngle.h"
 
 
@@ -13,10 +13,10 @@ public:
 	RobotContainer();
 
 private:
-	frc::XboxController controller{0};
+	frc2::CommandXboxController controller{0};
 	
-	// Drivetrain drivetrain;
-	Arm arm;
+	Drivetrain drivetrain;
+	// Arm arm;
 	// ArmAngle armAngle;
 
 	void ConfigureButtonBindings();
