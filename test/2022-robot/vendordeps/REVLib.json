@@ -1,34 +1,46 @@
 {
     "fileName": "REVLib.json",
     "name": "REVLib",
+<<<<<<<< HEAD:test/2022-robot/vendordeps/REVLib.json
     "version": "2023.0.0",
+========
+    "version": "2023.1.1",
+>>>>>>>> main:test/sparkmax-test/vendordeps/REVLib.json
     "uuid": "3f48eb8c-50fe-43a6-9cb7-44c86353c4cb",
     "mavenUrls": [
         "https://maven.revrobotics.com/"
     ],
-    "jsonUrl": "https://software-metadata.revrobotics.com/REVLib.json",
+    "jsonUrl": "https://software-metadata.revrobotics.com/REVLib-2023.json",
     "javaDependencies": [
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-java",
+<<<<<<<< HEAD:test/2022-robot/vendordeps/REVLib.json
             "version": "2023.0.0"
+========
+            "version": "2023.1.1"
+>>>>>>>> main:test/sparkmax-test/vendordeps/REVLib.json
         }
     ],
     "jniDependencies": [
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-driver",
+<<<<<<<< HEAD:test/2022-robot/vendordeps/REVLib.json
             "version": "2023.0.0",
+========
+            "version": "2023.1.1",
+>>>>>>>> main:test/sparkmax-test/vendordeps/REVLib.json
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [
                 "windowsx86-64",
                 "windowsx86",
-                "linuxaarch64bionic",
+                "linuxarm64",
                 "linuxx86-64",
                 "linuxathena",
-                "linuxraspbian",
-                "osxx86-64"
+                "linuxarm32",
+                "osxuniversal"
             ]
         }
     ],
@@ -36,7 +48,11 @@
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-cpp",
+<<<<<<<< HEAD:test/2022-robot/vendordeps/REVLib.json
             "version": "2023.0.0",
+========
+            "version": "2023.1.1",
+>>>>>>>> main:test/sparkmax-test/vendordeps/REVLib.json
             "libName": "REVLib",
             "headerClassifier": "headers",
             "sharedLibrary": false,
@@ -44,17 +60,21 @@
             "binaryPlatforms": [
                 "windowsx86-64",
                 "windowsx86",
-                "linuxaarch64bionic",
+                "linuxarm64",
                 "linuxx86-64",
                 "linuxathena",
-                "linuxraspbian",
-                "osxx86-64"
+                "linuxarm32",
+                "osxuniversal"
             ]
         },
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "REVLib-driver",
+<<<<<<<< HEAD:test/2022-robot/vendordeps/REVLib.json
             "version": "2023.0.0",
+========
+            "version": "2023.1.1",
+>>>>>>>> main:test/sparkmax-test/vendordeps/REVLib.json
             "libName": "REVLibDriver",
             "headerClassifier": "headers",
             "sharedLibrary": false,
@@ -62,11 +82,11 @@
             "binaryPlatforms": [
                 "windowsx86-64",
                 "windowsx86",
-                "linuxaarch64bionic",
+                "linuxarm64",
                 "linuxx86-64",
                 "linuxathena",
-                "linuxraspbian",
-                "osxx86-64"
+                "linuxarm32",
+                "osxuniversal"
             ]
         }
     ]
