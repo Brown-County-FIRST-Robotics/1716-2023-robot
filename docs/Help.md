@@ -314,6 +314,7 @@ void RobotContainer::ConfigureButtonBindings() {
 |`WPI_TalonFX`|`<ctre/Phoenix.h>`|-|
 |`WPI_TalonSRX`|`<ctre/Phoenix.h>`|-|
 |`frc::DoubleSolenoid`|`<frc/DoubleSolenoid.h>`|Positions can be accessed at `frc::DoubleSolenoid::Value::kForward`/`kReverse`/`kOff`. It should only be left on for a fraction of a second.|
+|`rev::CANSparkMax`|`<rev/CANSparkMax.h>`|-|
 
 ## Naming Conventions:
 
@@ -418,3 +419,4 @@ void Robot::TeleopInit() {
 	}
 }
 ```
+
