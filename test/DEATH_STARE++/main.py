@@ -10,17 +10,51 @@ import cv2
 import threading
 #import april
 import numpy as np
-import json, sys
+import json, sys, subprocess, os, glob
 
-if len(sys.argv)!=2:
+if sys.argv[1]=='--config':
+    print('making config file')
+    config={}
+    for i in range(4):
+        config[f'camera_{i}']={}
+        camera_port=input(f'camera {i+1} port:')
+        assert camera_port.isdigit(), 'please input a number'
+        assert os.path.exists(f'/dev/video{camera_port}'), 'camera not plugged in'
+        camera_id=subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "$e: id_model_id"')[15:]
+        assert len(camera_id)==4, 'invalid id'
+        config[f'camera_{i}']['uid']=camera_id
+        calibration_fname=glob.glob(input('camera calibration file(glob patterns allowed):'))[0]
+        assert os.path.exists(calibration_fname), f'{calibration_fname} does not exit'
+        with open(calibration_fname, 'r') as calibration_file:
+            calibration = json.loads(calibration_file.read())
+            '''
+            add calibration code here
+            '''
+            config[f'camera_{i}']['calibration']=calibration
+        pos=json.loads(input(f'Position of camera {i+1}(x,y,z,yaw,pitch,roll):'))
+        assert len(pos)==6, 'Length=6'
+        config[f'camera_{i}']['pos']=pos
+    config_fname=input('Name of config file:')
+    assert input(f'This will create a file called "configs/{config_fname}.json", are you sure(y/n):')=='y', 'Operation canceled'
+    with open(f'configs/{config_fname}.json') as config_file:
+        config_file.write(json.dumps(config))
+    print('Config file made')
+    sys.exit()
+
+if len(sys.argv)!=3:
     print('Run "python3 main.py {config file name} {server IP address}"')
+    print()
+    print('If you want to make a config file, run "python3 main.py --config"')
+    sys.exit()
+
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
 
 cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
-camera = cv2.VideoCapture()
-camera.open(cameraDev[0])
+camera = cv2.VideoCapture(0)
+#camera.open(cameraDev[0])
 camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
 
