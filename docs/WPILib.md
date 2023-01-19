@@ -15,7 +15,7 @@
 |--|--|--|
 |`WPI_TalonFX`|`<ctre/Phoenix.h>`|-|
 |`WPI_TalonSRX`|`<ctre/Phoenix.h>`|-|
-|`frc::DoubleSolenoid`|`<frc/DoubleSolenoid.h>`|Positions are accessible at `frc::DoubleSolenoid::Value`|
+|`frc::DoubleSolenoid`|`<frc/DoubleSolenoid.h>`|Positions are accessible at `frc::DoubleSolenoid::Value`; more info available [here](#solenoids)|
 |`rev::CANSparkMax`|`<rev/CANSparkMax.h>`|-|
 
 ## Naming Conventions:
@@ -50,4 +50,4 @@ You can put Boolean, Numeric, or String values on the smartdashboard very simply
 
 ## Solenoids
 
-Solenoids are the controllers for air-powered devices, generally pistons. They require an air compressor, which is automatically activated if a solenoid is declared ***(Does this still work with REV?)*** and does not require any code interaction. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second (about 3 ms), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston. ([docs](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html))
+Solenoids are the controllers for air-powered devices, generally pistons. They require an air compressor, which is automatically activated if a solenoid is declared ***(Does this still work with REV?)*** and does not require any code interaction. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second (about 3 ms), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston. There is a sample subsystem and command available for them [here](Command_Based#generalized-solenoid-subsystem-and-command). ([docs](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html))

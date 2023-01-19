@@ -15,36 +15,42 @@
 ## Commmand Concept Overviews:
 
 - A **component** is a single device on the robot
-    - Accessible by a class either built into wpilib or a [3rd party vendor library](Help.md#3rd-party-vendor-libraries) (not user-defined)
-    - Lowest level class we work with
-    - Examples: `TalonFX`, solenoid, input device such as CANcoder or limit switch
-- A **subsystem** is a specific section of the robot, it's used as an interface between components and commands
-    - Contains component(s)
-    - The only way to access a component, therefore, must contain all of the functionality needed to interface with all components contained by it
+    - Accessible via a class either built into wpilib or a [3rd party vendor library](WPILib.md#3rd-party-vendor-libraries) (not user-defined)
+    - Lowest level concept we work with
+    - Examples: `TalonFX`, solenoid, limit switch
+- A **subsystem** is a group of components on the robot
+    - The only way to access a component
+        - Must contain all functionality needed to interface with the components contained in it
     - Each component should be contained in exactly **one** subsystem
-        - Otherwise, the built-in protection against multiple values being sent to one subsystem at the same time won't work right (this is handled by the [command scheduler](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html))
-    - All components in one subsystem should be used at the same time most of the time 
-        - A subsystem can't do multiple things at once, so if you have your drive train in the same subsystem as your shooter, you can't drive and shoot at once, at least not easily
-    - Read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html)
-    - Examples: a drivetrain, a shooter system, an intake system
-- A **command** makes something happen, it's used as an interface between subsystems and triggers
-    - Contains subsystem(s)
-    - Handled by the [Command Scheduler](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html) (determines what commands are run when)
-    - Each subsystem can be in multiple commands
-        - WPILib handles it, making sure that a subsystem doesn't try to do two things at once
-        - Each command has "requirements", the list of subsystems it uses
-        - You can make a command interruptible, meaning that if another command with a shared requirement is scheduled, the current command will cancel rather than the other one either waiting or not being run
-        - An intake command on Armstrong would require the shooter motors, the arm angling motors, and the intake motors
-    - Commands can be formed by other commands in command grouping, these commands are called compositions
-        - There are many types of command groups to control the ordering of the commands, read more [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html)
-        - As composites are commands, they can be used to form more composites
-    - Read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html)
-- A **trigger** is some sort of input, it interacts with the command scheduler to call commands
+        - Otherwise, the built-in protection against multiple commands being scheduled for one subsystem at once will not properly protect the component (this is handled by [command requirements](https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html#getrequirements))
+    - No components in a subsystem should need to do different tasks at the same time
+        - A subsystem can't run multiple commands at once, so even if two tasks require different components and won't interfere, you will need to find a way to have the tasks in the same command or break your subsystem into multiple pieces
+        - If you have your drive train in the same subsystem as your shooter, you can't drive and shoot at once, at least not without an extremely confusing and unintuitive command; it's much simpler to have separate subsystems and separate commands for driving and shooting
+    - Read more on the subsystem [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html)
+    - Examples: a drivetrain, a shooter, an intake
+- A **command** does a task
+    - The only way to access subsystems
+        - User input (bindings) is abstracted into actions for the robot to do using its various subsystems
+    - Handled by the [Command Scheduler](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html), which determines what commands are running when through a system of scheduling a command when a binding is pressed in most cases and descheduling it when it completes or is interrupted
+    - Each subsystem can be used in multiple commands
+        - WPILib handles conflicts, ensuring that a subsystem doesn't try to do two things at once using [command requirements](https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html#getrequirements)
+        - Each command has a list of requirements, the subsytems that it uses
+        - You can make a command non-interruptible, meaning that if another command with a shared requirement is scheduled (or the command is interrupted in some other way), the current command will not be cancelled (interrupted)
+            - You can detect if your command was ended due to an interruption using the boolean `interrupted` parameter the command's `End()` method is called with
+    - Commands can be formed out of other commands in command grouping, these commands are called compositions
+        - There are several different types of command group to control the order that the composed commands are run in, read more [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html)
+        - As composites are commands, they can be used in the formation of more composites
+    - Read more on the command [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html)
+    - Examples: drive, shoot out a ball, take in a ball
+- A **trigger** is an input that interacts with the command scheduler to control when commands are scheduled and descheduled
     - The most common type of trigger is a button input
-        - Gamepad buttons can be accessed by the [button enum](https://github.wpilib.org/allwpilib/docs/release/cpp/structfrc_1_1_xbox_controller_1_1_button.html)
-    - Commands are generally bound to triggers in the `ConfigureButtonBindings` class of `RobotContainer`
-    - There are different bindings available for different use cases
+        - These can be formed by declaring a `frc2::CommandXboxController` and calling a button method (`A()`, `B()`, `Y()`), then a binding on that (`OnTrue()`, `WhileTrue()`)
+        - Ex: `commandXboxControllerObject.A().OnTrue([CommandPtrToBind]))`
+    - Commands are generally bound to buttons in the `ConfigureButtonBindings` class of `RobotContainer`
+    - There are different [bindings](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) available for different use cases
     - Triggers can be [composed](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#composing-triggers) so that `&&`, `||`, or `!` can be applied to them
+    - Bindings return the original trigger, so you can [chain together bindings](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#chaining-calls)
+    - After a trigger is made, you can apply a binding to it and place a `CommandPtr` as the argument, this will bind the command to the trigger with the binding's logic
     - Read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html)
 
 ```mermaid
