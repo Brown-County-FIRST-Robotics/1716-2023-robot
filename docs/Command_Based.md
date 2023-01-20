@@ -46,11 +46,13 @@
     - The most common type of trigger is a button input
         - These can be formed by declaring a `frc2::CommandXboxController` and calling a button method (`A()`, `B()`, `Y()`), then a binding on that (`OnTrue()`, `WhileTrue()`)
         - Ex: `commandXboxControllerObject.A().OnTrue([CommandPtrToBind]))`
-    - Commands are generally bound to buttons in the `ConfigureButtonBindings` class of `RobotContainer`
-    - There are different [bindings](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) available for different use cases
+    - Commands are generally bound to triggers in the `ConfigureButtonBindings` class of `RobotContainer`
+    - Alternatively, you can make [custom triggers](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#arbitrary-triggers), which, rather than being a button input, take a boolean value that you provide
+        - Example: `frc2::Trigger([&objectYourBoolIsIn] { return objectYourBoolIsIn.GetBoolValue(); }).Binding(Command(&subsystem).ToPtr(););`
+    - There are different [bindings](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) available, which allow for different logical connections between triggers and commands
+        - First, you make a trigger (such as a button), then call a binding on it, then place your command in the form of a `CommandPtr` as the argument for the binding
     - Triggers can be [composed](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#composing-triggers) so that `&&`, `||`, or `!` can be applied to them
     - Bindings return the original trigger, so you can [chain together bindings](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#chaining-calls)
-    - After a trigger is made, you can apply a binding to it and place a `CommandPtr` as the argument, this will bind the command to the trigger with the binding's logic
     - Read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html)
 
 ```mermaid
@@ -81,11 +83,9 @@ The following section covers how to write a new subsytem and command, and how to
 
 ### Subsystem:
 
-1. Ensure that you need a subsytem: a subsystem should be a specific section of a robot. It is used to interface the components included in it. It should generally use all of the included components at once, since it's difficult to use different ones for different purposes at once.
+1. Create your files: you'll need a `SubsystemName.h` file in the `include > subsystems` directory, and a `SubsytemName.cpp` file in the `cpp > subsystems` directory. (from now on, `SubsystemName` represents the name of the subsystem, your name should be CamelCase)
 
-2. Create your files: you'll need a `SubsystemName.h` file in the `include > subsystems` directory, and a `SubsytemName.cpp` file in the `cpp > subsystems` directory. (from now on, `SubsystemName` represents the name of the subsystem, your name should be CamelCase)
-
-3. In `SubsystemName.h` declare methods and components:
+2. In `SubsystemName.h` declare methods and components:
 ```C++
 #pragma once
 
@@ -106,7 +106,7 @@ private:
 };
 ```
 
-4. In `SubsytemName.cpp` define methods and components:
+3. In `SubsytemName.cpp` define methods and components:
 ```C++
 #include "subsystems/SubsytemName.h"
 
@@ -122,7 +122,7 @@ double SubsytemName::ExampleMethod2(double exampleParameter) {
 }
 ```
 
-5. In `RobotContainer.h` (in the `include` directory), make a pointer to your subsystem:
+4. In `RobotContainer.h` (in the `include` directory), make a pointer to your subsystem:
 ```C++
 #pragma once
 
