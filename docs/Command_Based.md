@@ -83,13 +83,14 @@ The following section covers how to write a new subsytem and command, and how to
 
 ### Subsystem:
 
-1. Create your files: you'll need a `SubsystemName.h` file in the `include > subsystems` directory, and a `SubsytemName.cpp` file in the `cpp > subsystems` directory. (from now on, `SubsystemName` represents the name of the subsystem, your name should be CamelCase)
+1. Create your files: you'll need a `include/subsystems/SubsystemName.h` file and a `cpp/subsystems/SubsytemName.cpp` file. (from now on, `SubsystemName` represents the name of your subsystem)
 
 2. In `SubsystemName.h` declare methods and components:
 ```C++
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <ctre/Phoenix.h>
 
 class SubsystemName : public frc2::SubsystemBase {
 public:
@@ -97,7 +98,7 @@ public:
 
     //Method declarations go here:
     void ExampleMethod1(); //Declare your own methods like so
-    double ExampleMethod2(double exampleParameter);
+    void ExampleMethod2(double exampleParameter);
 
 private:
     //subsystem components such as motors:
@@ -110,77 +111,74 @@ private:
 ```C++
 #include "subsystems/SubsytemName.h"
 
-SubsytemName::SubsytemName() : exampleTalonFX{0}, exampleTalonSRX{1} {} //constructor, make sure to include all components with their ids, separated by commas
+SubsytemName::SubsytemName() : exampleTalonFX{0}, exampleTalonSRX{1} {} //constructor, make sure to include all components with their constructor arguments
 
 void SubsytemName::ExampleMethod1() {
   exampleTalonFX.Set(0.5);
 }
 
-double SubsytemName::ExampleMethod2(double exampleParameter) {
+void SubsytemName::ExampleMethod2(double exampleParameter) {
   exampleTalonSRX.Set(exampleParameter);
-  return 5;
 }
 ```
 
-4. In `RobotContainer.h` (in the `include` directory), make a pointer to your subsystem:
+4. In `include/RobotContainer.h`, declare your subsystem:
 ```C++
 #pragma once
 
 #include <frc2/command/Command.h>
-#include <frc/XboxController.h>
+#include <frc2/command/button/CommandXboxController.h>
 
-#include "subsystems/SubsytemName.h"
+#include "subsystems/SubsytemName.h" //add this line
 
 class RobotContainer {
- public:
-  RobotContainer();
+public:
+    RobotContainer();
   
- private:
-  frc::XboxController controller{0}; //controller used for bindings
+private:
+  	frc2::CommandXboxController controller{0}; //controller used for bindings
   
-  SubsytemName subsytemName; //uses pascalCase as it is an instance
+    SubsytemName subsytemName; //use pascalCase for the instance
 
-  void ConfigureButtonBindings();
+    void ConfigureButtonBindings();
 };
 ```
 
 ### Command:
 
-1. Ensure you need a command, a command should *do* something, interface with subsystem(s), and is generally scheduled by a button press.
+1. Create your files: you'll need a `include/commands/CommandName.h` file and a `cpp/commands/CommandName.cpp` file. (from now on, `CommandName` represents the name of your command)
 
-2.  Create your files: you'll need a `CommandName.h` file in the `include > commands` directory, and a `CommandName.cpp` file in the `cpp > commands` directory. (from now on, `CommandName` represents the name of the command, your name should be CamelCase)
-
-3. In `CommandName.h`, declare constructor and methods you plan to use:
+2. In `CommandName.h`, declare constructor and methods you plan to use:
 ```C++
 #pragma once
 
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 
-#include "subsystems/SubsytemName.h" //Subsystem requirements, each should have its own include
+#include "subsystems/SubsytemName.h" //Subsystem requirement
 
 class CommandName : public frc2::CommandHelper<frc2::CommandBase, CommandName> {
- public:
-  explicit CommandName(SubsytemName* subsystem); //constructor, must take all required subsystems as parameters
+public:
+    explicit CommandName(SubsytemName* subsystem); //constructor, it must take all required subsystems as parameters
 
-    void Initialize() override; //Called once at the beginning, defaults to nothing
+    void Initialize() override; //Called once at the beginning, defaults to doing nothing
   
-    //void Execute() override; //Called every frame, defaults to nothing
+    //void Execute() override; //Called every frame that the command is scheduled, defaults to doing nothing
 
-    void End(bool interrupted) override; //Called once at the end, defaults to nothing
+    void End(bool interrupted) override; //Called once at the end, defaults to doing nothing, `interrupted` parameter tells whether the commmand was ended because it was interrupted
   
-    //bool IsFinished() override; //return whether the command has finished, run once per frame, defaults to false (no end until interrupt)
-	
- private:
-  SubsytemName* subsytemName; //each subsystem needs its own pointer
+    //bool IsFinished() override; //you return whether the command has completed, run once per frame that the command is scheduled, defaults to false (no end until interrupted)
+
+private:
+    SubsytemName* subsytemName; //each subsystem used needs its own pointer
 };
 ```
 
-4. In `CommandName.cpp`, define methods and constructor:
+3. In `CommandName.cpp`, define methods and constructor:
 ```C++
 #include "commands/CommandName.h"
 
-CommandName::CommandName(SubsytemName* subsystem) : subsystemName(subsystem) { //constructor, takes all required subsystems and adds them to command requirements
+CommandName::CommandName(SubsytemName* subsystem) : subsystemName(subsystem) { //constructor, takes all required subsystems and adds them to command requirements and instance variables
 	AddRequirements(subsystem); //subsystems must be added to the command's requirements
 }
 
@@ -194,7 +192,7 @@ void CommandName::Initialize() {
 }*/
 
 void CommandName::End(bool interrupted) {
-	subsytemName->ExampleMethod2(0.5);
+	subsytemName->ExampleMethod2(0);
 }
 
 /*bool SpinTfx::IsFinished() { //return whether the command should finish this frame
@@ -204,16 +202,14 @@ void CommandName::End(bool interrupted) {
 
 ### Button Binding:
 
-1. Ensure that you have "`frc::XboxController controller{0};`" and "`void ConfigureButtonBindings();`" under `private:` in `RobotContainer.h` (you'll need to include `<frc/XboxController.h>`). This instantiates a controller to use for bindings and declares the class for button bindings respectively.
+1. Ensure that you have "`frc2::CommandXboxController controller{0};`" and "`void ConfigureButtonBindings();`" under `private:` in `RobotContainer.h` (you'll need to include `<frc2/command/button/CommandXboxController.h>`). This instantiates a controller to use for button triggers and declares the method used for bindings.
 
-2. In `RobotContainer.cpp`, declare your button bindings (read the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-button-bindings) to find the correct binding for the functionality you want to acheive):
+2. In `RobotContainer.cpp`, declare your button bindings (read the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) to find the correct binding for the functionality you want to achieve):
 ```C++
 #include "RobotContainer.h"
 
 #include <frc2/command/button/JoystickButton.h>
-#include <frc/XboxController.h> //used for enumerators
 
-using frc::XboxController;
 using namespace frc2;
 
 RobotContainer::RobotContainer() {
@@ -221,16 +217,14 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-    // Configure your button bindings to commands here
-	JoystickButton(&controller, XboxController::Button::kA).WhenHeld(CommandName{&subsystemName}); //declare a joystick button using the enumerator of the a button of `controller` (remember the &), then call `.WhenHeld()`, a binding that schedules the command when you hit the button and cancels it when you release it, `.WhenHeld()` takes a command, which takes subsytem pointers according to its constructor, the subsytems should be declared in the header already
+    // bind your button triggers to commands here
+	controller.A().WhileTrue(CommandName(&subsystemName).ToPtr()); //declare a gamepad button trigger by calling the method named for the button you want on the controller, then call a binding on that, such as `WhileTrue()`, which schedules the command when you hit the button and deschedules it when you release it. The binding takes a `CommandPtr`, which you can make by declaring a command (which takes a subsytem instance with an "&" as the parameter), then calling `ToPtr()` or a decorator on it.
 
-    JoystickButton(&controller, XboxController::Button::kB)
-        .WhenActive(CommandName{&subsytemName})
-        .WhileHeld(CommandName2{&subsystemName}); //bindings return the original button, so they can be chained together
+    controller.B()
+        .OnTrue(CommandName(&subsytemName).ToPtr())
+        .WhileTrue(Command2Name(&subsystemName).ToPtr()); //bindings return the original trigger, so bindings can be chained together
 
-    (JoystickButton(&controller, XboxController::Button::kX)
-        || JoystickButton(&controller, XboxController::Button::kY))
-        .WhileActiveOnce(CommandName{&subsystemName}); //trigger composition, if either is pressed, CommandName will be scheduled (must use WhileActiveOnce() rather than whenHeld() because composition returns a trigger, not a button)
+    (controller.X() || controller.Y()).WhileFalse(CommandName(&subsystemName).ToPtr()); //trigger composition, if neither are pressed, the command `CommandName` will be scheduled
 }
 ```
 
