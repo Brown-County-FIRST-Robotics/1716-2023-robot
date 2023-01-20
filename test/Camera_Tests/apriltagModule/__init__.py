@@ -1,55 +1,36 @@
+'''
+TODO: add detection class
+TODO: make getPosition return
+
+'''
+
 import math, time, sys, json
 import apriltag
 import cv2
 import numpy as np
-from networktables import NetworkTables
 
-
-
-if len(sys.argv) != 4:
-    print('Run "python3 main.py {camera number} {camera calibration filename} {server IP address}"')
-    print('')
-    print('The calibration files should be in the "camera_calibrations/" directory')
-    print('The IP address for the robot is 10.17.16.2, but if you are testing locally, use 127.0.0.1')
-    sys.exit()
-
-NetworkTables.initialize(server=sys.argv[3])
-
-table = NetworkTables.getTable("apriltag")
-
-cam = cv2.VideoCapture()
-cam.open(f'/dev/video{int(sys.argv[1])}')
+#cam = cv2.VideoCapture()
+#cam.open(f'/dev/video{int(sys.argv[1])}')
 
 tag_size = 8 / 2.54
 
-video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 roll_threshold = 0.3
 
-with open(sys.argv[2], 'r') as f:
-    mtx, dist = json.loads(f.read())
-    mtx = np.array(mtx)
-    dist = np.array(dist)
+#with open(sys.argv[2], 'r') as f:
+#    mtx, dist = json.loads(f.read())
+#    mtx = np.array(mtx)
+#    dist = np.array(dist)
 
-with open('camera_error.json', 'r') as f:
-    camera_error = json.loads(f.read())
+#with open('camera_error.json', 'r') as f:
+#    camera_error = json.loads(f.read())
 
 
 def convert(pt):
     return float(pt[0]), float(pt[1])
 
 
-def getCameraError(pos, error):  # pos is [pitch, yaw, left_right, up_down, distance]
-    lowest = (-1, 1000000000)  # (index, value)
-    for i, canidate in enumerate([i1[0] for i1 in error]):
-        if sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]) < lowest[1]:
-            lowest = (i, sum([math.fabs(iii - ii) for ii, iii in zip(canidate, pos)]))
-    
-    return error[lowest[0]][1]
-
-
-while True:
-    img = cam.read()[1]
-
+def getPosition(img, camera_mtx, dist_coefficients):
     # Convert Images to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -107,7 +88,7 @@ while True:
             opointsArr.append(opoints)
 
             # mtx - the camera calibration's intrinsics
-            _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, mtx, dist, flags=cv2.SOLVEPNP_ITERATIVE)
+            _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, camera_mtx, dist_coefficients, flags=cv2.SOLVEPNP_ITERATIVE)
 
             # Draws the edges of the pose onto the image
             pitch = prvecs[0]
@@ -121,18 +102,6 @@ while True:
             if math.fabs(roll) > roll_threshold:
                 print('discarded a value')
                 continue
-
-            table.putNumber("april_number", detection.tag_id)
-            table.putNumber("distance", distance)
-            table.putNumber("up_down", up_down)
-            table.putNumber("left_right", left_right)
-            table.putNumber("pitch", pitch)
-            table.putNumber("yaw", yaw)
-
-            errors = getCameraError([pitch, yaw, left_right, up_down, distance], camera_error)
-
-            table.putNumber("distance_error", errors[4])
-            table.putNumber("up_down_error", errors[3])
-            table.putNumber("left_right_error", errors[2])
-            table.putNumber("pitch_error", errors[0])
-            table.putNumber("yaw_error", errors[1])
+            return pitch, yaw, roll, left_right, up_down, distance
+    else:
+        return None
