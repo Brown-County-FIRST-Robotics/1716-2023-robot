@@ -20,6 +20,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.SetDefaultOption("Spin All", &spinAll);
 	autonomousChooser.AddOption("Spin TalonSRX", &spinTsrx);
 	autonomousChooser.AddOption("Spin TalonFX", &spinTfx);
+	autonomousChooser.AddOption("Spin Neo", &spinNeo);
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
@@ -31,11 +32,11 @@ void RobotContainer::ConfigureButtonBindings() {
 	
 	(controller.A()
 		&& (!controller.B()))
-		.WhileTrue(SpinTfx(&motors).ToPtr()); //if a is held, but not b, spin Tfx
+		.WhileTrue(SpinNeo(&motors).ToPtr()); //if a is held, but not b, spin Tfx
 
 	(controller.B()
 		&& (!controller.A()))
-		.WhileTrue(SpinTsrx(&motors).ToPtr()); //if b is held, but not a, spin Tsrx
+		.WhileTrue(SpinTfx(&motors).ToPtr()); //if b is held, but not a, spin Tsrx
 
 	controller.Y().OnTrue(ToggleSolenoid(&solenoidSubsystem).WithTimeout(SOLENOIDSETLENGTH));
 }

@@ -2,7 +2,6 @@
 
 SpinAll::SpinAll(Motors* subsystem) : motors(subsystem) {
 	AddRequirements(subsystem);
-	motors = new Motors();
 }
 
 void SpinAll::Initialize() {
