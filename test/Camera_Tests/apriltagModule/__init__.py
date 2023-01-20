@@ -9,21 +9,21 @@ import apriltag
 import cv2
 import numpy as np
 
-#cam = cv2.VideoCapture()
-#cam.open(f'/dev/video{int(sys.argv[1])}')
-
 tag_size = 8 / 2.54
 
-#video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 roll_threshold = 0.3
 
-#with open(sys.argv[2], 'r') as f:
-#    mtx, dist = json.loads(f.read())
-#    mtx = np.array(mtx)
-#    dist = np.array(dist)
 
-#with open('camera_error.json', 'r') as f:
-#    camera_error = json.loads(f.read())
+class Detection:
+    def __init__(self, yaw, pitch, roll, left_right, up_down, distance, RMSError, tagID):
+        self.yaw = yaw
+        self.pitch = pitch
+        self.roll = roll
+        self.left_right = left_right
+        self.up_down = up_down
+        self.distance = distance
+        self.RMSError = RMSError
+        self.tagID = tagID
 
 
 def convert(pt):
@@ -52,10 +52,10 @@ def getPosition(img, camera_mtx, dist_coefficients):
 
     num_detections = len(detection_results)
 
-    imgPointsArr = []
-    objPointsArr = []
-    opointsArr = []
-
+    img_points_arr = []
+    obj_points_arr = []
+    points_array = []
+    detections=[]
     if num_detections > 0:
         for i, detection in enumerate(detection_results):
             if detection.tag_id > 8:
@@ -83,25 +83,28 @@ def getPosition(img, camera_mtx, dist_coefficients):
                 -1, 1, -2 * 1,
             ]).reshape(-1, 1, 3) * 0.5 * tag_size
 
-            imgPointsArr.append(imagePoints)
-            objPointsArr.append(object_pts)
-            opointsArr.append(opoints)
+            img_points_arr.append(imagePoints)
+            obj_points_arr.append(object_pts)
+            points_array.append(opoints)
 
             # mtx - the camera calibration's intrinsics
-            _, prvecs, ptvecs = cv2.solvePnP(object_pts, imagePoints, camera_mtx, dist_coefficients, flags=cv2.SOLVEPNP_ITERATIVE)
-
+            good, prvecs, ptvecs, RMS = cv2.solvePnPGeneric(object_pts, imagePoints, camera_mtx, dist_coefficients,
+                                                flags=cv2.SOLVEPNP_ITERATIVE)
+            assert good, 'something went wrong with solvePnP'
             # Draws the edges of the pose onto the image
-            pitch = prvecs[0]
-            yaw = prvecs[1]
-            roll = prvecs[2]
+            pitch = prvecs[0][0]
+            yaw = prvecs[0][1]
+            roll = prvecs[0][2]
 
-            left_right = -ptvecs[0] - ptvecs[2] / 4
-            up_down = (ptvecs[1] + ptvecs[2] / 16) * 2
-            distance = ptvecs[2]
+            left_right = -ptvecs[0][0] - ptvecs[0][2] / 4
+            up_down = (ptvecs[0][1] + ptvecs[0][2] / 16) * 2
+            distance = ptvecs[0][2]
 
             if math.fabs(roll) > roll_threshold:
                 print('discarded a value')
                 continue
-            return pitch, yaw, roll, left_right, up_down, distance
+            detections.append(Detection(yaw, pitch, roll, left_right, up_down, distance, RMS,
+                             detection.tag_id))
     else:
         return None
+    return detections

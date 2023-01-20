@@ -10,4 +10,4 @@ with open(glob.glob('ap*/cam*/ms.json')[0], 'r') as f:
 
 cam = cv2.VideoCapture()
 cam.open('/dev/video0')
-print(apriltagModule.getPosition(cam.read()[1], mtx, dist))
+print([i.RMSError for i in apriltagModule.getPosition(cam.read()[1], mtx, dist)])
