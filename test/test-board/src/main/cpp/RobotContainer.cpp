@@ -15,14 +15,13 @@ using namespace frc2;
 RobotContainer::RobotContainer() {
 	ConfigureButtonBindings();
 
-	motors.SetDefaultCommand(SpinNeo(&motors, [this] { return controller.GetLeftY();}).ToPtr());	
+	neo.SetDefaultCommand(SpinNeo(&neo, [this] { return controller.GetLeftY();}).ToPtr());	
 
 	//Autonomous:
 	//autonomousChooser.SetDefaultOption("Spin SRX Then FX Then Both", SpinTsrx(&motors).WithTimeout(2_s).AndThen(SpinTfx(&motors).WithTimeout(2_s).AndThen(SpinAll(&motors).WithTimeout(2_s))).get());
 	autonomousChooser.SetDefaultOption("Spin All", &spinAll);
 	autonomousChooser.AddOption("Spin TalonSRX", &spinTsrx);
 	autonomousChooser.AddOption("Spin TalonFX", &spinTfx);
-	autonomousChooser.AddOption("Spin Neo", &spinNeo);
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
