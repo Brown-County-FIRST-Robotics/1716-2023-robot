@@ -14,16 +14,11 @@ using namespace frc2;
 
 RobotContainer::RobotContainer() {
 	ConfigureButtonBindings();
-/*
+	
 	drivetrain.SetDefaultCommand(DriveCartesian(&drivetrain, 
 		[this] { return controller.GetLeftY(); }, 
-		[this] { return controller.GetLeftX(); }, 
-		[this] { return controller.GetRightX(); }));
-*/
-	drivetrain.SetDefaultCommand(DriveCartesian(&drivetrain, 
-		[this] { return controller.GetLeftY(); }, 
-		[this] { return controller.GetLeftX(); }, 
-		[this] { return controller.GetRightX(); }));
+		[this] { return 0; },//controller.GetLeftX(); }, 
+		[this] { return controller.GetLeftX(); } ))//RightX(); }));
 
 	//Autonomous:
 	// autonomousChooser.SetDefaultOption("Spin SRX Then FX Then Both", &spinSrxThenFxThenBoth);
