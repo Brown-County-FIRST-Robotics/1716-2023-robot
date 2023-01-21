@@ -94,6 +94,11 @@ def readCam(cam, frames, ind):
         ret, frame = cam.read()
         if not ret:
             break
+        res=apriltagModule.getPosition(frame,np.array([[1.31927534e+03, 0.00000000e+0, 1.04468063e+03],
+               [0.00000000e+00, 1.32853937e+03, 5.66297124e+02],
+               [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), np.array([-0.48969934,  0.2586879,  -0.00272287, -0.00090622, -0.07265459]))
+        if res is not None and len(res)>0:
+            print([i.yaw for i in res])
         resized = cv2.resize(frame,
                     (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
                     interpolation=cv2.INTER_LINEAR)
@@ -124,7 +129,7 @@ async def getCams():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return redirect('/goto_allcam')
 
 
 
@@ -157,7 +162,7 @@ def showAllCams():
 
         # Return the image to the browser
         yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + allImages + b'\r\n')  # concat frame one by one and show result
+                b'Content-Type: image/webp\r\n\r\n' + allImages + b'\r\n')  # concat frame one by one and show result
 
 @app.route('/allCamsImage')
 def allCamsImage():
