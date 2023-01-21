@@ -12,6 +12,7 @@ import threading
 import numpy as np
 import json, sys, subprocess, os, glob
 import apriltagModule
+import asyncio
 
 if sys.argv[1]=='--config':
     print('making config file')
@@ -27,7 +28,14 @@ if sys.argv[1]=='--config':
                 print('camera not plugged in')
                 continue
             break
-        camera_id=subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "$e: id_model_id"')[15:]
+        camera_id=subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "^e: id_model_id"')[15:]
+        """
+        How to get further camera information:
+        run `udevadm info -q all -n /dev/video{cam port} | grep -i -P '$e: v4l/by-path/.*-index'`
+        
+        If it returns 0, the camera is good
+        """
+
         assert len(camera_id)==4, 'invalid id. This is a weird camera problem. '
         config[f'camera_{i}']['uid']=camera_id
         while True:
@@ -67,18 +75,16 @@ if len(sys.argv)!=3:
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
 
-cameraDev = [ "/dev/video0", "/dev/video2", "/dev/video4", "/dev/video6" ]
-camera = cv2.VideoCapture(0)
+cameraDev = [ "/dev/video5", "/dev/video0"]#, "/dev/video0", "/dev/video0", "/dev/video0" ]
 #camera.open(cameraDev[0])
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
+
 
 cameras = []
 imageHoriz = []
 
 #camera dimensions
-camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+#camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+#camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 currentCam = 0
 
@@ -86,7 +92,7 @@ displayApril = False
 displayColor = False
 
 cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
-currentFrame = camera.read()
+#currentFrame = camera.read()
 
 def readCam(cam, frames, ind):
     while True:
@@ -98,21 +104,25 @@ def readCam(cam, frames, ind):
                     interpolation=cv2.INTER_LINEAR)
         frames[ind] = resized
 
-def openCam(i, cameras):
+def openCam(i):
+    global cameras
     cam = cv2.VideoCapture() 
     cam.open(cameraDev[i]) 
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
     cameras.append(cam)
-    
 
-def getCams(): 
-    cameras = []
+
+async def getCams():
+    global cameras
     for i in range(len(cameraDev)):
-        th = threading.Thread(target=openCam, args=(i, cameras))
+        print('hi')
+        th = threading.Thread(target=openCam, args=(i,))
         th.start()
     while len(cameras) < len(cameraDev):
-        print("Capturing all cameras...")
+        await asyncio.sleep(0.05)#print("Capturing all cameras...")
+
+    print('cameras good')
     return cameras
 
 """
@@ -243,10 +253,8 @@ def prev():
 
 
 @app.route('/goto_allcam')
-def gotoAllCam():
-    global cameras
-    camera.release()
-    cameras = getCams()
+async def gotoAllCam():
+    await getCams()
     return redirect('/allcam')
 
 @app.route('/allcam')
@@ -254,7 +262,8 @@ def all():
     return render_template("allcam.html")
 
 def showAllCams():
-    global imageHoriz 
+    global imageHoriz
+    print('hiiii',len(cameras))
     for i in range(len(cameraDev)):
         th = threading.Thread(target=readCam, args=(cameras[i], imageHoriz, i))
         th.start()
@@ -298,26 +307,20 @@ def readImg(ind):
                 b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n') 
 
 #side camera view
-@app.route('/goto_sidecam')
-def gotoSideCam():
-    global cameras
-    camera.release()
-    #indices = [ 0, 1, 2 ]
-    #cameras = getSpecificCams(indices)
-    return redirect('/sidecam')
 
-@app.route("/side1")
-def side1():
-    return Response(readImg(0), mimetype='multipart/x-mixed-replace; boundary=frame')
-@app.route("/side2")
-def side2():
-    return Response(readImg(1), mimetype='multipart/x-mixed-replace; boundary=frame')
-@app.route("/side3")
-def side3():
-    return Response(readImg(2), mimetype='multipart/x-mixed-replace; boundary=frame')
-@app.route("/side4")
-def side4():
-    return Response(readImg(3), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+#@app.route("/side1")
+#def side1():
+#    return Response(readImg(0), mimetype='multipart/x-mixed-replace; boundary=frame')
+#@app.route("/side2")
+#def side2():
+#    return Response(readImg(1), mimetype='multipart/x-mixed-replace; boundary=frame')
+#@app.route("/side3")
+#def side3():
+#    return Response(readImg(2), mimetype='multipart/x-mixed-replace; boundary=frame')
+#@app.route("/side4")
+#def side4():
+#    return Response(readImg(3), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
