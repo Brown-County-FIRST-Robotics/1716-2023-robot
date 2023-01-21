@@ -9,7 +9,11 @@ DriveCartesian::DriveCartesian(Drivetrain* subsystem, std::function<double()> fo
 }
 
 void DriveCartesian::Execute() {
-	drivetrain->Drive(-x(), y(), z());
+	xSquare = x() * fabs(x()); //multiply each axis by its absolute value, this makes acceleration exponential rather than linear
+	ySquare = y() * fabs(y());
+	zSquare = z() * fabs(z());
+
+	drivetrain->Drive(-xSquare, ySquare, zSquare); //x must be inverted
 }
 
 void DriveCartesian::End(bool interrupted) {

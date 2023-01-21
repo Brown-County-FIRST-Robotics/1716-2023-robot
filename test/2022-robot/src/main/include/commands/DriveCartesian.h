@@ -18,4 +18,8 @@ private:
 	std::function<double()> x;
 	std::function<double()> y;
 	std::function<double()> z;
+
+	double xSquare;
+	double ySquare;
+	double zSquare;
 };
