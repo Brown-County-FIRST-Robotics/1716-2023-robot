@@ -8,6 +8,7 @@
 #include "commands/SpinTfx.h"
 #include "commands/SpinTsrx.h"
 #include "commands/SpinAll.h"
+#include "commands/SpinNeo.h"
 #include "commands/ToggleSolenoid.h"
 #include "subsystems/Motors.h"
 #include "subsystems/SolenoidSubsystem.h"
@@ -29,6 +30,7 @@ private:
 	SpinAll spinAll{&motors};
 	SpinTfx spinTfx{&motors};
 	SpinTsrx spinTsrx{&motors};
+	SpinNeo spinNeo{&motors};
 
 	void ConfigureButtonBindings();
 };

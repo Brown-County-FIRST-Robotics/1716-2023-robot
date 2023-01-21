@@ -3,6 +3,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include <frc/AnalogOutput.h>
+#include <rev/CANSparkMax.h>
 
 class Motors : public frc2::SubsystemBase {
  public:
@@ -13,9 +14,11 @@ class Motors : public frc2::SubsystemBase {
 
 	void SetTfx(double speed); //Declare your own methods like so
 	void SetTsrx(double speed);
+	void SetNeo(double speed);
 
 	private:
 		//subsystem components such as motors
 		WPI_TalonFX tfx;
 		WPI_TalonSRX tsrx;
+		rev::CANSparkMax neo;
 };
