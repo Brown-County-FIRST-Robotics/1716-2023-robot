@@ -33,5 +33,5 @@ private:
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	WPI_Pigeon2 pigeon{0};
+	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
 };

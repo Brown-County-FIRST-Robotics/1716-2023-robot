@@ -1,4 +1,5 @@
 #include "subsystems/Drivetrain.h"
+#include <iostream>
 
 Drivetrain::Drivetrain() {
 	frontRight.SetInverted(true);
@@ -26,4 +27,5 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 
 double Drivetrain::GetPitch() {
 	return pigeon.GetPitch();
+	std::cout << pigeon.GetPitch();
 }

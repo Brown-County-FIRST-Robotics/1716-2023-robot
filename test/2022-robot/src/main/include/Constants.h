@@ -27,6 +27,8 @@ namespace DrivetrainConst {
 	const int FRONTRIGHTID = 2;
 	const int BACKLEFTID = 3;
 	const int BACKRIGHTID = 4;
+	
+	const int PIGEONID = 20;
 
 	const int ACCELERATIONCAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };
