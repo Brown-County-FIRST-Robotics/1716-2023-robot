@@ -86,12 +86,7 @@ imageHoriz = []
 #camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
 #camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
-currentCam = 0
 
-displayApril = False 
-displayColor = False
-
-cols = [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 255, 255, 255 ]]
 #currentFrame = camera.read()
 
 def readCam(cam, frames, ind):
@@ -99,7 +94,7 @@ def readCam(cam, frames, ind):
         ret, frame = cam.read()
         if not ret:
             break
-        resized = cv2.resize(frame, 
+        resized = cv2.resize(frame,
                     (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
                     interpolation=cv2.INTER_LINEAR)
         frames[ind] = resized
@@ -125,131 +120,12 @@ async def getCams():
     print('cameras good')
     return cameras
 
-"""
-def getSpecificCams(indices):
-    global imageHoriz
-    cams = []
-    for i in range(len(indices)):
-        th = threading.Thread(target=openCam, args=(indices[i], cams))
-        th.start()
-    while len(cams) < len(indices):
-        print("Capturing cameras...")
-    for i in range(len(cams)):
-        th = threading.Thread(target=readCam, args=(cams[i], imageHoriz, i))
-        th.start()
-    return cams
-"""
-
-# This function gets called by the /video_feed route below
-def gen_frames():  # generate frame by frame from camera
-    global currentFrame
-
-    # We want to loop this forever
-    while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-
-        #display april tags
-        if displayApril:
-            april.displayApril(frame, camera)
-        if displayColor:
-            color.findColor(frame, camera, np.array(cols[1], dtype=np.uint8),
-                                           np.array(cols[2], dtype=np.uint8))
-
-        
-        #draw crosshairs
-        cv2.rectangle(frame, 
-                      (int(camWidth / 2 - 2), int(camHeight / 2 - 16)),
-                      (int(camWidth / 2 + 2), int(camHeight / 2 + 16)),
-                      [255, 0, 0],2)
-        cv2.rectangle(frame, 
-                      (int(camWidth / 2 - 16), int(camHeight / 2 - 2)),
-                      (int(camWidth / 2 + 16), int(camHeight / 2 + 2)),
-                      [255, 0, 0],2)
-
-        # If something goes wrong with the camera, exit the function
-        if not success:
-            break
-        
-        currentFrame = frame
-
-        # This step encodes the data into a jpeg image
-        ret, buffer = cv2.imencode('.jpg', frame)
-
-        # We have to return bytes to the user
-        frame = buffer.tobytes() 
-
-        # Return the image to the browser
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
-
-
-@app.route('/video_feed')
-def video_feed():
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/')
 def index():
     """Video streaming home page."""
     return render_template('index.html')
 
-#switch between cameras
-@app.route('/next')
-def next():
-    global currentCam
-    global camera
-    global camWidth
-    global camHeight
-
-    currentCam += 1
-    currentCam %= len(cameraDev) 
-    camera.release()
-    camera = cv2.VideoCapture()
-    camera.open(cameraDev[currentCam])
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
-
-    print(currentCam) 
-    
-    camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-    camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-
-    return redirect('/')
-
-@app.route('/toggle_april_tag')
-def toggle_april():
-    global displayApril
-    displayApril = not displayApril
-    return redirect('/')
-
-@app.route('/toggle_color_detection')
-def toggle_color():
-    global displayColor
-    displayColor = not displayColor
-    return redirect('/')
-
-@app.route('/prev')
-def prev():
-    global currentCam
-    global camera
-    global camWidth
-    global camHeight    
-
-    currentCam -= 1
-    if currentCam < 0:
-        currentCam = len(cameraDev) - 1 
-    print(currentCam)
-    camera.release()
-    camera = cv2.VideoCapture()
-    camera.open(cameraDev[currentCam])
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15) 
-
-    camWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-    camHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-
-    return redirect('/')
 
 
 @app.route('/goto_allcam')
@@ -274,7 +150,7 @@ def showAllCams():
         allImages = cv2.hconcat(imageHoriz)
 
         # This step encodes the data into a jpeg image 
-        ret, buffer = cv2.imencode('.jpg', allImages)
+        ret, buffer = cv2.imencode('.webp', allImages)
 
         # We have to return bytes to the user
         allImages = buffer.tobytes() 
