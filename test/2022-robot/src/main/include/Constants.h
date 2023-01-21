@@ -1,29 +1,32 @@
 #pragma once
-#include <units/time.h>
+// #include <units/time.h>
+#include <frc/TimedRobot.h> //units::scalar
 
-namespace SolenoidConstants {
-	const units::second_t SOLENOIDSETLENGTH = 3_ms;
-}
+// namespace Solenoid {
+// 	const units::second_t SOLENOIDSETLENGTH = 3_ms;
+// }
 
-enum ArmConstants {
-	SHOOTERMOTOR1ID = 6,
-	SHOOTERMOTOR2ID = 7,
+// enum Arm {
+// 	SHOOTERMOTOR1ID = 6,
+// 	SHOOTERMOTOR2ID = 7,
 
-	SHOOTERSOLENOIDFORWARDID = 0,
-	SHOOTERSOLENOIDREVERSEID = 1,
+// 	SHOOTERSOLENOIDFORWARDID = 0,
+// 	SHOOTERSOLENOIDREVERSEID = 1,
 
-	CLIMBERSOLENOIDFORWARDID = 2,
-	CLIMBERSOLENOIDREVERSEID = 3
-};
+// 	CLIMBERSOLENOIDFORWARDID = 2,
+// 	CLIMBERSOLENOIDREVERSEID = 3
+// };
 
-enum ArmAngleConstants {
-	ANGLEMOTOR1ID = 10,
-	ANGLEMOTOR2ID = 11
-};
+// enum ArmAngle {
+// 	ANGLEMOTOR1ID = 10,
+// 	ANGLEMOTOR2ID = 11
+// };
 
-enum DrivetrainConstants {
-	FRONTRIGHTID = 2,
-	FRONTLEFTID = 1,
-	BACKRIGHTID = 3,
-	BACKLEFTID = 0
+namespace Drivetrain {
+	const int FRONTRIGHTID = 2;
+	const int FRONTLEFTID = 1;
+	const int BACKRIGHTID = 3;
+	const int BACKLEFTID = 0;
+
+	//const units::scalar ACCELERATIONRATE = (3 / 1_s);
 };

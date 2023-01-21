@@ -9,7 +9,7 @@ DriveCartesian::DriveCartesian(Drivetrain* subsystem, std::function<double()> fo
 }
 
 void DriveCartesian::Execute() {
-	drivetrain->Drive(x(), y(), z());
+	drivetrain->Drive(-x(), y(), z());
 }
 
 void DriveCartesian::End(bool interrupted) {

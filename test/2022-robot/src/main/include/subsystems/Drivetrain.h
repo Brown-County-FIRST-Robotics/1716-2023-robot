@@ -1,12 +1,12 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
-#include <ctre/Phoenix.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/DoubleSolenoid.h>
 #include <rev/CANSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
-#include "Constants.h"
+#include <frc/filter/SlewRateLimiter.h>
+#include <frc/TimedRobot.h> //units::scalar
 
 class Drivetrain : public frc2::SubsystemBase {
 public:
@@ -21,10 +21,12 @@ public:
 	void Drive(double x, double y, double z);
 
 private:
-	rev::CANSparkMax frontLeft{DrivetrainConstants::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backLeft{DrivetrainConstants::BACKLEFTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax frontRight{DrivetrainConstants::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backRight{DrivetrainConstants::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontLeft{1, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontRight{2, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backLeft{3, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backRight{4, rev::CANSparkMax::MotorType::kBrushless};
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
+
+	frc::SlewRateLimiter<units::scalar> accelerationCap{3 / 1_s};
 };
