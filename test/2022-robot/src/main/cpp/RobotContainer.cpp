@@ -18,7 +18,8 @@ RobotContainer::RobotContainer() {
 	drivetrain.SetDefaultCommand(DriveCartesian(&drivetrain, 
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return 0; },//controller.GetLeftX(); }, 
-		[this] { return controller.GetLeftX(); } ))//RightX(); }));
+		[this] { return controller.GetLeftX(); },//RightX(); }));
+		[this] { return controller.GetBButton(); } ));
 
 	//Autonomous:
 	// autonomousChooser.SetDefaultOption("Spin SRX Then FX Then Both", &spinSrxThenFxThenBoth);

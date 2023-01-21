@@ -20,6 +20,8 @@ public:
 	*/
 	void Drive(double x, double y, double z);
 
+	void ActivateBreakMode(bool doBrakeMode);
+
 private:
 	rev::CANSparkMax frontLeft{1, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{2, rev::CANSparkMax::MotorType::kBrushless};
@@ -28,5 +30,9 @@ private:
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	frc::SlewRateLimiter<units::scalar> accelerationCap{3 / 1_s};
+	frc::SlewRateLimiter<units::scalar> xAccelerationCap{3 / 1_s};
+	frc::SlewRateLimiter<units::scalar> yAccelerationCap{3 / 1_s};
+	frc::SlewRateLimiter<units::scalar> zAccelerationCap{3 / 1_s};
+
+	double CloserToZero(double value1, double value2);
 };

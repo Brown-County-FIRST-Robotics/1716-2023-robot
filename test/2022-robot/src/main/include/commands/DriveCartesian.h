@@ -7,7 +7,7 @@
 
 class DriveCartesian : public frc2::CommandHelper<frc2::CommandBase, DriveCartesian> {
 public:
-	explicit DriveCartesian(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation);
+	explicit DriveCartesian(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
 
 	void Execute() override;
 	
@@ -19,7 +19,11 @@ private:
 	std::function<double()> y;
 	std::function<double()> z;
 
+	std::function<bool()> doBrake;
+
 	double xSquare;
 	double ySquare;
 	double zSquare;
+
+	void updateBrake(std::function<bool()> brake);
 };
