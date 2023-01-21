@@ -31,6 +31,11 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureButtonBindings() {
 	//JoystickButton(&controller, XboxController::Button::kB).WhenActive(ToggleClimberSolenoid{&arm}.WithTimeout(SolenoidConstants::SOLENOIDSETLENGTH));
+	controller.X().ToggleOnTrue(DriveCartesian(&drivetrain, 
+		[this] { return -controller.GetLeftY(); }, 
+		[this] { return 0; },//controller.GetLeftX(); }, 
+		[this] { return controller.GetLeftX(); },//RightX(); }));
+		[this] { return controller.GetBButton(); } ).ToPtr());
 }
 
 // frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
