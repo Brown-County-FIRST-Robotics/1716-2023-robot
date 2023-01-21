@@ -230,50 +230,25 @@ void RobotContainer::ConfigureButtonBindings() {
 
 ## Decorators:
 
-Decorators are a sort of addon to any commands you may have that are applied during binding. They add additional functionality, such as ending a command after a certain amount of time. They can be used by including `<frc2/command/ParallelRaceGroup.h>`, which is their return type, and calling the decorator method on the command of choice inside of the binding method. So, for example:
+Decorators are a feature of WPILib that allow you to add additional functionality to commands during binding. They can be used by calling the decorator method on the command of choice inside of the binding method. So, for example:
 ```C++
-JoystickButton(&controller, XboxController::Button::kY).WhenActive(ToggleSolenoid{&solenoidSubsystem}.WithTimeout(3_ms));
+Jcontroller.Y().WhileTrue(ToggleSolenoid(&solenoidSubsystem).WithTimeout(3_s));
 ```
-One of the more useful decorators is `WithTimeout()`, which takes a `units::second_t` as a perameter. To use this, you'll need the `<units/time.h>` header. Read more about types of decorators on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html#command-decorator-methods).
+Read more about types of decorators on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#composition-types).
 
 ## Command Composition:
 
-Command can be made using other commands. This is called command composition. There are two main options: the `SequentialCommandGroup`, which runs each command one after another, and the `ParallelCommandGroup`, which runs all the commands at the same time. There are also two other types of `ParallelCommandGroup` which are used for more specific use cases (read more on the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html#types-of-command-groups)). If you need a more complex command structure, it can be built by composing command compositions, making command groups out of command groups. Commands can be composed like so:  
-
-`ComposedCommandName.h`:
-```C++
-#pragma once
-
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/SequentialCommandGroup.h> //or any other command group
-
-#include "Command1.h"
-#include "Command2.h"
-#include "Command3.h"
-
-class ComposedCommandName : public frc2::CommandHelper<frc2::SequentialCommandGroup, ComposedCommandName> {
-public:
-	ComposedCommandName(SubsystemName* subsystem);
-
-private:
-	SubsystemName* subsystemName;
-};
+Commands can be made by combining other commands using command composition. There are two main types of command groups: the *Sequence*, which runs a list of commands in sequence, and the *Parallel*, which runs a list of commands at the same time, provided they don't share any requirements (there are also two sub-types of parallel command group, listed [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#parallel)). If you need a more complex command structure, it can be built by composing command compositions, since command groups are themselves commands, they can be be composed into more command groups. Commands can be composed together by including `<frc2/command/Commands.h>` and then calling the factory for the group you want from `frc2::cmd` in `RobotContainer.cpp`:  
+```cpp
+controller.A().WhileTrue(frc2::cmd::Parallel(std::move(command1), std::move(command2), std::move(command3)));
+controller.B().OnTrue(frc2::cmd::Sequence(std::move(command1), std::move(command2)));
 ```
 
-`ComposedCommandName.cpp`:
-```C++
-#include "commands/ComposedCommandName.h"
-
-ComposedCommandName::ComposedCommandName(Motors* subsystem) : subsystemName(subsystem) {
-	AddCommands(Command1{subsystemName}, Command2{subsystemName}, Command3{subsystemName});
-}
-```
-
-Commands can also be composed inline, however this is more difficult. Read more about it here: [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/command-groups.html#inline-command-groups).
+Each command included in the composition needs to have `std::move` called on it from the `<utility>` library.
 
 ## Autonomous:
 
-This guide is based off of this one: [guide](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html).
+This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.
 1. Include `<frc/smartdashboard/SendableChooser.h>`
 2. In `RobotContainer.h` `private`, declare a variable of `SendableChooser`, which is able to be sent to the dashboard and allows you to choose an option from a list during runtime: `frc::SendableChooser<frc2::Command*> autonomousChooser;`
 3. Declare a variable of each command you would like to add to the chooser: `CommandName1 commandName1{&subsystemName};` (subsystemName must already be declared)
