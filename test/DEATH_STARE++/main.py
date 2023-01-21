@@ -11,32 +11,47 @@ import threading
 #import april
 import numpy as np
 import json, sys, subprocess, os, glob
+import apriltagModule
 
 if sys.argv[1]=='--config':
     print('making config file')
     config={}
     for i in range(4):
         config[f'camera_{i}']={}
-        camera_port=input(f'camera {i+1} port:')
-        assert camera_port.isdigit(), 'please input a number'
-        assert os.path.exists(f'/dev/video{camera_port}'), 'camera not plugged in'
+        while True:
+            camera_port=input(f'camera {i+1} port(probably an even number):')
+            if not camera_port.isdigit():
+                print('please input a number')
+                continue
+            if not os.path.exists(f'/dev/video{camera_port}'):
+                print('camera not plugged in')
+                continue
+            break
         camera_id=subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "$e: id_model_id"')[15:]
-        assert len(camera_id)==4, 'invalid id'
+        assert len(camera_id)==4, 'invalid id. This is a weird camera problem. '
         config[f'camera_{i}']['uid']=camera_id
-        calibration_fname=glob.glob(input('camera calibration file(glob patterns allowed):'))[0]
-        assert os.path.exists(calibration_fname), f'{calibration_fname} does not exit'
+        while True:
+            calibration_fname=input('camera calibration file(glob patterns allowed):')
+            if len(glob.glob(calibration_fname))!=1:
+                print(f'{calibration_fname} does not exit, or glob pattern is not specific enough. ')
+                continue
+            break
         with open(calibration_fname, 'r') as calibration_file:
             calibration = json.loads(calibration_file.read())
             '''
             add calibration code here
             '''
             config[f'camera_{i}']['calibration']=calibration
-        pos=json.loads(input(f'Position of camera {i+1}(x,y,z,yaw,pitch,roll):'))
-        assert len(pos)==6, 'Length=6'
+        while True:
+            pos=json.loads(input(f'Position of camera {i+1}(x,y,z,yaw,pitch,roll):'))
+            if len(pos)!=6:
+                print('Length=6')
+                continue
+            break
         config[f'camera_{i}']['pos']=pos
     config_fname=input('Name of config file:')
     assert input(f'This will create a file called "configs/{config_fname}.json", are you sure(y/n):')=='y', 'Operation canceled'
-    with open(f'configs/{config_fname}.json') as config_file:
+    with open(f'configs/{config_fname}.json','w') as config_file:
         config_file.write(json.dumps(config))
     print('Config file made')
     sys.exit()
@@ -89,6 +104,7 @@ def openCam(i, cameras):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
     cameras.append(cam)
+    
 
 def getCams(): 
     cameras = []
@@ -225,15 +241,6 @@ def prev():
 
     return redirect('/')
 
-@app.route('/capture_color')
-def captureColor():
-    global cols
-    success, image = camera.read()
-    cols = color.getAverage(image, 100)
-    cols[1] = [ cols[0][0] - 50, cols[0][1] - 50, cols[0][2] - 50 ]
-    cols[2] = [ cols[0][0] + 50, cols[0][1] + 50, cols[0][2] + 50 ]
-    return redirect('/')
-
 
 @app.route('/goto_allcam')
 def gotoAllCam():
@@ -241,22 +248,6 @@ def gotoAllCam():
     camera.release()
     cameras = getCams()
     return redirect('/allcam')
-
-@app.route('/goback')
-def goBack():
-    global cameras
-    global camera
-    global currentCam
-    for c in cameras:
-        c.release()
-    cameras = []
-    camera = cv2.VideoCapture()
-    currentCam = 0
-    camera.open(cameraDev[currentCam])
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
-    
-    return redirect('/')
 
 @app.route('/allcam')
 def all():
@@ -328,9 +319,6 @@ def side3():
 def side4():
     return Response(readImg(3), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/sidecam')
-def sidecam():
-    return render_template("sidecam.html")
 
 if __name__ == '__main__':
     for i in range(len(cameraDev)):
