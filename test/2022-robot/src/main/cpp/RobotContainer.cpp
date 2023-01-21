@@ -7,7 +7,7 @@
 //#include "commands/ToggleClimberSolenoid.h"
 //#include "commands/Shoot.h"
 #include "commands/DriveCartesian.h"
-#include <cstdio>
+#include "commands/AutoBalance.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -35,7 +35,9 @@ void RobotContainer::ConfigureButtonBindings() {
 		[this] { return -controller.GetLeftY(); }, 
 		[this] { return 0; },//controller.GetLeftX(); }, 
 		[this] { return controller.GetLeftX(); },//RightX(); }));
-		[this] { return controller.GetBButton(); } ).ToPtr());
+		[this] { return controller.GetBButton(); } ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf));
+
+	controller.Y().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
 }
 
 // frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

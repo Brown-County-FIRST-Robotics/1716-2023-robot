@@ -13,7 +13,10 @@ void DriveCartesian::Execute() {
 	ySquare = y() * fabs(y());
 	zSquare = z() * fabs(z());
 
-	drivetrain->Drive(-xSquare, ySquare, zSquare); //x must be inverted
+	drivetrain->Drive(
+		-CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
+		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
+		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
 
 	updateBrake(doBrake);
 }
@@ -28,5 +31,14 @@ void DriveCartesian::updateBrake(std::function<bool()> brake) {
 	}
 	else {
 		drivetrain->ActivateBreakMode(false);
+	}
+}
+
+double DriveCartesian::CloserToZero(double value1, double value2) {
+	if (fabs(value1) < fabs(value2)) {
+		return value1;
+	}
+	else {
+		return value2;
 	}
 }

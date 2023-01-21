@@ -1,12 +1,13 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
-#include <frc/DoubleSolenoid.h>
 #include <rev/CANSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/TimedRobot.h> //units::scalar
+#include <ctre/Phoenix.h>
+
+#include "Constants.h"
 
 class Drivetrain : public frc2::SubsystemBase {
 public:
@@ -22,17 +23,15 @@ public:
 
 	void ActivateBreakMode(bool doBrakeMode);
 
+	double GetPitch();
+
 private:
-	rev::CANSparkMax frontLeft{1, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax frontRight{2, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backLeft{3, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backRight{4, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backLeft{DrivetrainConst::BACKLEFTID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backRight{DrivetrainConst::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	frc::SlewRateLimiter<units::scalar> xAccelerationCap{3 / 1_s};
-	frc::SlewRateLimiter<units::scalar> yAccelerationCap{3 / 1_s};
-	frc::SlewRateLimiter<units::scalar> zAccelerationCap{3 / 1_s};
-
-	double CloserToZero(double value1, double value2);
+	WPI_Pigeon2 pigeon{0};
 };

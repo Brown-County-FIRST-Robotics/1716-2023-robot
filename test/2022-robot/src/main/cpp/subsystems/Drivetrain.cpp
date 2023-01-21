@@ -6,11 +6,7 @@ Drivetrain::Drivetrain() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	robotDrive.DriveCartesian(
-		CloserToZero(x, xAccelerationCap.Calculate(x)), 
-		CloserToZero(y, yAccelerationCap.Calculate(y)), 
-		CloserToZero(z, zAccelerationCap.Calculate(z)));
-	//robotDrive.DriveCartesian(accelerationCap.Calculate(x), accelerationCap.Calculate(y), accelerationCap.Calculate(z));
+	robotDrive.DriveCartesian(x, y, z);
 }
 
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
@@ -28,11 +24,6 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 	}
 }
 
-double Drivetrain::CloserToZero(double value1, double value2) {
-	if (fabs(value1) < fabs(value2)) {
-		return value1;
-	}
-	else {
-		return value2;
-	}
+double Drivetrain::GetPitch() {
+	return pigeon.GetPitch();
 }

@@ -22,11 +22,17 @@
 // 	ANGLEMOTOR2ID = 11
 // };
 
-namespace Drivetrain {
-	const int FRONTRIGHTID = 2;
+namespace DrivetrainConst {
 	const int FRONTLEFTID = 1;
-	const int BACKRIGHTID = 3;
-	const int BACKLEFTID = 0;
+	const int FRONTRIGHTID = 2;
+	const int BACKLEFTID = 3;
+	const int BACKRIGHTID = 4;
 
-	//const units::scalar ACCELERATIONRATE = (3 / 1_s);
+	const int ACCELERATIONCAP = 3; //the acceleration cap in joystick units/second, higher is faster
+};
+
+enum PIDConst {
+	PROPORTIONALFACTOR = 1,
+	INTEGRALFACTOR = 1,
+	DERIVATIVEFACTOR = 1
 };
