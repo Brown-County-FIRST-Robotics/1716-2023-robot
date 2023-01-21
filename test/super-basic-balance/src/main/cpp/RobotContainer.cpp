@@ -16,16 +16,13 @@ RobotContainer::RobotContainer() {
 
 	drivetrain.SetDefaultCommand(DriveCartesian(&drivetrain, 
 		[this] { 
-			double val = controller.GetLeftY() ;
-			return val * fabs(val) ;
+			return controller.GetLeftY();
 		 }, 
 		[this] { 
-			double val = controller.GetLeftX() ;
-			return val * fabs(val) ;
+			return controller.GetLeftX();
 		 }, 
 		[this] { 			
-			double val = controller.GetRightX() ;
-			return val * fabs(val) ;
+			return controller.GetRightX();
 		 }));
 
 	//Autonomous:

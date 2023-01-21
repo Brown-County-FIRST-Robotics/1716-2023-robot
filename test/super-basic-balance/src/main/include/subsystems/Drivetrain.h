@@ -5,7 +5,6 @@
 #include <frc/DoubleSolenoid.h>
 #include <rev/CANSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
-#include <frc/filter/SlewRateLimiter.h>
 #include <frc/TimedRobot.h> //units::scalar
 
 class Drivetrain : public frc2::SubsystemBase {
@@ -28,5 +27,4 @@ private:
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	frc::SlewRateLimiter<units::scalar> accelerationCap{3 / 1_s};
 };
