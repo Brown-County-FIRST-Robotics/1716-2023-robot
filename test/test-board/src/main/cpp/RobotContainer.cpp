@@ -1,5 +1,6 @@
 #include "RobotContainer.h"
 #include "Constants.h"
+#include "commands/SpinNeo.h"
 
 #include <frc2/command/button/JoystickButton.h>
 #include <frc/XboxController.h> //used for enumerators
@@ -13,7 +14,8 @@ using namespace frc2;
 
 RobotContainer::RobotContainer() {
 	ConfigureButtonBindings();
-	
+
+	motors.SetDefaultCommand(SpinNeo(&motors, [this] { return controller.GetLeftY();}).ToPtr());	
 
 	//Autonomous:
 	//autonomousChooser.SetDefaultOption("Spin SRX Then FX Then Both", SpinTsrx(&motors).WithTimeout(2_s).AndThen(SpinTfx(&motors).WithTimeout(2_s).AndThen(SpinAll(&motors).WithTimeout(2_s))).get());
@@ -32,7 +34,7 @@ void RobotContainer::ConfigureButtonBindings() {
 	
 	(controller.A()
 		&& (!controller.B()))
-		.WhileTrue(SpinNeo(&motors).ToPtr()); //if a is held, but not b, spin Tfx
+		.WhileTrue(SpinTsrx(&motors).ToPtr()); //if a is held, but not b, spin Tfx
 
 	(controller.B()
 		&& (!controller.A()))
