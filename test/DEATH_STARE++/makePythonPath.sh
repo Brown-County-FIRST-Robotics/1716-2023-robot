@@ -1,1 +1,3 @@
-export PythonPath=../Camera_Tests/
+#!/bin/bash
+
+export PYTHONPATH="../modules"
