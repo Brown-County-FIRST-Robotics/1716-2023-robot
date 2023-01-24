@@ -3,10 +3,7 @@
 
 ## Usage
 
-You should run this app using a Python virtual environment
+First, add the python path
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python app.py
+source makePythonPath.sh
 ```
