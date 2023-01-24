@@ -4,6 +4,8 @@
 Drivetrain::Drivetrain() {
 	frontRight.SetInverted(true);
 	backRight.SetInverted(true);
+
+	robotDrive.SetSafetyEnabled(false); //delete this later
 }
 
 void Drivetrain::Drive(double x, double y, double z) {

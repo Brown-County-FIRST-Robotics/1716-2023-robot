@@ -1,23 +1,26 @@
 #include "commands/AutoBalance.h"
 #include "Constants.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
-AutoBalance::AutoBalance(Drivetrain* subsystem) : drivetrain(subsystem)
+AutoBalance::AutoBalance(Drivetrain* drive) 
+	: CommandHelper{frc2::PIDController{PIDConst::PROPORTIONALFACTOR, PIDConst::INTEGRALFACTOR, PIDConst::DERIVATIVEFACTOR}, 
+	[drive] { return drive->GetPitch(); },
+	0,
+
+	//[drive](double output) { drive->Drive(output, 0, 0); },
+	[this, drive](double output) {frc::SmartDashboard::PutNumber("output", output);
+							frc::SmartDashboard::PutNumber("Proportional", m_controller.GetP());
+							frc::SmartDashboard::PutNumber("Pitch", drive->GetPitch()); 
+							/*drive->Drive(output, 0, 0);*/ },
+
+	{drive}} //https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#creating-a-pidcommand
 {
-	AddRequirements(subsystem);
-}
-
-void AutoBalance::Execute() {
-	pitch = drivetrain->GetPitch();
-	integralElement += pitch;
-
-	proportional = pitch * PIDConst::PROPORTIONALFACTOR;
-	integral = integralElement * PIDConst::INTEGRALFACTOR;
-	derivative = (pitch-prevPos) * PIDConst::DERIVATIVEFACTOR;
-
-	drivetrain->Drive(proportional + integral + derivative, 0, 0);
-	prevPos = pitch;
+	m_controller.SetTolerance(-3, 3);
+	m_controller.Reset();
+	AddRequirements(drive);
 }
 
 void AutoBalance::End(bool interrupted) {
-	drivetrain->Drive(0, 0, 0);
+	//drivetrain->Drive(0, 0, 0);
+	frc2::PIDCommand::End(interrupted); //call the original class's end function to not break anything within it
 }

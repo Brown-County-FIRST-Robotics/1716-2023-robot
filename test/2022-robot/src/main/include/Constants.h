@@ -33,8 +33,8 @@ namespace DrivetrainConst {
 	const int ACCELERATIONCAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };
 
-enum PIDConst {
-	PROPORTIONALFACTOR = 1,
-	INTEGRALFACTOR = 1,
-	DERIVATIVEFACTOR = 1
+namespace PIDConst {
+	const double PROPORTIONALFACTOR = .01 / 2.0;
+	const double INTEGRALFACTOR = 2.0 * 1.5;
+	const double DERIVATIVEFACTOR = 0.125 / 1.5;
 };
