@@ -5,6 +5,9 @@ import numpy as np
 import json, sys, subprocess, os, glob
 import apriltagModule
 import asyncio
+from networktables import NetworkTables
+
+
 
 global config
 
@@ -66,6 +69,11 @@ if len(sys.argv) != 3:
     print('If you want to make a config file, run "python3 main.py --config"')
     sys.exit()
 
+NetworkTables.initialize(server=sys.argv[-1])
+
+april_table = NetworkTables.getTable("apriltag")
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "1716robotics"
 
@@ -85,6 +93,19 @@ for i in config:
 
 cameras = []
 imageHoriz = []
+
+
+def handleApriltags(image, cameraMatrix):
+    res = apriltagModule.getPosition(image, cameraMatrix, None)
+
+    if res is not None and len(res) > 0:
+        for i in res:
+            april_table.putNumber("up_down", i.up_down)
+            april_table.putNumber("left_right", i.left_right)
+            april_table.putNumber("distance", i.distance)
+            april_table.putNumber("yaw", i.yaw)
+
+
 
 
 def handleCam(ind):
@@ -120,10 +141,7 @@ def handleCam(ind):
         frame = cv2.remap(frame, map1, map2, cv2.INTER_CUBIC)
 
         #april tags
-        res = apriltagModule.getPosition(frame, cameraMatrix, None)
-        if res is not None and len(res) > 0:
-            print([i.yaw for i in res])
-
+        handleApriltags(frame, cameraMatrix)
 
         #for sending to the web user
         resized = cv2.resize(frame,
