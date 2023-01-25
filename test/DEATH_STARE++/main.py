@@ -87,51 +87,53 @@ cameras = []
 imageHoriz = []
 
 
-def readCam(cam, frames, ind):
+def handleCam(ind):
+    global cameras
+    global imageHoriz
+
+
+    cam = cv2.VideoCapture()
+    cam.open(cameraDev[ind])
+    # it is possible to scale rawCameraMatrix by the calibrationResolution and captureResolution, see https://stackoverflow.com/questions/44888119/c-opencv-calibration-of-the-camera-with-different-resolution
+    # instead here we just make sure they are the same
+    video_size = calibrations[ind]["calibrationResolution"]
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
+    test_video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
+
     rawCameraMatrix = np.array(calibrations[ind]['cameraMatrix'])
     distCoeffs = np.array(calibrations[ind]['cameraDistortion'])
-    res = [int(cam.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))]
-    cameraMatrix, roi = cv2.getOptimalNewCameraMatrix(rawCameraMatrix, distCoeffs, res, 1,
-                                                      res)
-    map1, map2 = cv2.initUndistortRectifyMap(rawCameraMatrix, distCoeffs, None, cameraMatrix,
-                                             res, cv2.CV_16SC2)
+    processingResolution = np.array(calibrations[ind]['processingResolution'])
+
+    cameraMatrix, roi = cv2.getOptimalNewCameraMatrix(rawCameraMatrix, distCoeffs, video_size, 0, processingResolution)
+    map1, map2 = cv2.initUndistortRectifyMap(rawCameraMatrix, distCoeffs, None, cameraMatrix, processingResolution, cv2.CV_16SC2)
+
+    cameras[ind] = cam
 
     while True:
         ret, frame = cam.read()
         if not ret:
             break
-        cv2.remap(frame, map1, map2, cv2.INTER_CUBIC)
-        res = apriltagModule.getPosition(frame, np.array([[1.31927534e+03, 0.00000000e+0, 1.04468063e+03],
-                                                          [0.00000000e+00, 1.32853937e+03, 5.66297124e+02],
-                                                          [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), None)
+
+        #undistort
+        frame = cv2.remap(frame, map1, map2, cv2.INTER_CUBIC)
+
+        #april tags
+        res = apriltagModule.getPosition(frame, cameraMatrix, None)
         if res is not None and len(res) > 0:
             print([i.yaw for i in res])
+
+
+        #for sending to the web user
         resized = cv2.resize(frame,
                              (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
                              interpolation=cv2.INTER_LINEAR)
-        frames[ind] = resized
+        imageHoriz[ind] = resized
 
 
-def openCam(i):
-    global cameras
-    cam = cv2.VideoCapture()
-    cam.open(cameraDev[i])
-    assert tuple(calibrations[i]["calibrationResolution"]) == (
-        cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
-    cameras.append(cam)
 
 
-async def getCams():
-    global cameras
-    for i in range(len(cameraDev)):
-        th = threading.Thread(target=openCam, args=(i,))
-        th.start()
-    while len(cameras) < len(cameraDev):
-        await asyncio.sleep(0.05)  # print("Capturing all cameras...")
-    print('cameras good')
-    return cameras
 
 
 @app.route('/')
@@ -142,7 +144,7 @@ def index():
 
 @app.route('/goto_allcam')
 async def gotoAllCam():
-    await getCams()
+#    await getCams()
     return redirect('/allcam')
 
 
@@ -153,9 +155,6 @@ def all():
 
 def showAllCams():
     global imageHoriz
-    for i in range(len(cameraDev)):
-        th = threading.Thread(target=readCam, args=(cameras[i], imageHoriz, i))
-        th.start()
 
     # We want to loop this forever
     while True:
@@ -196,8 +195,19 @@ def readImg(ind):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
 
-
-if __name__ == '__main__':
+def main():
     for i in range(len(cameraDev)):
         imageHoriz.append(np.zeros((240, 240, 3), dtype=np.uint8))
+
+    global cameras
+    cameras = [None] * len(cameraDev)
+    for i in range(len(cameraDev)):
+        th = threading.Thread(target=handleCam, args=(i,))
+        th.start()
+
+
     app.run(threaded=True, host="0.0.0.0")
+
+
+if __name__ == '__main__':
+  main()
