@@ -144,7 +144,6 @@ def index():
 
 @app.route('/goto_allcam')
 async def gotoAllCam():
-#    await getCams()
     return redirect('/allcam')
 
 
@@ -178,22 +177,19 @@ def allCamsImage():
 
 
 def readImg(ind):
-    cam = cv2.VideoCapture()
-    cam.open(cameraDev[ind])
-    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 20)
-    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 15)
-    cameras.append(cam)
     while True:
-        ret, frame = cam.read()
-        # This step encodes the data into a jpeg image 
-        ret, buffer = cv2.imencode('.jpg', frame)
-
-        # We have to return bytes to the user
-        img = buffer.tobytes()
+        # This step encodes the data into a webp image
+        ret, buffer = cv2.imencode('.webp', imageHoriz[ind])
 
         # Return the image to the browser
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+               b'Content-Type: image/webp\r\n\r\n' + buffer.tobytes() + b'\r\n')
+
+
+@app.route("/camera/<num>")
+def camera(num):
+    return Response(readImg(int(num)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 def main():
     for i in range(len(cameraDev)):
@@ -205,9 +201,8 @@ def main():
         th = threading.Thread(target=handleCam, args=(i,))
         th.start()
 
-
     app.run(threaded=True, host="0.0.0.0")
 
 
 if __name__ == '__main__':
-  main()
+    main()
