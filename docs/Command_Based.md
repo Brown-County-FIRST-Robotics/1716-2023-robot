@@ -249,43 +249,57 @@ Each command included in the composition needs to have `std::move` called on it 
 ## Autonomous:
 
 This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.
-1. Include `<frc/smartdashboard/SendableChooser.h>`
-2. In `RobotContainer.h` `private`, declare a variable of `SendableChooser`, which is able to be sent to the dashboard and allows you to choose an option from a list during runtime: `frc::SendableChooser<frc2::Command*> autonomousChooser;`
-3. Declare a variable of each command you would like to add to the chooser: `CommandName1 commandName1{&subsystemName};` (subsystemName must already be declared)
-4. In the `RobotContainer.cpp` constructor, set your default command and add the others:
-	- For the first command, use `SetDefaultOption()`: `autonomousChooser.SetDefaultOption("Display Name", &commandName1);`\
-	- For all others, use `AddOption()`: `autonomousChooser.AddOption("Display Name", &commandName2);`
-5. Put this method at the end of your `RobotContainer.cpp` (remember the corrosponding public `frc2::Command* GetAutonomousCommand();` in the header): 
-```C++
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-return autonomousChooser.GetSelected();
-}
-```
-6. In `Robot.cpp` `AutonomousInit()` schedule the command if it is available (remember public `void AutonomousInit() override;`in `Robot.h`): 
-```C++
-void Robot::AutonomousInit() {
-  autonomousCommand = robotContainer.GetAutonomousCommand();
+1. In `RobotContainer.h`, include `<frc/smartdashboard/SendableChooser.h>`and declare a private `SendableChooser` object, which is able to be sent to the smartdashboard as a list of options:
+    ```C++
+    frc::SendableChooser<frc2::Command*> autonomousChooser;
+    ```
+2. Declare a private object for each command you would like to be available as an autonomous routine (subsystem object must already be declared): 
+    ```C++
+    Command1Name command1Name{&subsystemName};
+    ```
+3. Declare a public method to be accessed by `robot.cpp` that returns the currently selected autonomous command:
+    ```C++
+    frc2::Command* GetAutonomousCommand();
+    ```
+4. In `RobotContainer.cpp`, in the constructor, set your default command and add the others:
+	- For the first command, call `SetDefaultOption()`:
+        ```C++
+        autonomousChooser.SetDefaultOption("Display Name", &command1Name);
+        ```
+	- For all other commands, call `AddOption()`:
+        ```C++
+        autonomousChooser.AddOption("Display Name", &commandName2);
+        ```
+5. Define `GetAutonomousCommand()` to return the currently selected autonomous command at the end of `RobotContainer.cpp`:
+    ```C++
+    frc2::Command* RobotContainer::GetAutonomousCommand() {
+        return autonomousChooser.GetSelected();
+    }
+    ```
+6. In `Robot.h`, publicly override `AutonomousInit()` and `TeleopInit()`:
+    ```C++
+    void AutonomousInit() override;
+    void TeleopInit() override;
+    ```
+7. In `Robot.cpp`, schedule the command if there is one selected in `AutonomousInit()`:
+    ```C++
+    void Robot::AutonomousInit() {
+        autonomousCommand = robotContainer.GetAutonomousCommand();
 
-  if (autonomousCommand != nullptr) {
-    autonomousCommand->Schedule();
-  }
-}
-```
-7. Check that the scheduler is called in `RobotPeriodic()` (`Robot.cpp`):
-```C++
-void Robot::RobotPeriodic() {
-	frc2::CommandScheduler::GetInstance().Run();
-}
-```
-8. Cancel the autonomous command in `TeleopInit()`:
-```C++
-void Robot::TeleopInit() {
-	if (autonomousCommand != nullptr) {
-		autonomousCommand->Cancel();
-		autonomousCommand = nullptr;
-	}
-}
-```
+        if (autonomousCommand != nullptr) {
+            autonomousCommand->Schedule();
+        }
+    }
+    ```
+8. Cancel the autonomous command when teleoperated mode begins in `TeleopInit()`:
+    ```C++
+    void Robot::TeleopInit() {
+        if (autonomousCommand != nullptr) {
+            autonomousCommand->Cancel();
+            autonomousCommand = nullptr;
+        }
+    }
+    ```
 
 ## Generalized Solenoid Subsystem and Command
 
