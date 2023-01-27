@@ -303,87 +303,90 @@ This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/sof
 
 ## Generalized Solenoid Subsystem and Command
 
-Most double solenoids should be able to function using basically the same subsystem and command, though you may want to add the solenoid to another subsystem in some cases. Below is a general use command and subsystem in order to toggle a solenoid.  
-> **IMPORTANT: The below command must be bound to a trigger with the `WithTimeout(3_ms)` decorator. Failure to do so may result in damage to the solenoid and a nonfunctional command.**
+Most double solenoids should be able to function using basically the same subsystem and command, though you may need to add the solenoid to another subsystem in some cases. Below is a general use command and subsystem for toggling a solenoid.  
+> **IMPORTANT: The below command must be bound with the `WithTimeout(3_ms)` decorator. Failure to do so may result in damage to the solenoid.**
 
-`SubsystemName.h`:
+`SolenoidSubsystem.h`:
 ```C++
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DoubleSolenoid.h>
+#include <frc/PneumaticHub.h>
 
-class SubsystemName : public frc2::SubsystemBase {
+class SolenoidSubsystem : public frc2::SubsystemBase {
 public:
-	SubsystemName();
+	SolenoidSubsystem();
 
 	void SetPosition(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetPosition();
 
 private:
- 	frc::DoubleSolenoid solenoidName; //it is ill-advised to name your solenoid `solenoid`, as it may not interact well with wpilib
+	frc::PneumaticHub hub{0};
+ 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(0, 1);
 };
 ```
 
-`SubsystemName.cpp`:
+`SolenoidSubsystem.cpp`:
 ```C++
-#include "subsystems/SubsystemName.h"
+#include "subsystems/SolenoidSubsystem.h"
 
-SubsystemName::SubsystemName() : solenoidName{frc::PneumaticsModuleType::CTREPCM, [reverseId], [forwardId]} {} //declares the solenoid to use ctre control and the two provided ids as ints. Generally the smaller number should go first, test to see what works correctly.
-
-void SubsystemName::SetPosition(frc::DoubleSolenoid::Value position) {
-	solenoidName.Set(position);
+SolenoidSubsystem::SolenoidSubsystem() {
+    hub.EnableCompressorDigital();
 }
 
-frc::DoubleSolenoid::Value SubsystemName::GetPosition() {
-	return solenoidName.Get();
+void SolenoidSubsystem::SetPosition(frc::DoubleSolenoid::Value position) {
+	solenoid.Set(position);
+}
+
+frc::DoubleSolenoid::Value SolenoidSubsystem::GetPosition() {
+	return solenoid.Get();
 }
 ```
 
-`CommandName.h`(name should probably mention toggling the solenoid):
+`ToggleSolenoid.h`:
 ```C++
 #pragma once
 
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 
-#include "subsystems/SubsystemName.h"
+#include "subsystems/SolenoidSubsystem.h"
 
-class CommandName : public frc2::CommandHelper<frc2::CommandBase, CommandName> {
+class ToggleSolenoid : public frc2::CommandHelper<frc2::CommandBase, ToggleSolenoid> {
 public:
-	explicit CommandName(SubsystemName* subsystem);
+	explicit ToggleSolenoid(SolenoidSubsystem* subsystem);
 
 	void Initialize() override;
 	void End(bool interrupted) override;
 
 private:
-	SubsystemName* subsystemName;
+	SolenoidSubsystem* solenoidSubsystem;
 	frc::DoubleSolenoid::Value currentPosition;
 };
 ```
 
-`CommandName.cpp`:
+`ToggleSolenoid.cpp`:
 ```C++
-#include "commands/CommandName.h"
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "commands/ToggleSolenoid.h"
 
-CommandName::CommandName(SubsystemName* subsystem) : subsystemName(subsystem) {
+ToggleSolenoid::ToggleSolenoid(SolenoidSubsystem* subsystem) : solenoidSubsystem(subsystem) {
 	AddRequirements(subsystem);
-	currentPosition = frc::DoubleSolenoid::Value::kReverse; //set the initial position to retracted
+	currentPosition = solenoidSubsystem->GetPosition(); //set the initial position to whatever the solenoid is currently at
 }
 
-void CommandName::Initialize() {
-	if (currentPosition == frc::DoubleSolenoid::Value::kReverse) {
-		SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kForward);
+void ToggleSolenoid::Initialize() {
+	if (currentPosition == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		SolenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kForward);
 		currentPosition = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
-		SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kReverse);
+		SolenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kReverse);
 		currentPosition = frc::DoubleSolenoid::Value::kReverse;
 	}
 }
 
-void CommandName::End(bool interrupted) { //should be called 3 ms after `Initialize()`
-	SubsystemName->SetPosition(frc::DoubleSolenoid::Value::kOff);
+void ToggleSolenoid::End(bool interrupted) { //should be called 3 ms after `Initialize()` using `WithTimeout()` decorator
+	SolenoidSubsystem->SetPosition(frc::DoubleSolenoid::Value::kOff); //set the solenoid to off, the piston will remain where it was last set to
 }
 ```
