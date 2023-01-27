@@ -34,7 +34,10 @@ namespace DrivetrainConst {
 };
 
 namespace PIDConst {
-	const double PROPORTIONALFACTOR = .01 / 2.0;
-	const double INTEGRALFACTOR = 2.0 * 1.5;
-	const double DERIVATIVEFACTOR = 0.125 / 1.5;
+	const double ULTIMATEGAIN = .0067;
+	const double OSCPERIOD = 3.49;
+
+	const double PROPORTIONALFACTOR = (ULTIMATEGAIN * .6) * 1.9;
+	const double INTEGRALFACTOR = (((ULTIMATEGAIN * 1.2) / OSCPERIOD) * .5);
+	const double DERIVATIVEFACTOR = ((ULTIMATEGAIN * OSCPERIOD) * 0.075) * 0.8;
 };
