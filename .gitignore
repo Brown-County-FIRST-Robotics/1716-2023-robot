@@ -32,13 +32,15 @@
 *.app
 
 # simulation files 
- simgui-ds.json 
- simgui-window.json 
- simgui.json 
+**/simgui-ds.json 
+**/simgui-window.json 
+**/simgui.json 
   
   
- build/ 
- .gradle/
+**/build/ 
+**/.gradle/
 
-__pycache__/
-venv/
+**/__pycache__/
+**/venv/
+**/.idea/
+
