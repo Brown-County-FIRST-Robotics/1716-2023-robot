@@ -10,3 +10,4 @@ void Motors::SetTfx(double speed) {
 void Motors::SetTsrx(double speed) {
 	tsrx.Set(speed);
 }
+
