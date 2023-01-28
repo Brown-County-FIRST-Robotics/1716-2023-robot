@@ -4,6 +4,7 @@
 
 #include "commands/DriveCartesian.h"
 #include "commands/AutoBalance.h"
+#include "commands/RasPiDrive.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -30,7 +31,9 @@ void RobotContainer::ConfigureButtonBindings() {
 		[this] { return controller.GetLeftX(); },//RightX(); }));
 		[this] { return controller.GetBButton(); } ).WithInterruptBehavior(frc2::Command::InterruptionBehavior::kCancelSelf));
 
-	controller.Y().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
+	controller.A().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
+
+	controller.Y().ToggleOnTrue(RasPiDrive(&drivetrain).ToPtr());
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
