@@ -6,7 +6,7 @@ import time
 def main():
     NetworkTables.initialize("10.17.16.2")
 
-    drive_table = NetworkTables.getTable("1716drive")
+    drive_table = NetworkTables.getTable("1716Drive")
 
     print("Start")
     time.sleep(3)
