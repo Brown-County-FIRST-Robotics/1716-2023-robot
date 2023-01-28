@@ -4,9 +4,7 @@ import threading
 import numpy as np
 import json, sys, subprocess, os, glob
 import apriltagModule
-import asyncio
 from networktables import NetworkTables
-
 
 
 global config
@@ -25,15 +23,7 @@ if sys.argv[1] == '--config':
                 print('camera not plugged in')
                 continue
             break
-        camera_id = subprocess.getoutput(
-            f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "^e: id_model_id"')[15:]
-        """
-        How to get further camera information:
-        run `udevadm info -q all -n /dev/video{cam port} | grep -i -P '$s: v4l/by-path/.*-index'`
-        
-        If it returns 0, the camera is good
-        """
-
+        camera_id = subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "^e: id_model_id"')[15:]
         assert len(camera_id) == 4, 'invalid id. This is a weird camera problem. '
         config[-1]['uid'] = camera_id
         while True:
@@ -95,8 +85,8 @@ cameras = []
 imageHoriz = []
 
 
-def handleApriltags(image, cameraMatrix):
-    res = apriltagModule.getPosition(image, cameraMatrix, None)
+def handleApriltags(image, camera_matrix):
+    res = apriltagModule.getPosition(image, camera_matrix, None)
 
     if res is not None and len(res) > 0:
         for i in res:
@@ -106,16 +96,13 @@ def handleApriltags(image, cameraMatrix):
             april_table.putNumber("yaw", i.yaw)
 
 
-
-
 def handleCam(ind):
     global cameras
     global imageHoriz
 
-
     cam = cv2.VideoCapture()
     cam.open(cameraDev[ind])
-    # it is possible to scale rawCameraMatrix by the calibrationResolution and captureResolution, see https://stackoverflow.com/questions/44888119/c-opencv-calibration-of-the-camera-with-different-resolution
+    # it is possible to scale raw_camera_matrix by the calibrationResolution and captureResolution, see https://stackoverflow.com/questions/44888119/c-opencv-calibration-of-the-camera-with-different-resolution
     # instead here we just make sure they are the same
     video_size = calibrations[ind]["calibrationResolution"]
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
@@ -123,27 +110,28 @@ def handleCam(ind):
     test_video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
     assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
-    rawCameraMatrix = np.array(calibrations[ind]['cameraMatrix'])
-    distCoeffs = np.array(calibrations[ind]['cameraDistortion'])
-    processingResolution = np.array(calibrations[ind]['processingResolution'])
+    raw_camera_matrix = np.array(calibrations[ind]['cameraMatrix'])
+    dist_coeffs = np.array(calibrations[ind]['cameraDistortion'])
+    processing_resolution = np.array(calibrations[ind]['processingResolution'])
 
-    cameraMatrix, roi = cv2.getOptimalNewCameraMatrix(rawCameraMatrix, distCoeffs, video_size, 0, processingResolution)
-    map1, map2 = cv2.initUndistortRectifyMap(rawCameraMatrix, distCoeffs, None, cameraMatrix, processingResolution, cv2.CV_16SC2)
+    camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coeffs, video_size, 0, processing_resolution)
+    map1, map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coeffs, None, camera_matrix, processing_resolution, cv2.CV_16SC2)
 
     cameras[ind] = cam
 
     while True:
-        ret, frame = cam.read()
-        if not ret:
+        good, frame = cam.read()
+        if not good:
+            print('Capture failure')
             break
 
-        #undistort
+        # undistort
         frame = cv2.remap(frame, map1, map2, cv2.INTER_CUBIC)
 
-        #april tags
-        handleApriltags(frame, cameraMatrix)
+        # april tags
+        handleApriltags(frame, camera_matrix)
 
-        #for sending to the web user
+        # for sending to the web user
         resized = cv2.resize(frame,
                              (int(240 / cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * cam.get(cv2.CAP_PROP_FRAME_WIDTH)), 240),
                              interpolation=cv2.INTER_LINEAR)
