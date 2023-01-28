@@ -22,14 +22,14 @@ def convert(pt):
     return float(pt[0]), float(pt[1])
 
 
-def getPosition(img, camera_mtx, dist_coefficients, tags=range(9), roll_threshold=0.3):
+def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(9), roll_threshold=0.3):
     """
     This function takes an image and returns the position of apriltags in the image
 
     :param img: The image you want to find apriltags in
-    :param camera_mtx: The camera's calibration matrix
+    :param camera_matrix: The camera's calibration matrix
     :param dist_coefficients: The distortion coefficients of the camera
-    :param tags: (Default: 1-9) The apriltags to look for
+    :param valid_tags: (Default: 1-9) The apriltags to look for
     :param roll_threshold: (Default: 0.3 radians/17 degrees) The maximum roll of the apriltag. Helps remove false detections.
     :return: A list of Detection objects, or None if it fails
     :rtype: list(Detection objects)
@@ -54,10 +54,10 @@ def getPosition(img, camera_mtx, dist_coefficients, tags=range(9), roll_threshol
     detection_results = detector.detect(gray)
 
     detections = []
-    if len(detection_results) > 0: # Check if there are any apriltags
+    if len(detection_results) > 0:  # Check if there are any apriltags
         for detection in detection_results:
             # Check if apriltag is allowed
-            if detection.tag_id not in tags:
+            if detection.tag_id not in valid_tags:
                 continue
 
             image_points = detection.corners.reshape(1, 4, 2)
@@ -70,7 +70,7 @@ def getPosition(img, camera_mtx, dist_coefficients, tags=range(9), roll_threshol
             object_pts = np.array(ob_pts).reshape(4, 3)
 
             # Solve for rotation and translation
-            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points, camera_mtx,
+            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points, camera_matrix,
                                                                                  dist_coefficients,
                                                                                  flags=cv2.SOLVEPNP_ITERATIVE)
             assert good, 'something went wrong with solvePnP'

@@ -1,11 +1,16 @@
-from flask import Flask, render_template, Response, redirect, request
-import cv2
+import glob
+import json
+import os
+import subprocess
+import sys
 import threading
+
+import cv2
 import numpy as np
-import json, sys, subprocess, os, glob
-import apriltagModule
+from flask import Flask, render_template, Response, redirect
 from networktables import NetworkTables
 
+import apriltagModule
 
 global config
 
@@ -86,14 +91,14 @@ imageHoriz = []
 
 
 def handleApriltags(image, camera_matrix):
-    res = apriltagModule.getPosition(image, camera_matrix, None)
+    detections = apriltagModule.getPosition(image, camera_matrix, None)
 
-    if res is not None and len(res) > 0:
-        for i in res:
-            april_table.putNumber("up_down", i.up_down)
-            april_table.putNumber("left_right", i.left_right)
-            april_table.putNumber("distance", i.distance)
-            april_table.putNumber("yaw", i.yaw)
+    if detections is not None and len(detections) > 0:
+        for detection in detections:
+            april_table.putNumber("up_down", detection.up_down)
+            april_table.putNumber("left_right", detection.left_right)
+            april_table.putNumber("distance", detection.distance)
+            april_table.putNumber("yaw", detection.yaw)
 
 
 def handleCam(ind):
@@ -128,7 +133,9 @@ def handleCam(ind):
         # undistort
         frame = cv2.remap(frame, map1, map2, cv2.INTER_CUBIC)
 
-        # april tags
+        # ADD YOUR OWN MODULES HERE
+
+        # april valid_tags
         handleApriltags(frame, camera_matrix)
 
         # for sending to the web user
@@ -138,10 +145,6 @@ def handleCam(ind):
         imageHoriz[ind] = resized
 
 
-
-
-
-
 @app.route('/')
 def index():
     """Video streaming home page."""
@@ -149,7 +152,7 @@ def index():
 
 
 @app.route('/allcam')
-def all():
+def allcam():
     return render_template("allcam.html")
 
 
@@ -158,18 +161,18 @@ def showAllCams():
 
     # We want to loop this forever
     while True:
-        allImages = cv2.hconcat(imageHoriz)
+        all_images = cv2.hconcat(imageHoriz)
         if not imageHoriz:
             continue
         # This step encodes the data into a jpeg image 
-        ret, buffer = cv2.imencode('.webp', allImages)
+        good, buffer = cv2.imencode('.webp', all_images)
 
         # We have to return bytes to the user
-        allImages = buffer.tobytes()
+        all_images = buffer.tobytes()
 
         # Return the image to the browser
         yield (b'--frame\r\n'
-               b'Content-Type: image/webp\r\n\r\n' + allImages + b'\r\n')  # concat frame one by one and show result
+               b'Content-Type: image/webp\r\n\r\n' + all_images + b'\r\n')  # concat frame one by one and show result
 
 
 @app.route('/allCamsImage')
