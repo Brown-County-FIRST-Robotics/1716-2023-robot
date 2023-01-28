@@ -17,6 +17,7 @@
 |`WPI_TalonSRX`|`<ctre/Phoenix.h>`|-|
 |`frc::DoubleSolenoid`|`<frc/DoubleSolenoid.h>`|Positions are accessible at `frc::DoubleSolenoid::Value`; more info available [here](#solenoids)|
 |`rev::CANSparkMax`|`<rev/CANSparkMax.h>`|-|
+|`frc::PneumaticHub`|`<frc/PneumaticHub.h>`|-|
 
 ## Naming Conventions:
 
@@ -36,9 +37,9 @@ CC is camelCase, PC is PaskalCase
 1. Install their respective software. 
 	- ForREVLib, download the [Java/C++ API](https://docs.revrobotics.com/sparkmax/software-resourc​es/spark-max-api-information#c++-and-java) (big orange button with "Download latest Java API" on it) and unzip into the C:\Users\Public\wpilib\2023 directory on Windows or ~/wpilib/2023 directory on Linux. 
 	- For the CTRE Phoenix library, download and install the [Phoenix Framework](https://store.ctr-electronics.com/software/). 
-2. Next, in VSCode, press the wpilib icon in the top right in your project and go to `WPILib: Manage Vendor Libraries` then `Install new libraries (offline)` and select `REVLib` ***(check needed)***, `Phoenix (v5)`, or both.
+2. Next, in VSCode, press the wpilib icon in the top right in your project and go to `WPILib: Manage Vendor Libraries` then `Install new libraries (offline)` and select `REVLib`, `Phoenix (v5)`, or both.
 
-**Do not** install the `Phoenix (Pro)` library, as it is locked behind a paywall and will prevent your code from running. To uninstall a library, go to `WPILib: Manage Vendor Libraries` again and select `manage current libraries` ***(check needed)***, then select any libraries you wish to remove and press enter.
+**Do not** install the `Phoenix (Pro)` library, as it is locked behind a paywall and will prevent your code from running. To uninstall a library, go to `WPILib: Manage Vendor Libraries` again and select `Manage current libraries`, then select any libraries you wish to remove and press enter.
 
 ## Dashboard Values:
 
@@ -56,4 +57,4 @@ You can put Boolean, Numeric, or String values on the dashboard very simply by i
 
 ## Solenoids
 
-Solenoids are the controllers for air-powered devices, generally pistons. They require an air compressor, which is automatically activated if a solenoid is declared ***(Does this still work with REV?)*** and does not require any code interaction. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second (about 3 ms), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston. There is a sample subsystem and command available for them [here](Command_Based#generalized-solenoid-subsystem-and-command). ([docs](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html))
+Solenoids are the controllers and valves for air-powered devices, generally pistons. We use double solenoids, which have three settings: Forward, Reverse, and Off. The solenoid should never be in Forward or Reverse for longer than a fraction of a second (about 3 ms), just long enough to move the piston. It must then be set to Off again in order to avoid damaging the piston. There is a sample subsystem and command available for them [here](Command_Based#generalized-solenoid-subsystem-and-command). ([docs](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/pneumatics/pneumatics.html))

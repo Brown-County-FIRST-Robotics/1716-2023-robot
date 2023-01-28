@@ -202,7 +202,7 @@ void CommandName::End(bool interrupted) {
 
 ### Button Binding:
 
-1. Ensure that you have "`frc2::CommandXboxController controller{0};`" and "`void ConfigureButtonBindings();`" under `private:` in `RobotContainer.h` (you'll need to include `<frc2/command/button/CommandXboxController.h>`). This instantiates a controller to use for button triggers and declares the method used for bindings.
+1. Ensure that you have `frc2::CommandXboxController controller{0};` and `void ConfigureButtonBindings();` under `private` in `RobotContainer.h` (you'll need to include `<frc2/command/button/CommandXboxController.h>`). This instantiates a controller to use for button triggers and declares the method used for bindings.
 
 2. In `RobotContainer.cpp`, declare your button bindings (read the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) to find the correct binding for the functionality you want to achieve):
 ```C++
