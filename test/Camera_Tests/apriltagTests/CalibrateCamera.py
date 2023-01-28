@@ -21,11 +21,11 @@ ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
 #CHARUCO_BOARD = aruco.CharucoBoard(1,
 #        squaresX=CHARUCOBOARD_COLCOUNT,
 #        squaresY=CHARUCOBOARD_ROWCOUNT,
-#        squareLength=0.04,
-#        markerLength=0.02,
+#        squareLength=0.029,
+#        markerLength=0.014,
 #        dictionary=ARUCO_DICT)
 
-CHARUCO_BOARD = aruco.CharucoBoard((5,7), 0.04, 0.02, ARUCO_DICT, None)
+CHARUCO_BOARD = aruco.CharucoBoard((5,7), 0.029, 0.014, ARUCO_DICT, None)
 
 if 'generate' in sys.argv[1:]:
     imboard=CHARUCO_BOARD.generateImage((2000, 2000))
@@ -71,14 +71,6 @@ while True:
 
     cv2.imshow("test", dispimg)
 
-    k = cv2.waitKey(1)
-    if k%256 == 27:
-        # ESC pressed
-        print("Escape hit, breaking loop...")
-        break
-
-
-    print('captured frame')
     # Grayscale the image
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     image_size = gray.shape[::-1]
@@ -113,7 +105,7 @@ while True:
         #Add these corners and ids to our calibration arrays
         corners_all.append(charuco_corners)
         ids_all.append(charuco_ids)
-        pass
+        img_counter += 1
     else:
         cv2.putText(img, 'Charuco not found', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (20,20,255), 2, cv2.LINE_AA)
 
@@ -127,7 +119,8 @@ while True:
         break
 
 
-    img_counter += 1
+
+    print("Captured image %d" % img_counter)
 
 cam.release()
 
@@ -152,8 +145,5 @@ calibration, cameraMatrix, distCoeffs, rvecs, tvecs = aruco.calibrateCameraCharu
         distCoeffs=None)
 
 # Print matrix and distortion coefficient to the console
-out = {}
-out["calibrationResolution"] = image_size
-out["cameraMatrix"] = cameraMatrix
-out["cameraDistortion"] = distCoeffs
+out = [cameraMatrix.tolist(), distCoeffs.tolist()]
 print(out)
