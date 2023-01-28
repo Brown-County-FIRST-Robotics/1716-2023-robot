@@ -5,7 +5,7 @@
 1. [Component Reference](#component-reference)
 2. [Naming Conventions](#naming-conventions)
 3. [3rd Party Vendor Libraries](#3rd-party-vendor-libraries)
-4. [Smartdashboard/Shuffleboard Values](#smartdashboardshuffleboard-values)
+4. [Dashboard Values](#dashboard-values)
 	1. [Smartdashboard](#smartdashboard)
 5. [Solenoids](#solenoids)
 
@@ -40,13 +40,19 @@ CC is camelCase, PC is PaskalCase
 
 **Do not** install the `Phoenix (Pro)` library, as it is locked behind a paywall and will prevent your code from running. To uninstall a library, go to `WPILib: Manage Vendor Libraries` again and select `manage current libraries` ***(check needed)***, then select any libraries you wish to remove and press enter.
 
-## Smartdashboard/Shuffleboard Values:
+## Dashboard Values:
 
-One very useful feature of WPILib is the ability to post values to a smartdashboard ***(Check Name in DS)***. This can be used to show values for debugging, display useful information while driving, etc. Of the several options for smartdashboards included with WPILib (including making your own), we use shuffleboard because it looks nice, is simple to use, and is feature rich. There are three methods for putting values on shuffleboard: by putting a value on networktables (you can then manually move it onto smartdashboard), through WPILib's smartdashboard's API, which is meant for the older "smartdashboard", and shuffleboard can read and display on its `Smartdashboard` tab, or through shuffleboard's own API, which supports specifying which tab to place the value on, along with other features. The smartdashboard API is simpler, and should be used as of now (though since shuffleboard's API supports more features, it may be switched to in the future).
+One very useful feature of WPILib is the ability to post values to a dashboard. This can be used to show values for debugging, display useful information while driving, etc. Of the several options for dashboards included with WPILib (including making your own), we use shuffleboard because it looks nice, is simple to use, and is feature rich. There are three methods for putting values on shuffleboard: 
+- Putting a value on networktables, which you can then manually move it onto smartdashboard and save the position
+- Using the API for Smartdashboard, an older dashboard
+	- Shuffleboard can read values from Smartdashboard's API and will automatically display them on its `SmartDashboard` tab
+- Using shuffleboard's own API, which supports specifying which tab to place the value on, along with other features
+
+As the Smartdashboard API is the simplest option, it is used most as of now (though since shuffleboard's API supports more features, it may be switched to in the future).
 
 ### Smartdashboard:
 
-You can put Boolean, Numeric, or String values on the smartdashboard very simply by including `<frc/smartdashboard/SmartDashboard.h>` and calling `frc::SmartDashboard::PutBoolean`/`PutNumber`/`PutString` with the parameters `("Displayed Name", [value])`. The value should appear on shuffleboard on the `SmartDashboard` tab. ([docs](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/displaying-expressions.html))
+You can put Boolean, Numeric, or String values on the dashboard very simply by including `<frc/smartdashboard/SmartDashboard.h>` and calling `frc::SmartDashboard::PutBoolean`/`PutNumber`/`PutString` with the parameters `("Displayed Name", [value])`. The value should appear on shuffleboard on the `SmartDashboard` tab. ([docs](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/displaying-expressions.html))
 
 ## Solenoids
 
