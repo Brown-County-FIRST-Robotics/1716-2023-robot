@@ -3,13 +3,23 @@
 
 import rr1716
 import argparse
+import logging
 
 def main():
     parser = argparse.ArgumentParser()
-
+    
     parser.add_argument('--check', '-c', action="store_true", dest="check", help="Check the commits for correctness")
-
+    parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="CRITICAL", help="Check the commits for correctness")
     args = parser.parse_args()
+
+    # use getatter to turn loglevel into integer
+    logging.basicConfig(level=getattr(logging, args.loglevel))
+    
+    logging.debug("Debug test")
+    logging.info("Tnfo test")
+    logging.error("Error test")
+    logging.warning("warning test")
+    logging.critical("critical test")
 
     if args.check :
         print("Hello World")

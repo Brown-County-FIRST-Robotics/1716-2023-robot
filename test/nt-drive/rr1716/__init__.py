@@ -1,5 +1,5 @@
 
-from .mymodule import *
+
 from .AprilTags import *
 from .Camera import *
 from .DEATHSTARE import *

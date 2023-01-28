@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import logging
+
 class TestClass:
     def __init__(self):
         pass
