@@ -8,8 +8,10 @@
 #include "commands/SpinTfx.h"
 #include "commands/SpinTsrx.h"
 #include "commands/SpinAll.h"
+#include "commands/SpinNeo.h"
 #include "commands/ToggleSolenoid.h"
 #include "subsystems/Motors.h"
+#include "subsystems/Neo.h"
 #include "subsystems/SolenoidSubsystem.h"
 
 class RobotContainer {
@@ -21,6 +23,7 @@ private:
 	frc2::CommandXboxController controller{0};
 	
 	Motors motors;
+	Neo neo;
 	SolenoidSubsystem solenoidSubsystem;
 
 	//Autonomous
@@ -29,6 +32,7 @@ private:
 	SpinAll spinAll{&motors};
 	SpinTfx spinTfx{&motors};
 	SpinTsrx spinTsrx{&motors};
+	//SpinNeo spinNeo{&neo};
 
 	void ConfigureButtonBindings();
 };
