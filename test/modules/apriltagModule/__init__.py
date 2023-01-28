@@ -24,7 +24,7 @@ class Detection:
         self.distance_std = -1
         self.error = -1
 
-    def calcError(self, error_matrix=None, error_threshold=30):  # TODO: add error threshold
+    def calcError(self, error_matrix=None, error_threshold=3000):  # TODO: add error threshold
         if error_matrix is None:
             error_matrix = np.array([  # TODO: add real values
                 [1, 1, 1, 1, 1, 1, 1],
@@ -87,7 +87,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     if len(detection_results) > 0:  # Check if there are any apriltags
         for detection in detection_results:
             # Check if apriltag is allowed
-            if detection.tag/home/colin/Documents/1716-2023-robot/docs/ApritagModule.md_id not in valid_tags:
+            if detection.tag_id not in valid_tags:
                 continue
 
             image_points = detection.corners.reshape(1, 4, 2)

@@ -4,28 +4,29 @@ import os
 import subprocess
 import sys
 import threading
-
 import cv2
 import numpy as np
 from flask import Flask, render_template, Response, redirect
 from networktables import NetworkTables
 
 import apriltagModule
+import apriltagModule.aprilTagPositions
 
 global config
 
 if sys.argv[1] == '--config':
-    print('making config file')
+    print('Making config file')
+    print('Warning: cameras must all have zero pitch and roll relative to the apriltags')
     config = []
     for i in range(int(input('Number of cameras:'))):
         config.append({})
         while True:
             camera_port = input(f'camera {i + 1} port(probably an even number):')
             if not camera_port.isdigit():
-                print('please input a number')
+                print('Please input a number')
                 continue
             if not os.path.exists(f'/dev/video{camera_port}'):
-                print('camera not plugged in')
+                print('Camera not plugged in')
                 continue
             break
         camera_id = subprocess.getoutput(f'udevadm info -q all -n /dev/video{camera_port} | grep -i -P "^e: id_model_id"')[15:]
@@ -41,12 +42,12 @@ if sys.argv[1] == '--config':
             calibration = json.loads(calibration_file.read())
             config[-1]['calibration'] = calibration
         while True:
-            pos = input(f'Position of camera {i + 1}(x,y,z,yaw,pitch,roll):')
+            pos = input(f'Position of camera {i + 1}(x,y,z,yaw):')
             if pos == '':
-                pos = '[0,0,0,0,0,0]'
+                pos = '[0,0,0,0]'
             pos = json.loads(pos)
-            if len(pos) != 6:
-                print('Length=6')
+            if len(pos) != 4:
+                print('Length=4')
                 continue
             break
         config[-1]['pos'] = pos
