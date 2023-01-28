@@ -52,7 +52,7 @@ def convert(pt):
     return float(pt[0]), float(pt[1])
 
 
-def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(9), roll_threshold=0.3):
+def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20):
     """
     This function takes an image and returns the position of apriltags in the image
 
@@ -87,7 +87,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(9), roll
     if len(detection_results) > 0:  # Check if there are any apriltags
         for detection in detection_results:
             # Check if apriltag is allowed
-            if detection.tag_id not in valid_tags:
+            if detection.tag/home/colin/Documents/1716-2023-robot/docs/ApritagModule.md_id not in valid_tags:
                 continue
 
             image_points = detection.corners.reshape(1, 4, 2)
@@ -106,11 +106,11 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(9), roll
             assert good, 'something went wrong with solvePnP'
 
             # Map rotation_vector
-            pitch, yaw, roll = rotation_vector[0]
+            pitch, yaw, roll = rotation_vector[0]*180/math.pi
 
-            left_right = -translation_vector[0][0] - translation_vector[0][2] / 4
-            up_down = (translation_vector[0][1] + translation_vector[0][2] / 16) * 2
-            distance = translation_vector[0][2]
+            left_right = (-translation_vector[0][0] - translation_vector[0][2] / 4)*2.54
+            up_down = ((translation_vector[0][1] + translation_vector[0][2] / 16) * 2)*2.54
+            distance = translation_vector[0][2]*2.54
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
