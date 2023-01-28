@@ -2,9 +2,22 @@
 
 
 import rr1716
+import argparse
 
 def main():
-    print("main Hello world")
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--check', '-c', action="store_true", dest="check", help="Check the commits for correctness")
+
+    args = parser.parse_args()
+
+    if args.check :
+        print("Hello World")
+    else : 
+        print("It is curently not working")
+
+
+
 
 if __name__ == "__main__":
     main()
