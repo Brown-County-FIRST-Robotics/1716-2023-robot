@@ -22,6 +22,30 @@
 	max-height: 64px;
 }
 
+#robot
+{
+	height: 240px;
+	width: 300px;
+	justify-content: center;
+}
+
+.sidediv
+{
+	display: table;
+	align-items: center;
+	width: 100%;
+	text-align: center;
+	justify-content: center;
+}
+
+.side
+{
+	display: table-cell;
+	height: 240px;
+	width: 300px;		
+	vertical-align: middle;
+}
+
 .mt-5
 {
 	color: #FF4444;
@@ -44,4 +68,24 @@ button
 #buttons
 {
 	text-align: center;
+}
+
+.side1cam
+{
+	transform: perspective(100px) translate(0px, 60px) rotateX(-20deg);
+}
+
+.side2cam
+{
+	transform: perspective(100px) translate(80px, 0px) rotateY(25deg);
+}
+
+.side3cam
+{
+	transform: perspective(100px) translate(-80px, 0px) rotateY(-25deg);
+}
+
+.side4cam
+{
+	transform: perspective(100px) translate(0px, -60px) rotateX(20deg);
 }
