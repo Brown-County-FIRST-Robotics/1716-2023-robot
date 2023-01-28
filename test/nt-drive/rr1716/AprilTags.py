@@ -13,5 +13,5 @@ if __name__ == "__main__":
     pass
 else:
     # Run things on import here
-    print("module Hello world")
+    
     pass
