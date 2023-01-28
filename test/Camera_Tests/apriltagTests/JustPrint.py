@@ -30,6 +30,10 @@ if len(sys.argv)!=3:
 
 cam = cv2.VideoCapture()
 cam.open(f'/dev/video{sys.argv[1]}')
+
+#cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+#cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 

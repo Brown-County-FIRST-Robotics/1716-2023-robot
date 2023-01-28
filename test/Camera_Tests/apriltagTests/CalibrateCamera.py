@@ -44,8 +44,13 @@ camnum = int(sys.argv[1].strip())
 if str(camnum) == sys.argv[1].strip():
     pass
 cam = cv2.VideoCapture(camnum)
-cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+#cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+#cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 as_int = tuple(int(x) for x in video_size)
 assert as_int == video_size
