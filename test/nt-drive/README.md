@@ -12,10 +12,13 @@ Detects the visible april tags on the field
 ## Vision
 Sends what the robot is seeing to the network table(s)
 
-## Network Tables
+## Network Tablesz
 Tells the robot what to do
 
-## Runing the tests
-run pip install pytest (This installs pytest)
+# Testing
+This project uses pytest for testing objects
 
-run pytest
+## How to run the tests
+run `pip install pytest` (This installs pytest)
+
+run `pytest`
