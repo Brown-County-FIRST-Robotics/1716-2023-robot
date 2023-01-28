@@ -9,8 +9,10 @@
     3. [Button Binding](#button-binding)
 3. [Decorators](#decorators)
 4. [Command Composition](#command-composition)
-5. [Autonomous](#autonomous)
-6. [Generalized Solenoid Subsystem and Command](#generalized-solenoid-subsystem-and-command)
+5. [Lambda Use](#lambda-use)
+6. [Default Commands](#default-commands)
+7. [Autonomous](#autonomous)
+8. [Generalized Solenoid Subsystem and Command](#generalized-solenoid-subsystem-and-command)
 
 ## Commmand Concept Overviews:
 
@@ -269,6 +271,13 @@ A useful technique in command based is using lambda functions to easily and quic
     ```
     - The square brackets hold a list of class that will be accessible within the lambda, `this` refers to the current class, `RobotContainer`, where the controller is contained
     - Anythin within the curly braces will be run, return the value that you need in as few lines as possible
+
+## Default Commands:
+
+Each subsystem can have a default command that is run if no other command is currently using it. This feature is often useful in tandem with lambda functions because they allow functionality to be changed while running. Driving is almost always a default command, and shooting may also be; both use lambdas. You can set the default command of a subsystem in the `RobotContainer.cpp` constructor like so:
+```C++
+shooter.SetDefaultCommand(ShootCommand(&shooter));
+```
 
 ## Autonomous:
 
