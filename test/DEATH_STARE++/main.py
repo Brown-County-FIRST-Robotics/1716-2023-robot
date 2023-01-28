@@ -157,11 +157,6 @@ def handleCam(ind):
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return redirect('/goto_allcam')
-
-
-@app.route('/goto_allcam')
-async def gotoAllCam():
     return redirect('/allcam')
 
 
@@ -219,7 +214,7 @@ def main():
         th = threading.Thread(target=handleCam, args=(i,))
         th.start()
 
-    app.run(threaded=True, host="0.0.0.0")
+    app.run(threaded=True)
 
 
 if __name__ == '__main__':
