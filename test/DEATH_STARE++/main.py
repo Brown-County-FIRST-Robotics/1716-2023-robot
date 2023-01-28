@@ -80,7 +80,7 @@ calibrations = []
 
 for i in config:
     for camera in glob.glob('/dev/video*'):
-        if subprocess.getoutput(f"udevadm info -q all -n {camera} | grep -i -P '^s: v4l/by-path/.*-index'")[-1] == '0':
+        if subprocess.getoutput(f'udevadm info -q all -n {camera} | grep -i -P "^s: v4l/by-path/.*-index"')[-1] == '0':
             if subprocess.getoutput(f'udevadm info -q all -n {camera} | grep -i -P "^e: id_model_id"')[15:] == i['uid']:
                 cameraDev.append(camera)
                 calibrations.append(i['calibration'])
@@ -95,10 +95,18 @@ def handleApriltags(image, camera_matrix):
 
     if detections is not None and len(detections) > 0:
         for detection in detections:
+            detection.calcError()
             april_table.putNumber("up_down", detection.up_down)
             april_table.putNumber("left_right", detection.left_right)
             april_table.putNumber("distance", detection.distance)
             april_table.putNumber("yaw", detection.yaw)
+            april_table.putNumber("pitch", detection.pitch)
+
+            april_table.putNumber("up_down_std", detection.up_down_std)
+            april_table.putNumber("left_right_std", detection.left_right_std)
+            april_table.putNumber("distance_std", detection.distance_std)
+            april_table.putNumber("yaw_std", detection.yaw_std)
+            april_table.putNumber("pitch_std", detection.pitch_std)
 
 
 def handleCam(ind):
@@ -116,11 +124,11 @@ def handleCam(ind):
     assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
     raw_camera_matrix = np.array(calibrations[ind]['cameraMatrix'])
-    dist_coeffs = np.array(calibrations[ind]['cameraDistortion'])
+    dist_coefficients = np.array(calibrations[ind]['cameraDistortion'])
     processing_resolution = np.array(calibrations[ind]['processingResolution'])
 
-    camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coeffs, video_size, 0, processing_resolution)
-    map1, map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coeffs, None, camera_matrix, processing_resolution, cv2.CV_16SC2)
+    camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, video_size, 0, processing_resolution)
+    map1, map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, camera_matrix, processing_resolution, cv2.CV_16SC2)
 
     cameras[ind] = cam
 

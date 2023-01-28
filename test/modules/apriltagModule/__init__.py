@@ -17,6 +17,36 @@ class Detection:
         self.RMSError = rms_error
         self.tagID = tag_id
 
+        self.yaw_std = -1
+        self.pitch_std = -1
+        self.left_right_std = -1
+        self.up_down_std = -1
+        self.distance_std = -1
+        self.error = -1
+
+    def calcError(self, error_matrix=None, error_threshold=30):  # TODO: add error threshold
+        if error_matrix is None:
+            error_matrix = np.array([  # TODO: add real values
+                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1],
+            ])
+        input_matrix = np.array([  # TODO: rename
+            self.yaw,
+            self.pitch,
+            self.roll,
+            self.left_right,
+            self.up_down,
+            self.distance,
+            self.RMSError
+        ])
+        self.yaw_std, self.pitch_std, self.left_right_std, self.up_down_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
+        if self.error > error_threshold:
+            print(f'discarded a value (error:{self.error})')
+
 
 def convert(pt):
     return float(pt[0]), float(pt[1])
@@ -84,7 +114,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(9), roll
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
-                print('discarded a value')
+                print('discarded a value (roll)')
                 continue
             detections.append(Detection(yaw, pitch, roll, left_right, up_down, distance, rms,
                                         detection.tag_id))
