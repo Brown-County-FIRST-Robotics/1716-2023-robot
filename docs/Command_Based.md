@@ -248,7 +248,8 @@ Each command included in the composition needs to have `std::move` called on it 
 
 ## Autonomous:
 
-This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.
+This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.  
+> ***Note:** Decorators and inline commands are not supported for autonomous because the sendable chooser does not take CommandPtrs, define commands you need for autonomous in their own files (including compositions)*
 1. In `RobotContainer.h`, include `<frc/smartdashboard/SendableChooser.h>`and declare a private `SendableChooser` object, which is able to be sent to the smartdashboard as a list of options:
     ```C++
     frc::SendableChooser<frc2::Command*> autonomousChooser;
