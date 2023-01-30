@@ -6,6 +6,8 @@
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/TimedRobot.h> //units::scalar
 #include <ctre/Phoenix.h>
+#include <frc/DoubleSolenoid.h>
+#include <frc/PneumaticHub.h>
 
 #include "Constants.h"
 
@@ -27,6 +29,9 @@ public:
 	double GetPitch();
 	double GetYaw();
 
+	void SetSolenoidPosition(frc::DoubleSolenoid::Value position);
+	frc::DoubleSolenoid::Value GetSolenoidPosition();
+
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
@@ -36,4 +41,7 @@ private:
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
+
+	frc::PneumaticHub hub{0};
+ 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(0, 1);
 };

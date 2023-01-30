@@ -9,10 +9,12 @@ class SwitchDriveType : public frc2::CommandHelper<frc2::CommandBase, SwitchDriv
 public:
 	explicit SwitchDriveType(Drivetrain* drive);
 	
-	void Execute() override;
+	void Initialize() override;
 
 	void End(bool interrupted) override;
 
 private:
 	Drivetrain* drivetrain;
+
+	frc::DoubleSolenoid::Value currentPosition;
 };

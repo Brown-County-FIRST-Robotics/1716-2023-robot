@@ -38,3 +38,11 @@ double Drivetrain::GetPitch() {
 double Drivetrain::GetYaw() {
 	return pigeon.GetYaw();
 }
+
+void Drivetrain::SetSolenoidPosition(frc::DoubleSolenoid::Value position) {
+	solenoid.Set(position);
+}
+
+frc::DoubleSolenoid::Value Drivetrain::GetSolenoidPosition() {
+	return solenoid.Get();
+}

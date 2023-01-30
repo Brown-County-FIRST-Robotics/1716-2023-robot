@@ -2,9 +2,9 @@
 // #include <units/time.h>
 #include <frc/TimedRobot.h> //units::scalar
 
-// namespace Solenoid {
-// 	const units::second_t SOLENOIDSETLENGTH = 3_ms;
-// }
+namespace SolenoidConst {
+	const units::second_t SOLENOIDSETLENGTH = 3_ms;
+}
 
 // enum Arm {
 // 	SHOOTERMOTOR1ID = 6,
