@@ -27,7 +27,14 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 	}
 }
 
+double Drivetrain::GetRoll() {
+	return pigeon.GetRoll();
+}
+
 double Drivetrain::GetPitch() {
 	return pigeon.GetPitch();
-	std::cout << pigeon.GetPitch();
+}
+
+double Drivetrain::GetYaw() {
+	return pigeon.GetYaw();
 }

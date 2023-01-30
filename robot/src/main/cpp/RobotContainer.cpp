@@ -2,9 +2,10 @@
 
 #include "RobotContainer.h"
 
-#include "commands/DriveCartesian.h"
+#include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
+#include "commands/SwitchDriveType.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -12,7 +13,7 @@ using namespace frc2;
 RobotContainer::RobotContainer() {
 	ConfigureButtonBindings();
 	
-	drivetrain.SetDefaultCommand(DriveCartesian(&drivetrain, 
+	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, 
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return 0; },//controller.GetLeftX(); }, 
 		[this] { return controller.GetLeftX(); },//RightX(); }));
@@ -25,7 +26,7 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.X().ToggleOnTrue(DriveCartesian(&drivetrain, 
+	controller.X().ToggleOnTrue(TeleopDrive(&drivetrain, 
 		[this] { return -controller.GetLeftY(); }, 
 		[this] { return 0; },//controller.GetLeftX(); }, 
 		[this] { return controller.GetLeftX(); },//RightX(); }));

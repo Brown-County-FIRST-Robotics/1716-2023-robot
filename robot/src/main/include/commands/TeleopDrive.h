@@ -5,9 +5,9 @@
 
 #include "subsystems/Drivetrain.h"
 
-class DriveCartesian : public frc2::CommandHelper<frc2::CommandBase, DriveCartesian> {
+class TeleopDrive : public frc2::CommandHelper<frc2::CommandBase, TeleopDrive> {
 public:
-	explicit DriveCartesian(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
+	explicit TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
 
 	void Execute() override;
 	

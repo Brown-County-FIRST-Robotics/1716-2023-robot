@@ -23,7 +23,9 @@ public:
 
 	void ActivateBreakMode(bool doBrakeMode);
 
+	double GetRoll();
 	double GetPitch();
+	double GetYaw();
 
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
