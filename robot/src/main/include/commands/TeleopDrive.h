@@ -25,7 +25,7 @@ private:
 	double ySquare;
 	double zSquare;
 
-	void updateBrake(std::function<bool()> brake);
+	void updateBrake(bool brake);
 
 	frc::SlewRateLimiter<units::scalar> xAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
 	frc::SlewRateLimiter<units::scalar> yAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};

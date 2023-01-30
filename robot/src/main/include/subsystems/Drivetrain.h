@@ -44,4 +44,5 @@ private:
 
 	frc::PneumaticHub hub{0};
  	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(0, 1);
+	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
 };

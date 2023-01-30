@@ -9,7 +9,12 @@ Drivetrain::Drivetrain() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	robotDrive.DriveCartesian(x, y, z);
+	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
+		robotDrive.DriveCartesian(x, y, z);
+	}
+	else { //don't strafe in traction mode
+		robotDrive.DriveCartesian(x, 0, z);
+	}
 }
 
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
@@ -41,8 +46,9 @@ double Drivetrain::GetYaw() {
 
 void Drivetrain::SetSolenoidPosition(frc::DoubleSolenoid::Value position) {
 	solenoid.Set(position);
+	solenoidPos = position; //cache for efficiency
 }
 
 frc::DoubleSolenoid::Value Drivetrain::GetSolenoidPosition() {
-	return solenoid.Get();
+	return solenoidPos;
 }

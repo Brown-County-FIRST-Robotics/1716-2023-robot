@@ -15,7 +15,7 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 }
 
 void RasPiDrive::Execute() {
-	drivetrain->Drive(x.Get(), 0, z.Get());
+	drivetrain->Drive(x.Get(), y.Get(), z.Get());
 }
 
 void RasPiDrive::End(bool interrupted) {

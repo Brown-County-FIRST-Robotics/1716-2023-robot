@@ -18,15 +18,15 @@ void TeleopDrive::Execute() {
 		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
 		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
 
-	updateBrake(doBrake);
+	updateBrake(doBrake());
 }
 
 void TeleopDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 }
 
-void TeleopDrive::updateBrake(std::function<bool()> brake) {
-	if (brake()) {
+void TeleopDrive::updateBrake(bool brake) {
+	if (brake) {
 		drivetrain->ActivateBreakMode(true);
 	}
 	else {
