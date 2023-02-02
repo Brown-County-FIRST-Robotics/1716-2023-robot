@@ -4,6 +4,9 @@
 import rr1716
 import argparse
 import logging
+from rr1716 import Camera
+from rr1716 import DEATHSTARE
+import time
 
 def main():
     parser = argparse.ArgumentParser()
@@ -19,18 +22,18 @@ def main():
     
     
     
-    logging.debug("Debug test")
-    logging.info("Tnfo test")
-    logging.error("Error test")
-    logging.warning("warning test")
-    logging.critical("critical test")
+#    logging.debug("Debug test")
+#    logging.info("Tnfo test")
+#    logging.error("Error test")
+#    logging.warning("warning test")
+#    logging.critical("critical test")
 
-    if args.check :
-        print("Hello World")
-    else : 
-        print("It is curently not working")
+    cam = Camera(0)
+    DEATHSTARE.start(cam)
 
-
+    while True:
+        cam.update()
+        time.sleep(0.1)
 
 
 if __name__ == "__main__":
