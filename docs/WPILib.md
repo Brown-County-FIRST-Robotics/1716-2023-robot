@@ -95,6 +95,7 @@ On Shuffleboard, you can make a value selectable by calling the type-specific ge
 
 	bool doTheThing = boolEntry->GetBoolean(false);
 ```
+Make sure that you do not set the value too often, as it will make it difficult for you to get input reliably.
 
 ## NetworkTables:
 
