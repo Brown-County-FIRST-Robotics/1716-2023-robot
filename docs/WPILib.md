@@ -7,7 +7,8 @@
 3. [3rd Party Vendor Libraries](#3rd-party-vendor-libraries)
 4. [Dashboard Values](#dashboard-values)
 	1. [Smartdashboard](#smartdashboard)
-5. [Solenoids](#solenoids)
+5. [NetworkTables](#networktables)
+6. [Solenoids](#solenoids)
 
 ## Component Reference:
 
@@ -54,6 +55,35 @@ As the Smartdashboard API is the simplest option, it is used most as of now (tho
 ### Smartdashboard:
 
 You can put Boolean, Numeric, or String values on the dashboard very simply by including `<frc/smartdashboard/SmartDashboard.h>` and calling `frc::SmartDashboard::PutBoolean`/`PutNumber`/`PutString` with the parameters `("Displayed Name", [value])`. The value should appear on shuffleboard on the `SmartDashboard` tab. ([docs](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/displaying-expressions.html))
+
+## NetworkTables:
+
+Another feature of WPILib is NetworkTables, which can be used to communicate values between the driverstation computer, the RoboRIO, and any coprocessors such as Raspberry Pi's the robot my have on it. All NetworkTable values are copied to all devices connected to networktables, and values are organized similarly to a filesystem, where the folders are "subtables" and the files are "topics", which is the NetworkTables term for values. You can reference a value by accessing its table similarly to opening a folder, then declaring a `subscriber` to read values or a `publisher` to write values.
+1. In your header, include `<networktables/NetworkTable.h>`, `<networktables/NetworkTableInstance.h>`, and the topic for the data type you are working with, for example a float: `<networktables/FloatTopic.h>`
+2. Declare a private `NetworkTablesInstance`, a `shared_ptr<nt::NetworkTable>`, and a subscriber or publisher for the data type:
+	```C++
+	nt::NetworkTableInstance networkTableInst; //the default networktables network
+	std::shared_ptr<nt::NetworkTable> table; //the table to be used
+
+	nt::FloatSubscriber subscriber; //able to read values
+
+	nt::FloatPublisher publisher; //able to write values
+	```
+3. In the source file constructor, set the values to read from the topic you want:
+	```C++
+	networkTableInst = nt::NetworkTableInstance::GetDefault(); //the network the RoboRIO and DriverStation are connected to
+	table = networkTableInst.GetTable("YourTable"); //if the table does not exist, it will be created
+
+	subscriber = table->GetFloatTopic("YourTopic").Subscribe(0.0); //will create the topic if it doesn't exist, 
+		//Subscribe() parameter is the default value
+
+	publisher = table->GetFloatTopic("YourTopic").Publish(); //will create the topic if it doesn't exist, 
+	```
+4. Read or write values:
+	```C++
+	subscriber.Get(); //returns the float value topic is currently set to
+	publisher.Set(124.5); //takes a float to set the topic value to
+	```
 
 ## Solenoids
 
