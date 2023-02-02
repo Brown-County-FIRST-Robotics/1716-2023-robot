@@ -9,11 +9,15 @@ def main():
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--check', '-c', action="store_true", dest="check", help="Check the commits for correctness")
+    parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
     parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="CRITICAL", help="Check the commits for correctness")
     args = parser.parse_args()
 
     # use getatter to turn loglevel into integer
+    logging.basicConfig(filename=args.logfile, filemode='w')
     logging.basicConfig(level=getattr(logging, args.loglevel))
+    
+    
     
     logging.debug("Debug test")
     logging.info("Tnfo test")

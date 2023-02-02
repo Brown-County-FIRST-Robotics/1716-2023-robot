@@ -1,0 +1,3 @@
+ERROR:root:Error test
+WARNING:root:warning test
+CRITICAL:root:critical test
