@@ -9,8 +9,10 @@
     3. [Button Binding](#button-binding)
 3. [Decorators](#decorators)
 4. [Command Composition](#command-composition)
-5. [Autonomous](#autonomous)
-6. [Generalized Solenoid Subsystem and Command](#generalized-solenoid-subsystem-and-command)
+5. [Lambda Use](#lambda-use)
+6. [Default Commands](#default-commands)
+7. [Autonomous](#autonomous)
+8. [Generalized Solenoid Subsystem and Command](#generalized-solenoid-subsystem-and-command)
 
 ## Commmand Concept Overviews:
 
@@ -202,7 +204,7 @@ void CommandName::End(bool interrupted) {
 
 ### Button Binding:
 
-1. Ensure that you have "`frc2::CommandXboxController controller{0};`" and "`void ConfigureButtonBindings();`" under `private:` in `RobotContainer.h` (you'll need to include `<frc2/command/button/CommandXboxController.h>`). This instantiates a controller to use for button triggers and declares the method used for bindings.
+1. Ensure that you have `frc2::CommandXboxController controller{0};` and `void ConfigureButtonBindings();` under `private` in `RobotContainer.h` (you'll need to include `<frc2/command/button/CommandXboxController.h>`). This instantiates a controller to use for button triggers and declares the method used for bindings.
 
 2. In `RobotContainer.cpp`, declare your button bindings (read the [docs](https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html#trigger-bindings) to find the correct binding for the functionality you want to achieve):
 ```C++
@@ -246,9 +248,41 @@ controller.B().OnTrue(frc2::cmd::Sequence(std::move(command1), std::move(command
 
 Each command included in the composition needs to have `std::move` called on it from the `<utility>` library.
 
+## Lambda Use:
+
+A useful technique in command based is using lambda functions to easily and quickly get live input from the controller or some other variable. They are capable of getting the current value of a variable that is accessible from the place they are defined from. This is commonly used in the parameters of commands, such as when driving or shooting when you need the joystick or trigger values. Lambdas can be used in this way like so:
+1. Put a parameter of type `std::function<RETURNTYPE()>` in your command's header file, where `RETURNTYPE` is the type of variable you would like to get from your input
+    - For example, a joystick axis would have the type double, and the lambda would be declared as a `std::function<double()>`
+2. Make a private variable of the same type as your lambda so that is is accessible outside of the constructor
+3. In your command's source file, make the constructor match the header and place `memberVar(std::move(parameterVar))` after your subsystem's member definition, separated by commas
+    - `memberVar` is the name of your member variable, `parameterVar` is the name of your parameter, and `std::move` is accessible in `<utility>`
+    - For example:
+        ```C++
+        ShootCommand::ShootCommand(Shooter* subsystem, std::function<double()> speed) 
+            : drivetrain(subsystem), triggerValue(std::move(speed))
+        {
+            AddRequirements(subsystem);
+        }
+        ```
+4. When you bind your command, you can use the following format to define your lambda in the constructor:
+    ```C++
+    ShootCommand::ShootCommand(Shooter* subsystem, 
+    [this] { return controller.GetRightTriggerAxis(); });
+    ```
+    - The square brackets hold a list of class that will be accessible within the lambda, `this` refers to the current class, `RobotContainer`, where the controller is contained
+    - Anythin within the curly braces will be run, return the value that you need in as few lines as possible
+
+## Default Commands:
+
+Each subsystem can have a default command that is run if no other command is currently using it. This feature is often useful in tandem with lambda functions because they allow functionality to be changed while running. Driving is almost always a default command, and shooting may also be; both use lambdas. You can set the default command of a subsystem in the `RobotContainer.cpp` constructor like so:
+```C++
+shooter.SetDefaultCommand(ShootCommand(&shooter));
+```
+
 ## Autonomous:
 
-This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.
+This guide is based off of [this one](https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/choosing-an-autonomous-program-from-smartdashboard.html#command-based) from the smartdashboard docs.  
+> ***Note:** Decorators and inline commands are not supported for autonomous because the sendable chooser does not take CommandPtrs, define commands you need for autonomous in their own files (including compositions)*
 1. In `RobotContainer.h`, include `<frc/smartdashboard/SendableChooser.h>`and declare a private `SendableChooser` object, which is able to be sent to the smartdashboard as a list of options:
     ```C++
     frc::SendableChooser<frc2::Command*> autonomousChooser;
