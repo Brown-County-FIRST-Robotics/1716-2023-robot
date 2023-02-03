@@ -16,8 +16,8 @@ RobotContainer::RobotContainer() {
 	
 	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, 
 		[this] { return controller.GetLeftY(); }, 
-		[this] { return 0; },//controller.GetLeftX(); }, 
-		[this] { return controller.GetLeftX(); },//RightX(); }));
+		[this] { return controller.GetLeftX(); }, 
+		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ));
 
 	//Autonomous:
@@ -32,8 +32,8 @@ void RobotContainer::ConfigureButtonBindings() {
 	//Drive modes (controlled with D-Pad, cancelled on D-Pad down):
 	frc2::Trigger([this] { return controller.GetPOV() == 270; }).OnTrue(TeleopDrive(&drivetrain, 
 		[this] { return -controller.GetLeftY(); }, 
-		[this] { return 0; },//controller.GetLeftX(); }, 
-		[this] { return controller.GetLeftX(); },//RightX(); }));
+		[this] { return controller.GetLeftX(); }, 
+		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ).Until([this] { return controller.GetPOV() == 180; }));
 		//Backwards driving (left on D-Pad)
 
