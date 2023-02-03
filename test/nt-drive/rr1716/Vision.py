@@ -1,9 +1,32 @@
 #!/usr/bin/env python
 
 import logging
+import numpy as np
+import cv2
 
-#Object - can represent a cone or a cube
-class Object():
+#use this for calibrating the color detector
+#pass in frame
+#pass in range from center of image that you want to sample
+#returns average color is an array
+def averageColor(frame, sampleRange):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    height = len(hsv)
+    width = len(hsv[0])
+    x = int(width / 2) - sampleRange
+    y = int(height / 2) - sampleRange
+    hSum = 0
+    sSum = 0
+    vSum = 0
+    for i in range(x, x + 2 * sampleRange):
+        for j in range(y, y + 2 * sampleRange):
+            hSum += hsv[j][i][0]
+            sSum += hsv[j][i][1]
+            vSum += hsv[j][i][2]
+    averageColor = [ hSum / (4 * sampleRange * sampleRange), sSum / (4 * sampleRange * sampleRange), vSum / (4 * sampleRange * sampleRange) ]
+    return averageColor
+
+#GamePiece - can represent a cone or a cube
+class GamePiece():
     # position of cone in the image in terms of pixels
     x = 0
     y = 0
@@ -12,6 +35,20 @@ class Object():
     h = 0
     # is the cone upright?
     upright = False #Do not care about this value if this is a cube
+    lower_color = np.array([ 0, 0, 0 ], np.uint8)
+    upper_color = np.array([ 0xFF, 0xFF, 0xFF ], np.uint8)
+
+    def setLowerColor(self, lower):
+        self.lower_color = lower
+    
+    def setUpperColor(self, upper):
+        self.upper_color = upper
+
+    def getLowerColor(self):
+        return self.lower_color
+
+    def getUpperColor(self):
+        return self.upper_color
 
     def isUpright(self):
         return self.upright
@@ -43,148 +80,141 @@ class Object():
     def setHeight(self, height):
         self.h = height
 
-# Returns a cone object when it attempts to find a
-# cone in an image (frame)
-# also passes in the lower color of the cone and upper color of the cone
-def findCone(frame, lower_color_kone, upper_color_kone):
-    logging.log("looking for cone")
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    maskKone = cv2.inRange(hsv, lower_color_kone, upper_color_kone)
-         
-    gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-       
-    # cut out anything that isn't the cone
-    for i in range(len(blur)):
-        for j in range(len(blur[i])): 
-            if maskKone[i][j]:
-                continue
-            blur[i,j] = 0 
-
-    contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
-    maskKone_copy = maskKone.copy()
-
-    contours, hierarchy = cv2.findContours(image=maskKone, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-    largestCont = 0
-    largestBoundRectArea = 0
-    x = y = w = h = 0
-    lx = ly = lw = lh = 0 
-    #find largest contour
-    for cont in contours:
-        x,y,w,h = cv2.boundingRect(cont)
-        area = w * h
-        if area > largestBoundRectArea:
-            largestBoundRectArea = area
-            largestCont = cont
-            lx = x
-            ly = y
-            lw = w
-            lh = h
+    # Returns a cone object when it attempts to find a
+    # cone in an image (frame)
+    # also passes in the lower color of the cone and upper color of the cone
+    def findCone(self, frame):
+        logging.info("looking for cone")
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    # Determine if the cone is upright
-    upright = False
-    #check if the rectangle's dimensions are in
-    if(lw < lh):
-        yellowTop = 0
-        yellowBot = 0
-        for x in range(int(lx), int(lx + lw)):
-            for y in range(int(ly), int(ly + lh / 2)):
-                if maskKone[y][x]:
-                    yellowTop += 1
-        for x in range(int(lx), int(lx + lw)):
-            for y in range(int(ly + lh / 2), int(ly + lh)):
-                if maskKone[y][x]:
-                    yellowBot += 1
-        if yellowTop < yellowBot: 
-            upright = True
+        maskKone = cv2.inRange(hsv, self.lower_color, self.upper_color)
+            
+        gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+           
+        # cut out anything that isn't the cone
+        for i in range(len(blur)):
+            for j in range(len(blur[i])): 
+                if maskKone[i][j]:
+                    continue
+                blur[i,j] = 0 
+    
+        contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
+        maskKone_copy = maskKone.copy()
+    
+        contours, hierarchy = cv2.findContours(image=maskKone, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+        largestCont = 0
+        largestBoundRectArea = 0
+        x = y = w = h = 0
+        lx = ly = lw = lh = 0 
+        #find largest contour
+        for cont in contours:
+            x,y,w,h = cv2.boundingRect(cont)
+            area = w * h
+            if area > largestBoundRectArea:
+                largestBoundRectArea = area
+                largestCont = cont
+                lx = x
+                ly = y
+                lw = w
+                lh = h
+        
+        # Determine if the cone is upright
+        upright = False
+        #check if the rectangle's dimensions are in
+        if(lw < lh):
+            yellowTop = 0
+            yellowBot = 0
+            for x in range(int(lx), int(lx + lw)):
+                for y in range(int(ly), int(ly + lh / 2)):
+                    if maskKone[y][x]:
+                        yellowTop += 1
+            for x in range(int(lx), int(lx + lw)):
+                for y in range(int(ly + lh / 2), int(ly + lh)):
+                    if maskKone[y][x]:
+                        yellowBot += 1
+            if yellowTop < yellowBot: 
+                upright = True
+    
+        self.setX(int(lx + lw / 2))
+        self.setY(int(ly + lh / 2))
+        self.setHeight(int(lh))
+        self.setWidth(int(lw))
+        self.setUpright(upright)
+    
+    # Returns a cube object when it attempts to find a
+    # cube in an image (frame)
+    # also passes in the lower color of the cube and upper color of the cube 
+    # NOTE: this also does a ratio check to roughly guess if it is a cube
+    def findCube(self, frame):
+        logging.info("looking for cube")
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+        maskKube = cv2.inRange(hsv, self.lower_color, self.upper_color)
+             
+        gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+           
+        # cut out anything that isn't the cone
+        for i in range(len(blur)):
+            for j in range(len(blur[i])): 
+                if maskKube[i][j]:
+                    continue
+                blur[i,j] = 0 
+    
+        contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
+        maskKube_copy = maskKube.copy()
+    
+        contours, hierarchy = cv2.findContours(image=maskKube, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+        largestCont = 0
+        largestBoundRectArea = 0
+        x = y = w = h = 0
+        lx = ly = lw = lh = 0 
+        #find largest contour
+        RATIO_RANGE = 0.3
+        for cont in contours:
+            x,y,w,h = cv2.boundingRect(cont)
+            area = w * h
+            if area > largestBoundRectArea and w / h < 1.0 + RATIO_RANGE and w / h > 1.0 - RATIO_RANGE:
+                largestBoundRectArea = area
+                largestCont = cont
+                lx = x
+                ly = y
+                lw = w
+                lh = h 
+        self.setX(int(lx + lw / 2))
+        self.setY(int(ly + lh / 2))
+        self.setHeight(int(lh))
+        self.setWidth(int(lw))
+        self.setUpright(False) #don't care if cube is upright
 
-    kone = Object()
-    kone.setX(int(lx + lw / 2))
-    kone.setY(int(ly + lh / 2))
-    kone.setHeight(int(lh))
-    kone.setWidth(int(lw))
-    kone.setUpright(upright)
-    return kone
+    def drawBoundRect(self, frame, color):
+        cv2.rectangle(frame, (self.x - self.w / 2, self.y - self.h / 2), (self.x + self.w / 2, self.y + self.h / 2), color, 4, cv2.LINE_AA)
 
-#use this for calibrating the color detector
-#pass in frame
-#pass in range from center of image that you want to sample
-#returns average color is an array
-def averageColor(frame, sampleRange):
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    height = len(hsv)
-    width = len(hsv[0])
-    x = int(width / 2) - sampleRange
-    y = int(height / 2) - sampleRange
-    hSum = 0
-    sSum = 0
-    vSum = 0
-    for i in range(x, x + 2 * sampleRange):
-        for j in range(y, y + 2 * sampleRange):
-            hSum += hsv[j][i][0]
-            sSum += hsv[j][i][1]
-            vSum += hsv[j][i][2]
-    averageColor = [ hSum / (4 * sampleRange * sampleRange), sSum / (4 * sampleRange * sampleRange), vSum / (4 * sampleRange * sampleRange) ]
-    logging.log(str(averageColor))
-    return averageColor
-
-# Returns a cube object when it attempts to find a
-# cube in an image (frame)
-# also passes in the lower color of the cube and upper color of the cube 
-# NOTE: this also does a ratio check to roughly guess if it is a cube
-def findCube(frame, lower_color_kone, upper_color_kone):
-    logging.log("looking for cube")
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    maskKone = cv2.inRange(hsv, lower_color_kone, upper_color_kone)
-         
-    gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-       
-    # cut out anything that isn't the cone
-    for i in range(len(blur)):
-        for j in range(len(blur[i])): 
-            if maskKone[i][j]:
-                continue
-            blur[i,j] = 0 
-
-    contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
-    maskKone_copy = maskKone.copy()
-
-    #debug, remove later
-    cv2.imshow("mask", maskKone_copy) 
-
-    contours, hierarchy = cv2.findContours(image=maskKone, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-    largestCont = 0
-    largestBoundRectArea = 0
-    x = y = w = h = 0
-    lx = ly = lw = lh = 0 
-    #find largest contour
-    RATIO_RANGE = 0.3
-    for cont in contours:
-        x,y,w,h = cv2.boundingRect(cont)
-        area = w * h
-        if area > largestBoundRectArea and w / h < 1.0 + RATIO_RANGE and w / h > 1.0 - RATIO_RANGE:
-            largestBoundRectArea = area
-            largestCont = cont
-            lx = x
-            ly = y
-            lw = w
-            lh = h 
-
-    kone = Object()
-    kone.setX(int(lx + lw / 2))
-    kone.setY(int(ly + lh / 2))
-    kone.setHeight(int(lh))
-    kone.setWidth(int(lw))
-    kone.setUpright(False) #don't care if cube is upright
-    return kone
+    #green if frame
+    def drawCone(self, frame):
+        if self.isUpright():
+            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
+        else:
+            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
 
 if __name__ == "__main__":
     # We're a module, never run anything here
+    #TEST CODE DO NOT USE
+    cone = GamePiece()
+    
+    cam = cv2.VideoCapture("/dev/video0")
+    
+    while True:
+        ret, frame = cam.read()
+        cone.findCone(frame)
+
+        cone.drawCone(frame)
+        cv2.imshow("test", frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
     pass
 else:
-    # Run things on import here
-    
+    # Run things on import here 
     pass
