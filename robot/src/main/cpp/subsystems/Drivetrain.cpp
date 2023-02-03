@@ -1,5 +1,4 @@
 #include "subsystems/Drivetrain.h"
-#include <iostream>
 
 Drivetrain::Drivetrain() {
 	frontRight.SetInverted(true);
@@ -42,6 +41,27 @@ double Drivetrain::GetPitch() {
 
 double Drivetrain::GetYaw() {
 	return pigeon.GetYaw();
+}
+
+int16_t Drivetrain::GetX() {
+	int16_t accelerometer[3];
+	pigeon.GetBiasedAccelerometer(accelerometer);
+
+	return accelerometer[0];
+}
+
+int16_t Drivetrain::GetY() {
+	int16_t accelerometer[3];
+	pigeon.GetBiasedAccelerometer(accelerometer);
+
+	return accelerometer[1];
+}
+
+int16_t Drivetrain::GetZ() {
+	int16_t accelerometer[3];
+	pigeon.GetBiasedAccelerometer(accelerometer);
+
+	return accelerometer[2];
 }
 
 void Drivetrain::SetSolenoidPosition(frc::DoubleSolenoid::Value position) {

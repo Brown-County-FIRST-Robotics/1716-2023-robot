@@ -26,4 +26,8 @@ private:
 	nt::FloatSubscriber x; //x, y, and rotational values
 	nt::FloatSubscriber y;
 	nt::FloatSubscriber z;
+
+	nt::FloatPublisher yaw;
+	nt::FloatPublisher forwBack;
+	nt::FloatPublisher leftRight;
 };

@@ -28,6 +28,9 @@ public:
 	double GetRoll();
 	double GetPitch();
 	double GetYaw();
+	int16_t GetX();
+	int16_t GetY();
+	int16_t GetZ();
 
 	void SetSolenoidPosition(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoidPosition();
@@ -42,7 +45,7 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
 
-	frc::PneumaticHub hub{0};
+	frc::PneumaticHub hub{1};
  	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(0, 1);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
 };
