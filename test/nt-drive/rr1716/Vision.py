@@ -47,6 +47,7 @@ class Object():
 # cone in an image (frame)
 # also passes in the lower color of the cone and upper color of the cone
 def findCone(frame, lower_color_kone, upper_color_kone):
+    logging.log("looking for cone")
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     maskKone = cv2.inRange(hsv, lower_color_kone, upper_color_kone)
@@ -125,6 +126,7 @@ def averageColor(frame, sampleRange):
             sSum += hsv[j][i][1]
             vSum += hsv[j][i][2]
     averageColor = [ hSum / (4 * sampleRange * sampleRange), sSum / (4 * sampleRange * sampleRange), vSum / (4 * sampleRange * sampleRange) ]
+    logging.log(str(averageColor))
     return averageColor
 
 # Returns a cube object when it attempts to find a
@@ -132,6 +134,7 @@ def averageColor(frame, sampleRange):
 # also passes in the lower color of the cube and upper color of the cube 
 # NOTE: this also does a ratio check to roughly guess if it is a cube
 def findCube(frame, lower_color_kone, upper_color_kone):
+    logging.log("looking for cube")
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     maskKone = cv2.inRange(hsv, lower_color_kone, upper_color_kone)
