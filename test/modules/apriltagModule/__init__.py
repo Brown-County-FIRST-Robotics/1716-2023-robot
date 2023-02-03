@@ -18,7 +18,6 @@ class Detection:
         self.tagID = tag_id
 
         self.yaw_std = -1
-        self.pitch_std = -1
         self.left_right_std = -1
         self.up_down_std = -1
         self.distance_std = -1
@@ -27,23 +26,21 @@ class Detection:
     def calcError(self, error_matrix=None, error_threshold=3000):  # TODO: add error threshold
         if error_matrix is None:
             error_matrix = np.array([  # TODO: add real values
-                [1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1],
             ])
         input_matrix = np.array([  # TODO: rename
             self.yaw,
-            self.pitch,
-            self.roll,
             self.left_right,
             self.up_down,
             self.distance,
             self.RMSError
         ])
-        self.yaw_std, self.pitch_std, self.left_right_std, self.up_down_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
+        self.yaw_std, self.left_right_std, self.up_down_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
         if self.error > error_threshold:
             print(f'discarded a value (error:{self.error})')
 
@@ -52,7 +49,7 @@ def convert(pt):
     return float(pt[0]), float(pt[1])
 
 
-def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20):
+def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
     """
     This function takes an image and returns the position of apriltags in the image
 
@@ -61,6 +58,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :param dist_coefficients: The distortion coefficients of the camera
     :param valid_tags: (Default: 1-9) The apriltags to look for
     :param roll_threshold: (Default: 0.3 radians/17 degrees) The maximum roll of the apriltag. Helps remove false detections.
+    :param check_hamming: (Default: True) Checks if the hamming value is 0
     :return: A list of Detection objects, or None if it fails
     :rtype: list(Detection objects)
     """
@@ -89,6 +87,8 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             # Check if apriltag is allowed
             if detection.tag_id not in valid_tags:
                 continue
+            if detection.hamming != 0 and check_hamming:
+                continue
 
             image_points = detection.corners.reshape(1, 4, 2)
 
@@ -114,7 +114,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
-                print('discarded a value (roll)')
+                print(f'discarded a value (roll:{roll})')
                 continue
             detections.append(Detection(yaw, pitch, roll, left_right, up_down, distance, rms,
                                         detection.tag_id))
