@@ -15,6 +15,7 @@ classDiagram
     Decision .. WhatWeHave : Subclass
     Decision .. Drop : Subclass
     Decision .. WhereWeAre : Subclass
+    HumanInput .. Decision : Inputs
     class Camera{
       camera_id
       frame
@@ -49,4 +50,9 @@ classDiagram
     class WhereWeAre{
       Position
     }  
+    class HumanInput{
+        ShuffleBoard
+        NetworkTables?
+        DEATHSTARE?
+    }
 ```
