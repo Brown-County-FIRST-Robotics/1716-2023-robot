@@ -3,6 +3,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include <frc/AnalogOutput.h>
+#include <rev/CANSparkMax.h>
 
 class Motors : public frc2::SubsystemBase {
  public:
