@@ -4,7 +4,7 @@
 import rr1716
 import argparse
 import logging
-from rr1716 import Camera
+from rr1716 import Cameras
 from rr1716 import DEATHSTARE
 import time
 
@@ -28,11 +28,11 @@ def main():
 #    logging.warning("warning test")
 #    logging.critical("critical test")
 
-    cam = Camera(0)
-    DEATHSTARE.start(cam)
+    DEATHSTARE.start(Cameras)
 
     while True:
-        cam.update()
+        for i in Cameras:
+            i.update()
         time.sleep(0.01)
 
 
