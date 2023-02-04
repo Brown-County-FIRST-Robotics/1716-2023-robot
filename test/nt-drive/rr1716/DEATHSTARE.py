@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import logging
-from flask import Flask, render_template, Response, redirect
+from flask import Flask, render_template, Response, redirect, request
 from threading import Thread
 
 app = Flask(__name__)
@@ -17,42 +17,40 @@ def gen_frames(camera):  # generate frame by frame from camera
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
+@app.route('/camera_feed/<int:Number>')
+def camera_feed(Number):
+    logging.debug("DEATHSTARE.camera_feed")
 
-@app.route('/video_feed')
-def video_feed():
-    logging.debug("DEATHSTARE.video_feed")
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(app.Cameras[0]), mimetype='multipart/x-mixed-replace; boundary=frame')
+    if len(app.Cameras) <= Number:
+        the_camera = app.Cameras[-1]
+    else:
+        the_camera = app.Cameras[Number]
 
-@app.route('/camera_feed0')
-def camera_feed0():
-    logging.debug("DEATHSTARE.camera_feed0")
     #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(app.Cameras[0]), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/camera_feed1')
-def camera_feed1():
-    logging.debug("DEATHSTARE.camera_feed1")
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(app.Cameras[1]), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/camera_feed2')
-def camera_feed2():
-    logging.debug("DEATHSTARE.camera_feed2")
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(app.Cameras[2]), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/camera_feed3')
-def camera_feed3():
-    logging.debug("DEATHSTARE.camera_feed3")
-    #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(app.Cameras[3]), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen_frames(the_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/')
 def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
     return render_template('index.html')
+
+@app.route('/all')
+def all():
+    logging.debug("DEATHSTARE.all")
+
+    number = request.args.get('num')
+    camera = request.args.get('cam')
+    if number == None:
+        number = 0
+    else:
+        number = int(number)
+    if camera is not None:
+        app.Cameras[int(camera)].id = number
+
+    if number == 4:
+        return redirect("/")
+    return render_template('all.html', len=5, num=number+1)
 
 def start(camera):
     logging.debug("DEATHSTARE.start")
