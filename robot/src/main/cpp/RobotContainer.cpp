@@ -1,4 +1,5 @@
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/InstantCommand.h>
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -6,7 +7,6 @@
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
-#include "commands/SwitchDriveType.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -27,7 +27,8 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(SwitchDriveType(&drivetrain).WithTimeout(SolenoidConst::SOLENOIDSETLENGTH));
+	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}).ToPtr());
+		//toggle solenoid
 
 	//Drive modes (controlled with D-Pad, cancelled on D-Pad down):
 	frc2::Trigger([this] { return controller.GetPOV() == 270; }).OnTrue(TeleopDrive(&drivetrain, 

@@ -23,6 +23,8 @@ public:
 	*/
 	void Drive(double x, double y, double z);
 
+	void Periodic() override;
+
 	void ActivateBreakMode(bool doBrakeMode);
 
 	double GetRoll();
@@ -32,8 +34,7 @@ public:
 	int16_t GetY();
 	int16_t GetZ();
 
-	void SetSolenoidPosition(frc::DoubleSolenoid::Value position);
-	frc::DoubleSolenoid::Value GetSolenoidPosition();
+	void ToggleSolenoid();
 
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
@@ -45,7 +46,9 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
 
-	frc::PneumaticHub hub{1};
- 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(0, 1);
+	frc::PneumaticHub hub{DrivetrainConst::HUBID};
+ 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOIDFORWARDID, DrivetrainConst::SOLENOIDREVERSEID);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
+
+	int waitTicksNeeded = -1;
 };

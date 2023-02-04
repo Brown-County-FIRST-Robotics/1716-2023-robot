@@ -30,6 +30,12 @@ namespace DrivetrainConst {
 	
 	const int PIGEONID = 20;
 
+	const int HUBID = 42;
+	const int SOLENOIDFORWARDID = 0;
+	const int SOLENOIDREVERSEID = 1;
+
+	const int WAITTICKS = 3; //solenoids
+
 	const int ACCELERATIONCAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };
 

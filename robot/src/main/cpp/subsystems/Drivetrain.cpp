@@ -5,6 +5,8 @@ Drivetrain::Drivetrain() {
 	backRight.SetInverted(true);
 
 	robotDrive.SetSafetyEnabled(false); //delete this later
+
+	solenoidPos = solenoid.Get();
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
@@ -64,11 +66,22 @@ int16_t Drivetrain::GetZ() {
 	return accelerometer[2];
 }
 
-void Drivetrain::SetSolenoidPosition(frc::DoubleSolenoid::Value position) {
-	solenoid.Set(position);
-	solenoidPos = position; //cache for efficiency
+void Drivetrain::Periodic() {
+	if (waitTicksNeeded == 0) {
+		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
+	}
+	waitTicksNeeded--;
 }
 
-frc::DoubleSolenoid::Value Drivetrain::GetSolenoidPosition() {
-	return solenoidPos;
+void Drivetrain::ToggleSolenoid() {
+	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoidPos = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
+	}
+	
+	waitTicksNeeded = DrivetrainConst::WAITTICKS;
 }
