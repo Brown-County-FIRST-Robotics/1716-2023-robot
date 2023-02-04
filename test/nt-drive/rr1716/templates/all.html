@@ -13,13 +13,16 @@
 </head>
 <body>
 <div class="container">
+Pick Camera {{ num }}
     <div class="row">
-        <div class="col-lg-8  offset-lg-2">
-            <h3 class="mt-5">Live Streaming</h3>
-            <img src="{{ url_for('camera_feed', Number = 3) }}" width="100%">
+{%for i in range(0, len)%}
+        <div class="col-sm">
+            <a href="{{ url_for('all') }}?cam={{ i }}&num={{ num }}">
+            <img src="{{ url_for('camera_feed', Number = i) }}" width=100%>
+            </a>
         </div>
+{%endfor%}
     </div>
 </div>
-<button onclick="window.location.href='/picker'">Color Picker</button>
 </body>
 </html>
