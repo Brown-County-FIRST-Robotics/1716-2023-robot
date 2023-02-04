@@ -33,6 +33,9 @@ def camera_feed(Number):
 def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
+
+    if app.Cameras[0].id is None:
+        return redirect("/all")
     return render_template('index.html')
 
 @app.route('/all')
