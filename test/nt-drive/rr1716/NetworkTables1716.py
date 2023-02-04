@@ -30,7 +30,7 @@ class NetworkTablesWrapper:
         self.drive_table.putBoolean('pickupPiece', True)
 
     def StartDrop(self):  # TODO:rename
-        self.drive_table.putBoolean('startAutoBalance', True)
+        self.drive_table.putBoolean('dropPiece', True)
 
 
     def GetAccel(self):
