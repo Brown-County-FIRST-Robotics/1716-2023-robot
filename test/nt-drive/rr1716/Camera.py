@@ -5,7 +5,43 @@ import cv2
 import time
 import numpy as np
 
-Cameras = []
+class CameraTracker:
+
+    def __init__(self):
+        self.cameras = []
+        self.order =[]
+        self.ordered = False
+
+    def __getitem__(self, key):
+        if self.ordered:
+            return self.order[key]
+        else:
+            return self.cameras[key]
+
+    def __setitem__(self, key, value):
+        if self.ordered:
+            self.order[key] = value
+        else:
+            self.order[key] = value
+
+    def __len__(self):
+        if self.ordered:
+            return len(self.order)
+        else:
+            return len(self.cameras)
+
+    def append(self, value):
+        if self.ordered:
+            self.order.append(value)
+        else:
+            self.cameras.append(value)
+
+    def append_order(self, value):
+        self.order.append(value)
+        if len(self.order) == 4:
+            self.ordered = True
+
+Cameras = CameraTracker()
 
 class Camera:
     def __init__(self, device):
