@@ -31,9 +31,8 @@ def main():
     DEATHSTARE.start(Cameras)
 
     while True:
-        for i in Cameras:
-            i.update()
-        time.sleep(0.1)
+        Cameras[0].update()
+        time.sleep(0.01)
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ def index():
 
 def start(camera):
     logging.debug("DEATHSTARE.start")
-    app.open_cv = camera
+    app.Cameras = camera
     thread = Thread(target=app.run)
     thread.start()
 
