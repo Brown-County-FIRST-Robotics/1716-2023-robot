@@ -42,11 +42,11 @@
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center">
-    <div class="col-md-auto">
+    <div class="col-md-auto" style="z-index:5">
         <img class="side side1cam pull-right" width="100%" src="{{ url_for('camera_feed', Number = 0) }}">
     </div>
   </div>
-  <div class="row no-gutters">
+  <div class="row no-gutters align-items-center" style="z-index:1">
     <div class="col">
         <img class="side side2cam float-right" src="{{ url_for('camera_feed', Number = 1) }}">
     </div>
@@ -58,7 +58,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col-md-auto">
+    <div class="col-md-auto" style="z-index:5">
         <img class="side side4cam" width="100%" src="{{ url_for('camera_feed', Number = 3) }}">
     </div>
   </div> <!-- row -->
