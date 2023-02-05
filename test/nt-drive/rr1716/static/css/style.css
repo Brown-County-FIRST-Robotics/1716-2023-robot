@@ -75,6 +75,14 @@ button
 	transform: perspective(100px) translate(0px, 60px) rotateX(-20deg);
 }
 
+.trapezium {
+  height: 0;
+  width: 150px;
+  border-bottom: 150px;
+  border-left: 100px;
+  border-right: 100px;
+}
+
 .side2cam
 {
 	transform: perspective(100px) translate(80px, 0px) rotateY(25deg);
