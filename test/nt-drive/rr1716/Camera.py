@@ -50,7 +50,12 @@ class Camera:
         self.hsv = None
         self.gray = None
         self.id = None
+        self.device = device
         self.camera = cv2.VideoCapture(device)
+        self.camera.set(cv2.CAP_PROP_FPS, 10)
+        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
     def update(self):
         logging.debug("Camera.update")
@@ -60,8 +65,8 @@ class Camera:
             self.hsv = None
             self.gray = None
         else:
-            logging.critical("Camera Read Failed")
-    
+            logging.critical("Camera Read Failed %s" % self.device)
+
     def get_frame(self, flipped=False):
         if flipped:
             return cv2.flip(self.frame, 1)
@@ -132,7 +137,8 @@ if __name__ == "__main__":
     pass
 else:
     # Run things on import here
-    cams = list_ports()
+    #cams = list_ports()
+    cams = [0]
     for i in cams:
         Cameras.append(Camera(i))
     
