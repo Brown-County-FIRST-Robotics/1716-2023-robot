@@ -31,8 +31,14 @@ namespace DrivetrainConst {
 	const int PIGEONID = 20;
 
 	const int HUBID = 42;
-	const int SOLENOIDFORWARDID = 0;
-	const int SOLENOIDREVERSEID = 1;
+	const int SOLENOID0FORWARDID = 0;
+	const int SOLENOID0REVERSEID = 1;
+	const int SOLENOID1FORWARDID = 2;
+	const int SOLENOID1REVERSEID = 3;
+	const int SOLENOID2FORWARDID = 4;
+	const int SOLENOID2REVERSEID = 5;
+	const int SOLENOID3FORWARDID = 6;
+	const int SOLENOID3REVERSEID = 7;
 
 	const int WAITTICKS = 3; //solenoids
 

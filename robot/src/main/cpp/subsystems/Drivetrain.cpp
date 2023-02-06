@@ -6,7 +6,7 @@ Drivetrain::Drivetrain() {
 
 	robotDrive.SetSafetyEnabled(false); //delete this later
 
-	solenoidPos = solenoid.Get();
+	solenoidPos = solenoid0.Get();
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
@@ -68,18 +68,27 @@ int16_t Drivetrain::GetZ() {
 
 void Drivetrain::Periodic() {
 	if (waitTicksNeeded == 0) {
-		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
+		solenoid0.Set(frc::DoubleSolenoid::Value::kOff);
+		solenoid1.Set(frc::DoubleSolenoid::Value::kOff);
+		solenoid2.Set(frc::DoubleSolenoid::Value::kOff);
+		solenoid3.Set(frc::DoubleSolenoid::Value::kOff);
 	}
 	waitTicksNeeded--;
 }
 
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
-		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoid0.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoid1.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoid2.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoid3.Set(frc::DoubleSolenoid::Value::kForward);
 		solenoidPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
-		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoid0.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoid1.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoid2.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoid3.Set(frc::DoubleSolenoid::Value::kReverse);
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
