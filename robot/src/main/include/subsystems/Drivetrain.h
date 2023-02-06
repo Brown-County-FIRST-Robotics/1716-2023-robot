@@ -35,6 +35,8 @@ public:
 	int16_t GetZ();
 
 	void ToggleSolenoid();
+	void SetSolenoid(frc::DoubleSolenoid::Value position);
+	frc::DoubleSolenoid::Value GetSolenoid();
 
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};

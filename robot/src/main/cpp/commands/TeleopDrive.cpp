@@ -18,14 +18,14 @@ void TeleopDrive::Execute() {
 		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
 		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
 
-	updateBrake(doBrake());
+	UpdateBrake(doBrake());
 }
 
 void TeleopDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 }
 
-void TeleopDrive::updateBrake(bool brake) {
+void TeleopDrive::UpdateBrake(bool brake) {
 	if (brake) {
 		drivetrain->ActivateBreakMode(true);
 	}

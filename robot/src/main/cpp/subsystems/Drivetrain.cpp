@@ -94,3 +94,17 @@ void Drivetrain::ToggleSolenoid() {
 	
 	waitTicksNeeded = DrivetrainConst::WAITTICKS;
 }
+
+void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
+	solenoid0.Set(position);
+	solenoid1.Set(position);
+	solenoid2.Set(position);
+	solenoid3.Set(position);
+	solenoidPos = position;
+	
+	waitTicksNeeded = DrivetrainConst::WAITTICKS;
+}
+
+frc::DoubleSolenoid::Value Drivetrain::GetSolenoid() {
+	return solenoidPos;
+}

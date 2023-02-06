@@ -7,6 +7,7 @@
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
+#include "commands/AutoSwitchDrive.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -63,6 +64,21 @@ void RobotContainer::ConfigureButtonBindings() {
 				.Until([this] { return controller.GetPOV() == 180; })); })
 		.Until([this] { return controller.GetPOV() == 180; }));
 		//RasPi control (up on D-Pad)
+
+	controller.Start().OnTrue(AutoSwitchDrive(&drivetrain, 
+		[this] { return -controller.GetLeftY(); }, 
+		[this] { return controller.GetLeftX(); }, 
+		[this] { return controller.GetRightX(); },
+		[this] { return controller.GetBButton(); } )
+		.FinallyDo(
+			[this](bool interrupted) { drivetrain.SetDefaultCommand(
+				AutoSwitchDrive(&drivetrain, 
+					[this] { return -controller.GetLeftY(); }, 
+					[this] { return controller.GetLeftX(); }, 
+					[this] { return controller.GetRightX(); },
+					[this] { return controller.GetBButton(); } )
+				.Until([this] { return controller.GetPOV() == 180; })); })
+		.Until([this] { return controller.GetPOV() == 180; }));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

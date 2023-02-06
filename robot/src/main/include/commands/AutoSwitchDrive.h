@@ -5,9 +5,10 @@
 
 #include "subsystems/Drivetrain.h"
 
-class TeleopDrive : public frc2::CommandHelper<frc2::CommandBase, TeleopDrive> {
+//To do: make this extend the ToggleSolenoid command when testing's available
+class AutoSwitchDrive : public frc2::CommandHelper<frc2::CommandBase, AutoSwitchDrive> {
 public:
-	explicit TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
+	explicit AutoSwitchDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
 
 	void Execute() override;
 	
@@ -32,4 +33,6 @@ private:
 	frc::SlewRateLimiter<units::scalar> zAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
 
 	double CloserToZero(double value1, double value2);
+
+	double leftStickAngle = 0;
 };
