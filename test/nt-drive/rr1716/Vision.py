@@ -33,6 +33,8 @@ class GamePiece():
     #dimensions of bounding rectangle
     w = 0
     h = 0
+    imgX = 0
+    imgY = 0
     # is the cone upright?
     upright = False #Do not care about this value if this is a cube
     lower_color = np.array([ 0, 0, 0 ], np.uint8)
@@ -110,6 +112,7 @@ class GamePiece():
         if len(contours) == 0:
             self.notfound = True
             return
+        self.notfound = False
 
         #find largest contour
         for cont in contours:
@@ -141,6 +144,8 @@ class GamePiece():
                 upright = True
 
         frameDimensions = frame.shape
+        self.imgX = int(lx + lw / 2)
+        self.imgY = int(ly + lh / 2)
         self.setX(int(lx + lw / 2) - int(frameDimensions[1] / 2))
         self.setY(int(ly + lh / 2) - int(frameDimensions[0] / 2))
         self.setHeight(int(lh))
@@ -185,6 +190,8 @@ class GamePiece():
                 lw = w
                 lh = h 
         frameDimensions = frame.shape
+        self.imgX = int(lx + lw / 2)
+        self.imgY = int(ly + lh / 2)
         self.setX(int(lx + lw / 2) - int(frameDimensions[1] / 2))
         self.setY(int(ly + lh / 2) - int(frameDimensions[0] / 2))
         self.setHeight(int(lh))
@@ -192,14 +199,14 @@ class GamePiece():
         self.setUpright(False) #don't care if cube is upright
 
     def drawBoundRect(self, frame, color):
-        cv2.rectangle(frame, (self.x - self.w / 2, self.y - self.h / 2), (self.x + self.w / 2, self.y + self.h / 2), color, 4, cv2.LINE_AA)
+        cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), color, 4, cv2.LINE_AA)
 
     #green if frame
     def drawCone(self, frame):
         if self.isUpright():
-            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
+            cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
         else:
-            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
+            cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
 
 if __name__ == "__main__":
     # We're a module, never run anything here
