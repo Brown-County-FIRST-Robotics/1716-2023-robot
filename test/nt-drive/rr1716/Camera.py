@@ -5,56 +5,37 @@ import cv2
 import time
 import numpy as np
 
-class CameraTracker:
-
-    def __init__(self):
-        self.cameras = []
-        self.order =[]
-        self.ordered = False
-
-    def __getitem__(self, key):
-        if self.ordered:
-            return self.order[key]
-        else:
-            return self.cameras[key]
-
-    def __setitem__(self, key, value):
-        if self.ordered:
-            self.order[key] = value
-        else:
-            self.order[key] = value
-
-    def __len__(self):
-        if self.ordered:
-            return len(self.order)
-        else:
-            return len(self.cameras)
-
-    def append(self, value):
-        if self.ordered:
-            self.order.append(value)
-        else:
-            self.cameras.append(value)
-
-    def append_order(self, value):
-        self.order.append(value)
-        if len(self.order) == 4:
-            self.ordered = True
-
-Cameras = CameraTracker()
+#Cameras = CameraTracker()
 
 class Camera:
-    def __init__(self, device):
+    def __init__(self, device, calibration, position):
         logging.debug("camera.init")
         self.frame = None
         self.hsv = None
         self.gray = None
         self.id = None
         self.camera = cv2.VideoCapture(device)
+        self.pos=position
+
+        video_size = calibration["calibrationResolution"]
+        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
+        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
+        test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
+
+        raw_camera_matrix = np.array(calibration['cameraMatrix'])
+        dist_coefficients = np.array(calibration['cameraDistortion'])
+        processing_resolution = np.array(calibration['processingResolution'])
+
+        self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, video_size, 0,
+                                                           processing_resolution)
+        self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
+                                                 processing_resolution, cv2.CV_16SC2)
 
     def update(self):
         logging.debug("Camera.update")
         success, frame = self.camera.read()
+        frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
         if success:
             self.frame = frame
             self.hsv = None
@@ -98,7 +79,7 @@ class Camera:
         ret, buffer = cv2.imencode('.jpg', frame)
         jpg = buffer.tobytes()
         return jpg
-
+'''
 def list_ports():
     
     #Test the ports and returns a tuple with the available ports and the ones that are working.
@@ -125,14 +106,16 @@ def list_ports():
             camera.release()
         dev_port +=1
     return working_ports
-
+'''
 
 if __name__ == "__main__":
     # We're a module, never run anything here
     pass
 else:
+    pass
     # Run things on import here
-    cams = list_ports()
-    for i in cams:
-        Cameras.append(Camera(i))
+    #cams = list_ports()
+    #for i in cams:
+    #    Cameras.append(Camera(i))
+
     

@@ -4,8 +4,9 @@
 import rr1716
 import argparse
 import logging
-from rr1716 import Cameras
+#from rr1716 import Cameras
 from rr1716 import DEATHSTARE
+from rr1716 import Camera
 import time
 import sys
 import os
@@ -19,21 +20,22 @@ def main():
     parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
     parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="CRITICAL", help="Check the commits for correctness")
     parser.add_argument('--make_config', action='store_true', help="Create a config file")
-    parser.add_argument('--config', action="store", dest="config_file", help='the config file to use')
+    parser.add_argument('--config', '-k', action="store", dest="config_file", help='the config file to use')
 
     args = parser.parse_args()
     if args.make_config:
         print('Making config file')
         print('Warning: cameras must all have zero pitch and roll relative to the apriltags')
-        config = {}
+        config = []
         for i in range(int(input('Number of cameras:'))):
+            config.append({})
             while True:
                 camera_port = input(f'camera {i + 1} numbers:')
                 if not os.path.exists(f'/dev/v4l/by-path/pci-0000:00:14.0-usb-{camera_port}-video-index0'):
                     print('Camera not plugged in')
                     continue
                 break
-            config[camera_port]={}
+            config[-1]['port']=f'/dev/v4l/by-path/pci-0000:00:14.0-usb-{camera_port}-video-index0'
 
             while True:
                 calibration_fname = input('camera calibration file(glob patterns allowed):')
@@ -43,7 +45,7 @@ def main():
                 break
             with open(glob.glob(calibration_fname)[0], 'r') as calibration_file:
                 calibration = json.loads(calibration_file.read())
-                config[camera_port]['calibration'] = calibration
+                config[-1]['calibration'] = calibration
             while True:
                 pos = input(f'Position of camera {i + 1}(x,y,z,yaw):')
                 if pos == '':
@@ -53,7 +55,7 @@ def main():
                     print('Length=4')
                     continue
                 break
-            config[camera_port]['pos'] = pos
+            config[-1]['pos'] = pos
         config_fname = input('Name of config file:')
         assert input(
             f'This will create a file called "configs/{config_fname}.json", are you sure(y/n):') == 'y', 'Operation canceled'
@@ -65,14 +67,19 @@ def main():
     logging.basicConfig(filename=args.logfile, filemode='w')
     logging.basicConfig(level=getattr(logging, args.loglevel))
 
-
-    with open(parser.config_file, 'r') as f:
+    with open(args.config_file, 'r') as f:
         config=json.loads(f.read())
+    print('w')
+    cameras = []
 
     for i in config:
-        if not os.path.exists(f'dev/v4l/by-path/pci-0000:00:14.0-usb-{i}-video-index0'):
+        if not os.path.exists(i['port']):
             logging.error("camera not connected")
-    
+            sys.exit()
+        cameras.append(Camera(i['port'],i['calibration'],i['pos']))
+
+
+
     
     
     
@@ -82,10 +89,10 @@ def main():
 #    logging.warning("warning test")
 #    logging.critical("critical test")
 
-    DEATHSTARE.start(Cameras)
+    DEATHSTARE.start(cameras)
 
     while True:
-        for i in Cameras:
+        for i in cameras:
             i.update()
         time.sleep(0.01)
 
