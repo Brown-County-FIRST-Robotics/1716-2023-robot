@@ -14,7 +14,9 @@ class Camera:
         self.hsv = None
         self.gray = None
         self.id = None
+        self.device = device
         self.camera = cv2.VideoCapture(device)
+
         self.pos=position
 
         video_size = calibration["calibrationResolution"]
@@ -32,6 +34,10 @@ class Camera:
         self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
                                                  processing_resolution, cv2.CV_16SC2)
 
+        self.camera.set(cv2.CAP_PROP_FPS, 10)
+        self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
+
+
     def update(self):
         logging.debug("Camera.update")
         success, frame = self.camera.read()
@@ -41,8 +47,8 @@ class Camera:
             self.hsv = None
             self.gray = None
         else:
-            logging.critical("Camera Read Failed")
-    
+            logging.critical("Camera Read Failed %s" % self.device)
+
     def get_frame(self, flipped=False):
         if flipped:
             return cv2.flip(self.frame, 1)
@@ -115,7 +121,5 @@ else:
     pass
     # Run things on import here
     #cams = list_ports()
-    #for i in cams:
-    #    Cameras.append(Camera(i))
 
     
