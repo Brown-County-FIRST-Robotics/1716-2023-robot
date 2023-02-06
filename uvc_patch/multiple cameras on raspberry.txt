@@ -1,0 +1,54 @@
+multiple cameras on raspberry pi
+
+most cheap UVC cameras only offer streaming over isochronous USB.  that means that any bandwidth they plan to consume must be reserved, and the total reservations on the USB controller must come in under something like 80% of the 480Mbps offered by USB2.  With uncompressed frames it's likely that ytou can't even use 2 cameras on a single controller, and the pi 4 only has one USB2 controller.
+
+USB3 doesn't help because it doesn't actually separate USB2 streams, it just shunts them all to the usb2 controller.  a hub doesnt help because the controller is still shared.
+
+lowering frame rate often doesn't help because the camera has to send the frames at some high speed even if it then doesn't use the reservation for a while becasue the camera can't buffer the frame to streach out the sending.
+
+Now, what about compressed frames?  switch to MJPEG compression and the frames get WAAAY smaller, so it should use less bandwidth.  unfortunetly most cheap cameras still report a very large bandwidth reservation need.
+
+The solution is to use MJPEG and to hack the UVC camera driver to ignore the erroniously high bandwidth required in compressed mode.  You set a bandwidth that is large enough for the actual compressed frames but as small as possible. (Note that bandwidth is not a continous number.  the camera or your hack selects a bandwidth in bytes per frame, then the USB endpoint gets sets to one of several possible values available on that camera such that the configuration is the smallest one that offers at least as much bandwidth as you asked for.
+
+
+see these:
+https://www.thegoodpenguin.co.uk/blog/multiple-uvc-cameras-on-linux/
+
+https://stackoverflow.com/questions/8744087/how-to-recompile-just-a-single-kernel-module
+
+https://github.com/aircrack-ng/rtl8812au/issues/933
+
+https://github.com/RPi-Distro/rpi-source
+
+
+
+watching the driver
+as root: echo 0xffff > /sys/module/uvcvideo/parameters/trace
+dmesg --follow
+
+
+
+
+rebuilding uvc_driver on a 64 bit pi
+458  sudo apt-get install git bc bison flex libssl-dev
+  459  sudo wget https://raw.githubusercontent.com/notro/rpi-source/master/rpi-source -O /usr/local/bin/rpi-source && sudo chmod +x /usr/local/bin/rpi-source && /usr/local/bin/rpi-source -q --tag-update
+  463  sudo apt install python2
+  492  wget https://raw.githubusercontent.com/RPi-Distro/rpi-source/ceee03b5fb9cee65dd933f4784bb455cfa872a76/rpi-source
+  499  python2 rpi-source --architecture 1
+  516  cd linux
+  517  make -C . M=drivers/media/usb/uvc
+  532  sudo rmmod uvcvideo
+  533  sudo insmod drivers/media/usb/uvc/uvcvideo.ko
+as root: echo 1000 > /sys/module/uvcvideo/parameters/bandwidth_cap
+
+
+
+the patch:
+  523  patch -p1 < uvc_bw_patch 
+  524  make -C . M=drivers/media/usb/uvc
+
+
+other:
+557  sudo lsusb -v | less
+v4l2-ctl --list-formats-ext -d 0
+
