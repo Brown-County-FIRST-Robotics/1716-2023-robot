@@ -3,14 +3,15 @@
 import rr1716
 import argparse
 import logging
-from rr1716 import DEATHSTARE
 from rr1716 import Camera
+from rr1716 import DEATHSTARE
 from rr1716 import AprilTags
 import time
 import sys
 import os
 import glob
 import json
+import signal
 
 def main():
     parser = argparse.ArgumentParser()
@@ -75,7 +76,6 @@ def main():
 
     with open(args.config_file, 'r') as f:
         config=json.loads(f.read())
-    print('w')
     cameras = []
 
     for i in config:
@@ -92,14 +92,29 @@ def main():
 #    logging.warning("warning test")
 #    logging.critical("critical test")
 
+
+
+    stopping = False
+    originalhandler = signal.getsignal(signal.SIGINT)
+    def handler(signum, frame):
+        nonlocal stopping
+        print('Signal handler called with signal', signum)
+        print('stopping loop')
+        stopping = True
+        signal.signal(signal.SIGINT, originalhandler)
+    signal.signal(signal.SIGINT, handler)
+
     DEATHSTARE.start(cameras)
 
-    while True:
-        for i in cameras:
-            i.update()
-            AprilTags.getPosition(i.frame, i.camera_matrix, None)
-        time.sleep(0.01)
-
+    try:
+        while not stopping:
+            for i in cameras:
+                i.update()
+                AprilTags.getPosition(i.frame, i.camera_matrix, None)
+            time.sleep(0.01)
+    finally:
+        for camera in cameras:
+            camera.shutdown()
 
 if __name__ == "__main__":
     main()

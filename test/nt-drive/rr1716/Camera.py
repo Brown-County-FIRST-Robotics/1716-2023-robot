@@ -3,22 +3,25 @@
 import logging
 import cv2
 import time
+import threading
 import numpy as np
 
 class Camera:
     def __init__(self, device, calibration, position):
-        logging.debug("camera.init")
+        logging.debug("camera init %s", device)
         self.frame = None
         self.hsv = None
         self.gray = None
+
         self.id = None
         self.frame_count = 0
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
-
+        assert self.camera.isOpened()
         self.pos=position
 
+#v4l2-ctl --list-formats-ext -d 0
         video_size = calibration["calibrationResolution"]
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
@@ -38,18 +41,54 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
 
-    def update(self):
-        logging.debug("Camera.update")
-        success, frame = self.camera.read()
-        frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
-        if success:
-            self.frame = frame
+        self._stopping = False
+        self._getframe = threading.Event()
+        self._frameready = threading.Event()
+        self.thread = threading.Thread(target=self._thread)
+        self.thread.start()
+        self.update()
+        if self.frame is None:
+            self.shutdown()
+            raise Exception('camera intialization failed on ' + device)
+        
+
+    def _thread(self):
+        while not self._stopping:
+            success, frame = self.camera.read()
+            frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
+            if success:
+                self.frame = frame
+                self.frame_count = self.frame_count + 1
+            else:
+                self.frame=None
             self.hsv = None
             self.gray = None
-            self.frame_count = self.frame_count + 1
-        else:
-            logging.critical("Camera Read Failed %s" % self.device)
 
+            self._getframe.clear()
+            self._frameready.set()
+            self._getframe.wait()
+
+
+    def shutdown(self):
+        self._stopping = True
+        self._getframe.set()
+        self.thread.join()
+
+
+    def startupdate(self):
+        logging.debug("Camera update start")
+        if self._getframe.is_set():
+          self._frameready.wait()
+        self._frameready.clear()
+        self._getframe.set()
+
+    def update(self):
+        self.startupdate()
+        self._frameready.wait()
+        if self.frame is None:
+            logging.critical("Camera Read Failed")
+
+    
     def get_frame(self, flipped=False):
         if flipped:
             return cv2.flip(self.frame, 1)
@@ -83,16 +122,26 @@ class Camera:
     def get_jpg_bytes(self, flipped=False):
         # Let's block on this call if we alredy returned this frame
         while self.frame_count <= self.last_frame_count:
-            time.sleep(0.01)
+            self._getframe.wait()
+            self.wait()
         self.last_frame_count = self.frame_count
         logging.debug("camera.get_jpg_bytes")
         frame = self.get_frame(flipped)
         ret, buffer = cv2.imencode('.jpg', frame)
         jpg = buffer.tobytes()
         return jpg
+
+    def wait(self):
+       self._frameready.wait()
+
+
 if __name__ == "__main__":
-    # We're a module, never run anything here
-    pass
-else:
-    # Run things on import here
-    pass
+    try:
+        openCameras()        
+        print('started successfully')
+    finally:
+        for camera in Cameras:
+            camera.shutdown()
+            
+    print('done')
+    
