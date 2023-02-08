@@ -14,6 +14,8 @@ class Camera:
         self.hsv = None
         self.gray = None
         self.id = None
+        self.frame_count = 0
+        self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
 
@@ -46,6 +48,7 @@ class Camera:
             self.frame = frame
             self.hsv = None
             self.gray = None
+            self.frame_count = self.frame_count + 1
         else:
             logging.critical("Camera Read Failed %s" % self.device)
 
@@ -80,6 +83,10 @@ class Camera:
         self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
 
     def get_jpg_bytes(self, flipped=False):
+        # Let's block on this call if we alredy returned this frame
+        while self.frame_count <= self.last_frame_count:
+            time.sleep(0.01)
+        self.last_frame_count = self.frame_count
         logging.debug("camera.get_jpg_bytes")
         frame = self.get_frame(flipped)
         ret, buffer = cv2.imencode('.jpg', frame)
