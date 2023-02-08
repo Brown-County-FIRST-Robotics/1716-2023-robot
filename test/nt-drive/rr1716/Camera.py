@@ -5,8 +5,6 @@ import cv2
 import time
 import numpy as np
 
-#Cameras = CameraTracker()
-
 class Camera:
     def __init__(self, device, calibration, position):
         logging.debug("camera.init")
@@ -14,6 +12,8 @@ class Camera:
         self.hsv = None
         self.gray = None
         self.id = None
+        self.frame_count = 0
+        self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
 
@@ -46,6 +46,7 @@ class Camera:
             self.frame = frame
             self.hsv = None
             self.gray = None
+            self.frame_count = self.frame_count + 1
         else:
             logging.critical("Camera Read Failed %s" % self.device)
 
@@ -80,46 +81,18 @@ class Camera:
         self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
 
     def get_jpg_bytes(self, flipped=False):
+        # Let's block on this call if we alredy returned this frame
+        while self.frame_count <= self.last_frame_count:
+            time.sleep(0.01)
+        self.last_frame_count = self.frame_count
         logging.debug("camera.get_jpg_bytes")
         frame = self.get_frame(flipped)
         ret, buffer = cv2.imencode('.jpg', frame)
         jpg = buffer.tobytes()
         return jpg
-'''
-def list_ports():
-    
-    #Test the ports and returns a tuple with the available ports and the ones that are working.
-    
-    non_working_ports = []
-    dev_port = 0
-    working_ports = []
-    available_ports = []
-    while len(non_working_ports) < 6: # if there are more than 5 non working ports stop the testing. 
-        camera = cv2.VideoCapture(dev_port)
-        if not camera.isOpened():
-            non_working_ports.append(dev_port)
-            logging.debug("Port %s is not working." %dev_port)
-        else:
-            is_reading, img = camera.read()
-            w = camera.get(3)
-            h = camera.get(4)
-            if is_reading:
-                logging.debug("Port %s is working and reads images (%s x %s)" %(dev_port,h,w))
-                working_ports.append(dev_port)
-            else:
-                logging.debug("Port %s for camera ( %s x %s) is present but does not reads." %(dev_port,h,w))
-                available_ports.append(dev_port)
-            camera.release()
-        dev_port +=1
-    return working_ports
-'''
-
 if __name__ == "__main__":
     # We're a module, never run anything here
     pass
 else:
-    pass
     # Run things on import here
-    #cams = list_ports()
-
-    
+    pass
