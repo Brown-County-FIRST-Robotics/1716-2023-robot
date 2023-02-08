@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-
 import rr1716
 import argparse
 import logging
-#from rr1716 import Cameras
 from rr1716 import DEATHSTARE
 from rr1716 import Camera
 import time
@@ -15,7 +13,7 @@ import json
 
 def main():
     parser = argparse.ArgumentParser()
-    
+
     parser.add_argument('--check', '-c', action="store_true", dest="check", help="Check the commits for correctness")
     parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
     parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="CRITICAL", help="Check the commits for correctness")
@@ -78,11 +76,7 @@ def main():
             sys.exit()
         cameras.append(Camera(i['port'],i['calibration'],i['pos']))
 
-
-
-    
-    
-    
+# Keep these here as examples for logging
 #    logging.debug("Debug test")
 #    logging.info("Tnfo test")
 #    logging.error("Error test")
