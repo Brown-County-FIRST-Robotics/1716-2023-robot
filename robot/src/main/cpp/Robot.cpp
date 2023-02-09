@@ -2,6 +2,11 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
+#include <frc/shuffleboard/Shuffleboard.h>
+
+void Robot::RobotInit() {
+	robotRunning = frc::Shuffleboard::GetTab("Controller").Add("Robot Running", false).GetEntry();
+}
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
@@ -13,6 +18,8 @@ void Robot::AutonomousInit() {
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Schedule();
 	}
+
+	robotRunning->SetBoolean(true);
 }
 
 void Robot::TeleopInit() {
@@ -20,10 +27,16 @@ void Robot::TeleopInit() {
 		autonomousCommand->Cancel();
     	autonomousCommand = nullptr;
 	}
+
+	robotRunning->SetBoolean(true);
 }
 
 void Robot::TeleopPeriodic() {
 	robotContainer.UpdateControllerLogging();
+}
+
+void Robot::DisabledInit() {
+	robotRunning->SetBoolean(false);
 }
 
 #ifndef RUNNING_FRC_TESTS
