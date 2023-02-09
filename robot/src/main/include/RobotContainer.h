@@ -12,6 +12,7 @@ class RobotContainer {
 public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
+	void UpdateControllerLogging();
 
 private:
 	frc2::CommandXboxController controller{0};
@@ -20,7 +21,29 @@ private:
 
 	void ConfigureButtonBindings();
 
+	void InitControllerLogging();
+
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
+
+
+	//Controller logging
+	nt::GenericEntry* a;
+	nt::GenericEntry* b;
+	nt::GenericEntry* x;
+	nt::GenericEntry* y;
+	nt::GenericEntry* lb;
+	nt::GenericEntry* rb;
+	nt::GenericEntry* lt;
+	nt::GenericEntry* rt;
+	nt::GenericEntry* pov;
+	nt::GenericEntry* back;
+	nt::GenericEntry* start;
+	nt::GenericEntry* lx;
+	nt::GenericEntry* ly;
+	nt::GenericEntry* rx;
+	nt::GenericEntry* ry;
+	nt::GenericEntry* ls;
+	nt::GenericEntry* rs;
 };

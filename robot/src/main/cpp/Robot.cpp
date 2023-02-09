@@ -22,6 +22,10 @@ void Robot::TeleopInit() {
 	}
 }
 
+void Robot::TeleopPeriodic() {
+	robotContainer.UpdateControllerLogging();
+}
+
 #ifndef RUNNING_FRC_TESTS
 int main() {
 	return frc::StartRobot<Robot>();
