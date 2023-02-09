@@ -58,19 +58,33 @@ class TestNetworkTables(unittest.TestCase):
         # Check that all the values were set correctly
         assert self.drive_table.getBoolean('startAutoBalance', False), "startAutoBalance value not set"
 
-    def testStartPickup(self):
-        # Run the test function
-        self.TestWrapper.StartPickup()
+    def testPickupPortal(self):  # TODO:rename
+        self.TestWrapper.PickupPortal()
+        assert self.drive_table.getBoolean('pickupPortalPiece', False)
 
-        # Check that all the values were set correctly
-        assert self.drive_table.getBoolean('pickupPiece', False), "pickupPiece value not set"
+    def testPickupFloor(self):  # TODO:rename
+        self.TestWrapper.PickupFloor()
+        assert self.drive_table.getBoolean('pickupFloorPiece', False)
 
-    def testStartDrop(self):
-        # Run the test function
-        self.TestWrapper.StartDrop()
+    def testDropLow(self):  # TODO:rename
+        self.TestWrapper.DropLow()
+        assert self.drive_table.getBoolean('dropLow', False)
 
-        # Check that all the values were set correctly
-        assert self.drive_table.getBoolean('dropPiece', False), "dropPiece value not set"
+    def testDropMedium(self):  # TODO:rename
+        self.TestWrapper.DropMedium()
+        assert self.drive_table.getBoolean('dropMedium', False)
+
+    def testDropHigh(self):  # TODO:rename
+        self.TestWrapper.DropHigh()
+        assert self.drive_table.getBoolean('dropHigh', False)
+
+    def testDropHighNode(self):  # TODO:rename
+        self.TestWrapper.DropHighNode()
+        assert self.drive_table.getBoolean('dropHighNode', False)
+
+    def testDropLowNode(self):  # TODO:rename
+        self.TestWrapper.DropLowNode()
+        assert self.drive_table.getBoolean('dropLowNode', False)
 
     def testGetGyro(self):
         assert self.TestWrapper.GetGyro() is None, 'GetGyro does not return None when `gyro` has no value'
