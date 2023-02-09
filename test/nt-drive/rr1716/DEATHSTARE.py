@@ -6,6 +6,8 @@ from threading import Thread
 
 app = Flask(__name__)
 
+temp_cameras = []
+
 # This function gets called by the /video_feed route below
 def gen_frames(camera):  # generate frame by frame from camera
     logging.debug("DEATHSTARE.gen_frames")
@@ -33,32 +35,12 @@ def camera_feed(Number):
 def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
-
-    if app.Cameras[0].id is None:
-        return redirect("/all")
-    return render_template('index.html')
-
-@app.route('/all')
-def all():
-    logging.debug("DEATHSTARE.all")
-
-    number = request.args.get('num')
-    camera = request.args.get('cam')
-    if number == None:
-        number = 0
-    else:
-        number = int(number)
-    if camera is not None:
-        app.Cameras[int(camera)].id = number
-
-    if number == 4:
-        return redirect("/")
-    return render_template('all.html', len=5, num=number+1)
+    return render_template('sidecam.html')
 
 def start(camera):
     logging.debug("DEATHSTARE.start")
     app.Cameras = camera
-    thread = Thread(target=app.run)
+    thread = Thread(target=app.run, kwargs={'host':"0.0.0.0"})
     thread.start()
 
 if __name__ == '__main__':
