@@ -2,7 +2,7 @@ import math
 import apriltag
 import cv2
 import numpy as np
-from .positions import *
+from rr1716.positions import *
 
 tag_size = 8 / 2.54
 
@@ -57,7 +57,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     """
     This function takes an image and returns the position of apriltags in the image
 
-    :param img: The image you want to find apriltags in
+    :param img: The image you want to find apriltags in (must be grayscale)
     :param camera_matrix: The camera's calibration matrix
     :param dist_coefficients: The distortion coefficients of the camera
     :param valid_tags: (Default: 1-9) The apriltags to look for
@@ -66,8 +66,8 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :return: A list of Detection objects, or None if it fails
     :rtype: list(Detection objects)
     """
-    # Convert Images to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Check if image is grayscale
+    assert len(img.shape)==2, 'Image must be grayscale'
 
     # AprilTag detector options
     options = apriltag.DetectorOptions(families='tag16h5',
@@ -83,7 +83,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     # Create a detector with given options
     detector = apriltag.Detector(options)
     # Find the apriltags
-    detection_results = detector.detect(gray)
+    detection_results = detector.detect(img)
 
     detections = []
     if len(detection_results) > 0:  # Check if there are any apriltags
