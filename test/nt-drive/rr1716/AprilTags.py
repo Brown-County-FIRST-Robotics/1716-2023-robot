@@ -2,51 +2,55 @@ import math
 import apriltag
 import cv2
 import numpy as np
+from .positions import *
 
 tag_size = 8 / 2.54
 
 
 class Detection:
-    def __init__(self, yaw, pitch, roll, left_right, up_down, distance, rms_error, tag_id):
+    def __init__(self, yaw, left_right, distance, rms_error, tag_id):
         self.yaw = yaw
-        self.pitch = pitch
-        self.roll = roll
         self.left_right = left_right
-        self.up_down = up_down
         self.distance = distance
         self.RMSError = rms_error
         self.tagID = tag_id
 
+        self.field_yaw = -1
+        self.field_x = -1
+        self.field_y = -1
+
         self.yaw_std = -1
         self.left_right_std = -1
-        self.up_down_std = -1
         self.distance_std = -1
         self.error = -1
 
     def calcError(self, error_matrix=None, error_threshold=3000):  # TODO: add error threshold
         if error_matrix is None:
             error_matrix = np.array([  # TODO: add real values
-                [1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1],
+                [1, 1, 1, 1],
+                [1, 1, 1, 1],
+                [1, 1, 1, 1],
             ])
         input_matrix = np.array([  # TODO: rename
             self.yaw,
             self.left_right,
-            self.up_down,
             self.distance,
             self.RMSError
         ])
-        self.yaw_std, self.left_right_std, self.up_down_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
+        self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
         if self.error > error_threshold:
             print(f'discarded a value (error:{self.error})')
 
-
-def convert(pt):
-    return float(pt[0]), float(pt[1])
+    def calcFieldPos(self):
+        pos = apriltagPositions[self.tagID]
+        camera_theta = 180 + self.yaw + pos[3]
+        thetaCA = camera_theta - math.atan(self.left_right / self.distance) * 180 / math.pi
+        camera_Y = pos[1] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.sin(thetaCA * math.pi / 180))
+        camera_X = pos[0] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.cos(thetaCA * math.pi / 180))
+        self.field_yaw = thetaCA
+        self.field_x = camera_X
+        self.field_y = camera_Y
 
 
 def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
@@ -116,9 +120,15 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             if math.fabs(roll) > roll_threshold:
                 print(f'discarded a value (roll:{roll})')
                 continue
-            detections.append(Detection(yaw, pitch, roll, left_right, up_down, distance, rms,
+            detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
     else:
         # If there are no apriltags, return None
         return None
     return detections
+
+
+if __name__ == "main":
+    pass
+else:
+    pass
