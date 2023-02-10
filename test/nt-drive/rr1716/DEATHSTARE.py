@@ -35,27 +35,7 @@ def camera_feed(Number):
 def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
-
-    if app.Cameras.ordered == False:
-        return redirect("/all")
     return render_template('sidecam.html')
-
-@app.route('/all')
-def all():
-    logging.debug("DEATHSTARE.all")
-
-    number = request.args.get('num')
-    camera = request.args.get('cam')
-    if number == None:
-        number = 0
-    else:
-        number = int(number)
-    if camera is not None:
-        app.Cameras.append_order(app.Cameras[int(camera)])
-
-    if number == 4:
-        return redirect("/")
-    return render_template('all.html', len=5, num=number+1)
 
 def start(camera):
     logging.debug("DEATHSTARE.start")
