@@ -41,8 +41,45 @@ def index():
     """Video streaming home page."""
     return render_template('sidecam.html')
 
+#Color picker
+# This function gets called by the /video_feed route below
+def gen_frames_picker(camera):  # generate frame by frame from camera
+    logging.debug("DEATHSTARE.gen_frames_picker")
+    # We want to loop this forever
+    while True:
+
+        frame = camera.frame.copy()
+
+        w = len(frame[0])
+        h = len(frame)
+
+        x = int(w / 2)
+        y = int(h / 2)
+
+        cv2.rectangle(frame, (x - __COLOR_PICK_RANGE__, y - __COLOR_PICK_RANGE__), 
+                             (x + __COLOR_PICK_RANGE__, y + __COLOR_PICK_RANGE__), (0, 255, 0), 1) 
+
+        ret, jpeg = cv2.imencode(".jpg", frame)
+        data = jpeg.tobytes()
+
+        #print("dimensions", len(frame), len(frame[0]))
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n')  # concat frame one by one and show result
+
+@app.route('/picker_image')
+def picker_image():
+    logging.debug("DEATHSTARE.picker_image")
+
+    the_camera = app.Cameras[0]
+
+    #Video streaming route. Put this in the src attribute of an img tag
+    return Response(gen_frames_picker(the_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 @app.route('/picker')
 def picker_page():
+    logging.debug("DEATHSTARE.picker")
     return render_template('picker.html')
 
 @app.route("/pick")
