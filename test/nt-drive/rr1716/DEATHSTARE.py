@@ -3,6 +3,10 @@
 import logging
 from flask import Flask, render_template, Response, redirect, request
 from threading import Thread
+import rr1716
+import cv2
+
+__COLOR_PICK_RANGE__ = 20
 
 app = Flask(__name__)
 
@@ -54,6 +58,21 @@ def all():
     if number == 4:
         return redirect("/")
     return render_template('all.html', len=5, num=number+1)
+
+@app.route('/picker')
+def picker_page():
+    return render_template('picker.html')
+
+@app.route("/pick")
+def pick():
+    col = rr1716.Vision.averageColor(cv2.cvtColor(app.Cameras[0].frame, cv2.COLOR_BGR2HSV),
+                                                  __COLOR_PICK_RANGE__)
+    print("color: ", col)
+    #write to file
+    file = open("picked_color", "w")
+    file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
+    file.close()
+    return redirect("/")
 
 def start(camera):
     logging.debug("DEATHSTARE.start")
