@@ -9,6 +9,7 @@ class NetworkTablesWrapper:
     def __init__(self):
         self.drive_table = NetworkTables.getTable('1716Drive')
         self.pigeon_table = NetworkTables.getTable('1716Pigeon')
+        self.game_table=NetworkTables.getTable('1716GameInfo')
 
     def Drive(self, x, y, r):
         self.drive_table.putNumber("X", x)
@@ -62,6 +63,26 @@ class NetworkTablesWrapper:
             print('No gyro value')
             return None
         return gyro
+
+    def GetIsAutonomous(self): # TODO:add tests
+        val = self.game_table.getBoolean('isAutonomous',False)
+        return val
+
+    def GetIsTeleop(self): # TODO:add tests
+        val = self.game_table.getBoolean('isTeleop', False)
+        return val
+
+    def GetIsRedAlliance(self): # TODO:add tests
+        val = self.game_table.getBoolean('isRedAlliance', False)
+        return val
+
+    def GetMatchTime(self): # TODO:add tests
+        match_time = self.pigeon_table.getNumber('matchTime', -1)
+        if match_time==-1:
+            print('No match_time value')
+            return None
+        return match_time
+
 
 if __name__ == "__main__":
     # TEST CODE

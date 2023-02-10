@@ -27,3 +27,15 @@
 | YAccel           | double  | The accelerometer output in the Y direction |
 | Gyro             | double  | The gyroscope output in the yaw direction   |
 
+
+
+
+## `1716GameInfo`
+| Name            | Type     | Value                                          |
+|-----------------|----------|------------------------------------------------|
+| isAutonomous    | boolean  | If the robot is currently in autonomous mode   |
+| isTeleop        | boolean  | If the robot is currently in teleop mode       |
+| isRedAlliance   | boolean  | If the robot is on the red alliance            |
+| matchTime       | double   | The time remaining in the match                |
+
+To get these values, see [the wpilib documentation](https://github.wpilib.org/allwpilib/docs/release/cpp/classfrc_1_1_driver_station.html). 
