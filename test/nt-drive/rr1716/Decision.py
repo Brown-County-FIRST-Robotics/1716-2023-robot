@@ -99,13 +99,13 @@ if __name__ == "__main__":
     gameobjects[3].notfound = True
 
     nttable = NetworkTables1716.NetworkTablesWrapper()
-    cam = cv2.VideoCapture("/dev/video0")
+    cam = cv2.VideoCapture("/dev/video2")
 
     ret, frame = cam.read()
-    avgColor = Vision.averageColor(frame, 100)
+    avgColor = Vision.averageColor(frame, 20)
 
     low = [ avgColor[0] * 0.3, avgColor[1] * 0.7, avgColor[2] * 0.7 ]
-    high = [ avgColor[0] * 2.0, avgColor[1] * 2.0, avgColor[2] * 2.0 ]
+    high = [ avgColor[0] * 3.3, avgColor[1] * 1.3, avgColor[2] * 1.3 ]
     gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
     gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
 
