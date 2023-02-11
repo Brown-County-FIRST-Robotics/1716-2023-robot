@@ -34,6 +34,10 @@ class NetworkTablesWrapper:
     def PickupFloor(self):  # TODO:rename
         self.drive_table.putBoolean('pickupFloorPiece', True)
 
+
+
+
+
     def DropLow(self):  # TODO:rename
         self.drive_table.putBoolean('dropLow', True)
 
@@ -48,6 +52,9 @@ class NetworkTablesWrapper:
 
     def DropLowNode(self):  # TODO:rename
         self.drive_table.putBoolean('dropLowNode', True)
+
+
+
 
 
     def GetAccel(self):

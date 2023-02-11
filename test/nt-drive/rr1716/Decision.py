@@ -1,3 +1,5 @@
+import math
+
 from rr1716 import Vision
 from rr1716 import AprilTags
 import cv2
@@ -28,7 +30,7 @@ class Action:
         pass
 
     def ShouldEnd(self):
-        pass
+        return True
 
     def End(self):
         pass
@@ -55,12 +57,29 @@ class StartFilter(Action):
         return None not in self.filter.lastApril # check if lastApril has a None, meaning it has not seen an apriltag
 
     def MakeChild(self):
-        return Dri(self.filter, self.cams, self.ntInterface)
+        return DriveToLocation(self.filter, self.cams, self.ntInterface, [0,0,0]) # IMPORTANT: change
 
-class Dri(Action):
-    def __init__(self, filter, cams, ntInterface):
+class DriveToLocation(Action):
+    def __init__(self, filter, cams, ntInterface, location):
         super().__init__(filter, cams, ntInterface)
-        print('dri init')
+        self.location = location
+
+    def Step(self):
+        field_x,field_y,field_r=self.filter.getCurrentPos(self.ntInterface)
+        cx = math.cos((field_r)*math.pi/180)
+        cy = math.sin((field_r) * math.pi / 180)
+
+        ax = math.cos((field_r+90) * math.pi / 180)
+        ay = math.sin((field_r+90) * math.pi / 180)
+
+        offset_x=field_x-self.location[0]
+        offset_y = field_y - self.location[1]
+        offset_r = field_r - self.location[2]
+
+        self.ntInterface.Drive(0.1*(offset_x*cx+offset_y*cy),0.1*(offset_x*ax+offset_y*ay),0.1*offset_r)
+        
+    def ShouldEnd(self):
+        return False
 
 
 def doCurrentAction(action):

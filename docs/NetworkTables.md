@@ -11,12 +11,17 @@
 | startAutoBalance  | boolean | Tells the robot to start balancing                          |
 | pickupFloorPiece  | boolean | Tells the robot to pickup the piece on the floor            |
 | pickupPortalPiece | boolean | Tells the robot to pickup the piece from the portal         |
-| dropLow           | boolean | Tells the robot to drop the piece on the lowest level       |
-| dropMedium        | boolean | Tells the robot to drop the piece on the medium level       |
-| dropHigh          | boolean | Tells the robot to drop the piece on the highest level      |
-| dropLowNode       | boolean | Tells the robot to drop the piece on the lowest level node  |
-| dropHighNode      | boolean | Tells the robot to drop the piece on the highest level node |
+| setLow            | boolean | Tells the robot to drop the piece on the lowest level       |
+| setMedium         | boolean | Tells the robot to drop the piece on the medium level       |
+| setHigh           | boolean | Tells the robot to drop the piece on the highest level      |
+| setLowNode        | boolean | Tells the robot to drop the piece on the lowest level node  |
+| setHighNode       | boolean | Tells the robot to drop the piece on the highest level node |
+| dropObject        | boolean | Tells the robot to drop piece it is holding                 |
 
+### Notes on how some functions should work
+
+- For some commands (ie: dropLow), The Pi will set the value to true, but once you finish it, set it to false
+- For startAutoBalance, The Pi will set the value to `False` to signal that the auto balance should stop
 
 ## `1716Encoder`
 | Name              | Type    | Value                                    |
