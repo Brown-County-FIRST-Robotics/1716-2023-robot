@@ -89,13 +89,14 @@ def main():
     DEATHSTARE.start(cameras)
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
+    current_action=Decision.PutDown(filter, cameras, nt_table)
 
     while True:
         for i in cameras:
             i.update()
-        decisionArgs=Decision.DecisionArg()
-        if not decisionArgs.pass_round:
-            pass  # TODO: add decision
+        res=Decision.doCurrentAction(current_action)
+        if res is not None:
+            current_action=res
         #AprilTags.getPosition(i.get_gray(), i.camera_matrix, None)
         time.sleep(0.01)
 
