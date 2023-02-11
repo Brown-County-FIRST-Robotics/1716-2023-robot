@@ -122,9 +122,6 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
                 continue
             detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
-    else:
-        # If there are no apriltags, return None
-        return None
     return detections
 
 
