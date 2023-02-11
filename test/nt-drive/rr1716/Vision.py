@@ -43,9 +43,19 @@ class GamePiece():
 
     def setLowerColor(self, lower):
         self.lower_color = lower
-    
+        for i in range(len(self.lower_color)):
+            if self.lower_color[i] < 0:
+                self.lower_color[i] = 0
+            if self.lower_color[i] > 255:
+                self.lower_color[i] = 255
+
     def setUpperColor(self, upper):
         self.upper_color = upper
+        for i in range(len(self.upper_color)):
+            if self.upper_color[i] < 0:
+                self.upper_color[i] = 0
+            if self.upper_color[i] > 255:
+                self.upper_color[i] = 255
 
     def getLowerColor(self):
         return self.lower_color
@@ -97,7 +107,7 @@ class GamePiece():
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
         maskKone = cv2.inRange(hsv, self.lower_color, self.upper_color)
-            
+           
         gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
     
         contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 

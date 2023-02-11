@@ -26,11 +26,26 @@ class NetworkTablesWrapper:
     def StartAutoBalance(self):
         self.drive_table.putBoolean('startAutoBalance', True)
 
-    def StartPickup(self):  # TODO:rename
-        self.drive_table.putBoolean('pickupPiece', True)
+    def PickupPortal(self):  # TODO:rename
+        self.drive_table.putBoolean('pickupPortalPiece', True)
 
-    def StartDrop(self):  # TODO:rename
-        self.drive_table.putBoolean('startAutoBalance', True)
+    def PickupFloor(self):  # TODO:rename
+        self.drive_table.putBoolean('pickupFloorPiece', True)
+
+    def DropLow(self):  # TODO:rename
+        self.drive_table.putBoolean('dropLow', True)
+
+    def DropMedium(self):  # TODO:rename
+        self.drive_table.putBoolean('dropMedium', True)
+
+    def DropHigh(self):  # TODO:rename
+        self.drive_table.putBoolean('dropHigh', True)
+
+    def DropHighNode(self):  # TODO:rename
+        self.drive_table.putBoolean('dropHighNode', True)
+
+    def DropLowNode(self):  # TODO:rename
+        self.drive_table.putBoolean('dropLowNode', True)
 
 
     def GetAccel(self):
