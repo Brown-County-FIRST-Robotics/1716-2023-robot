@@ -89,7 +89,7 @@ def main():
     DEATHSTARE.start(cameras)
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
-    current_action=Decision.PutDown(filter, cameras, nt_table)
+    current_action=Decision.StartFilter(filter, cameras, nt_table)
 
     while True:
         for i in cameras:

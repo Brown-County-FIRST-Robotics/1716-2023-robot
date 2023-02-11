@@ -11,12 +11,20 @@ class Action:
         self.filter = filter
 
     def GetFilter(self):
-        pass
+        robotLocation=None
+        for camera in self.cams:
+            res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None) # check for apriltag
+            if res is not None and res!=[]: # TODO: change?
+                robotLocation=res[0] # TODO: change?
+                break
+        if robotLocation is not None:
+            self.filter.updateWithApriltag(robotLocation, self.ntInterface)
+        return self.filter.getCurrentPos(self.ntInterface)
 
     def GetGameObjects(self):
         pass
 
-    def Execute(self):
+    def Step(self):
         pass
 
     def ShouldEnd(self):
@@ -29,13 +37,34 @@ class Action:
         pass
 
 
-class PutDown(Action):
+class StartFilter(Action):
     def __init__(self, filter, cams, ntInterface):
         super().__init__(filter, cams, ntInterface)
 
+    def Step(self):
+        robotLocation = None
+        for camera in self.cams:
+            res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None)  # check for apriltag
+            if res is not None and res != []:  # TODO: change?
+                robotLocation = res[0]  # TODO: change?
+                break
+        if robotLocation is not None:
+            self.filter.updateWithApriltag(robotLocation, self.ntInterface)
+
+    def ShouldEnd(self):
+        return None not in self.filter.lastApril # check if lastApril has a None, meaning it has not seen an apriltag
+
+    def MakeChild(self):
+        return Dri(self.filter, self.cams, self.ntInterface)
+
+class Dri(Action):
+    def __init__(self, filter, cams, ntInterface):
+        super().__init__(filter, cams, ntInterface)
+        print('dri init')
+
 
 def doCurrentAction(action):
-    action.Execute()
+    action.Step()
     if action.ShouldEnd():
         action.End()
         return action.MakeChild()
