@@ -1,30 +1,70 @@
-import Vision
+from rr1716 import Vision
+from rr1716 import AprilTags
+import cv2
+import numpy as np
+#from rr1716 import Filter
 
 
 class DecisionArg:
-    closestObjFrames = [None,  # Camera 1
-                        None,  # Camera 2
-                        None,  # Camera 3
-                        None  # Camera 4
-                        ]
     # is the robot holding something?
     holdingSomething = False
     # in seconds
     timeLeft = 120
 
-    def __init__(self, objects_in_frames, holding, game_time_left):
-        self.closestObjFrames = objects_in_frames
+    robotLocation=None
+
+    def __init__(self, cams, holding, game_time_left, ntInterface, filter):
+        self.cams = cams
         self.holdingSomething = holding
         self.timeLeft = game_time_left
+        self.ntInterface=ntInterface
+        self.filter=filter
+        self.pass_round=False
+        if self.filter.lastApril[0] is None:
+            for cam in self.cams:
+                res = AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+                if res is not None and res != []:  # TODO: change?
+                    self.robotLocation = res[0].calcFieldPos()  # TODO: change?
+                    break
+            if self.robotLocation is None:
+                self.pass_round=True
+                return
 
-    def getClosest(self):
-        return self.closestObjFrames
 
-    def isHolding(self):
-        return self.holdingSomething
+    def getAprilTags(self):
+        for cam in self.cams:
+            res = AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+            if res is not None and res!=[]: # TODO: change?
+                self.robotLocation=res[0].calcFieldPos() # TODO: change?
+                return
+        if self.robotLocation is None:
+            pass
 
-    def getTimeLeft(self):
-        return self.timeLeft
+
+
+"""    def getObjects(self):
+        gameobjects = []
+        for frame in self.frames:
+            gameobjects.append(Vision.GamePiece())
+            avgColor = Vision.averageColor(frame, 100)
+            low = [avgColor[0] * 0.3, avgColor[1] * 0.7, avgColor[2] * 0.7]
+            high = [avgColor[0] * 2.0, avgColor[1] * 2.0, avgColor[2] * 2.0]
+            gameobjects[-1].setLowerColor(np.array(low, dtype=np.uint8))
+            gameobjects[-1].setUpperColor(np.array(high, dtype=np.uint8))
+
+       ''' gameobjects[0].x = -30
+        gameobjects[0].y = 0
+
+        gameobjects[1].notfound = True
+        gameobjects[2].notfound = True
+        gameobjects[3].notfound = True
+'''
+
+            gameobjects[0].findCone(frame)
+"""
+
+
+
 
 
 class DecisionOutput:
@@ -60,13 +100,15 @@ class DecisionOutput:
     def getDriveSpeed(self):
         return self.driveSpeed
 
+    def execute(self):
+        pass
 
 # returns a DecisionOutput object with data to be sent
 # to networktables
-def decision(info):
+def make_decision(info):
     closest = info.closestObjFrames
     # Attempt to center the object in the front camera
-    if not info.isHolding():
+    if not info.holdingSomething:
         for i in range(len(closest)):
             obj = closest[i]
 
@@ -89,9 +131,8 @@ def decision(info):
 
 # TEST CODE GOES HERE
 if __name__ == "__main__":
-    import NetworkTables1716
-    import cv2
-    import numpy as np
+    from rr1716 import NetworkTables1716
+
 
     gameobjects = [
         Vision.GamePiece(),
@@ -130,7 +171,7 @@ if __name__ == "__main__":
                                interpolation=cv2.INTER_AREA)
         cv2.imshow("frame", scaled_up)
 
-        decisionMade = decision(DecisionArg(gameobjects, False, 120))
+        decisionMade = make_decision(DecisionArg(gameobjects, False, 120))
         print("rotation speed:", decisionMade.driveRotation, "speed:", decisionMade.driveSpeed)
         nttable.Drive(decisionMade.driveSpeed, 0.0, decisionMade.driveRotation)
 

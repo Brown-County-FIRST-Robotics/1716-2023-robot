@@ -6,6 +6,9 @@ import logging
 from rr1716 import DEATHSTARE
 from rr1716 import Camera
 from rr1716 import AprilTags
+from rr1716 import Decision
+from rr1716 import NetworkTables1716
+from rr1716 import Filter
 import time
 import sys
 import os
@@ -68,7 +71,6 @@ def main():
 
     with open(args.config_file, 'r') as f:
         config=json.loads(f.read())
-    print('w')
     cameras = []
 
     for i in config:
@@ -85,11 +87,16 @@ def main():
 #    logging.critical("critical test")
 
     DEATHSTARE.start(cameras)
+    nt_table = NetworkTables1716.NetworkTablesWrapper()
+    filter=Filter.Filter()
 
     while True:
         for i in cameras:
             i.update()
-            AprilTags.getPosition(i.frame, i.camera_matrix, None)
+        decisionArgs=Decision.DecisionArg()
+        if not decisionArgs.pass_round:
+            pass  # TODO: add decision
+        #AprilTags.getPosition(i.get_gray(), i.camera_matrix, None)
         time.sleep(0.01)
 
 

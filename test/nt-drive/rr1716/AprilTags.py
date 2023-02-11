@@ -51,6 +51,7 @@ class Detection:
         self.field_yaw = thetaCA
         self.field_x = camera_X
         self.field_y = camera_Y
+        return camera_X,camera_Y,thetaCA
 
 
 def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
