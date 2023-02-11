@@ -12,6 +12,8 @@ import os
 import glob
 import json
 import signal
+from concurrent.futures import ThreadPoolExecutor
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -106,13 +108,33 @@ def main():
 
     DEATHSTARE.start(cameras)
 
+    aprilexecutor = ThreadPoolExecutor(max_workers=len(cameras))
+
+    lastframetime = 0
     try:
         while not stopping:
-            for i in cameras:
-                i.update()
-                AprilTags.getPosition(i.frame, i.camera_matrix, None)
-            time.sleep(0.01)
+            #cap at 10 FPS in case this loop isn't the only thing on the pi and we want to not constantly nail the cpu
+            newtime = time.time()
+            towait = .1-(newtime - lastframetime)
+            if towait > 0:
+              time.sleep(towait)
+            lastframetime = newtime
+            for cam in cameras:
+                cam.startupdate()
+            for cam in cameras:
+                cam.wait()
+
+            aprilfutures = []
+            for cam in cameras:
+                aprilfutures.append(aprilexecutor.submit(AprilTags.getPosition, cam.frame, cam.camera_matrix, None))
+            for future in aprilfutures:
+                detections = future.result()
+                if detections:
+                    print('\a', [d.yaw for d in detections])
+
+
     finally:
+        aprilexecutor.shutdown()
         for camera in cameras:
             camera.shutdown()
 
