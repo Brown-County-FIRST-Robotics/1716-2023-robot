@@ -18,6 +18,15 @@
 | dropHighNode      | boolean | Tells the robot to drop the piece on the highest level node |
 
 
+## `1716Encoder`
+| Name              | Type    | Value                                    |
+|-------------------|---------|------------------------------------------|
+| frontLeftEncoder  | double  | The position according to the encoder    |
+| backLeftEncoder   | double  | The position according to the encoder    |
+| frontRightEncoder | double  | The position according to the encoder    |
+| backRightEncoder  | double  | The position according to the encoder    |
+| encoderReset      | boolean | Reset the position of the encoders to 0  |
+see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.html#aa1a4166c3a802a2379500ba5b979a64f) and [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_spark_max_relative_encoder.html)
 
 
 ## `1716Pigeon`
@@ -26,8 +35,6 @@
 | XAccel           | double  | The accelerometer output in the x direction |
 | YAccel           | double  | The accelerometer output in the Y direction |
 | Gyro             | double  | The gyroscope output in the yaw direction   |
-
-
 
 
 ## `1716GameInfo`
