@@ -3,25 +3,36 @@
 import rr1716
 import argparse
 import logging
-from rr1716 import DEATHSTARE
 from rr1716 import Camera
+from rr1716 import DEATHSTARE
 from rr1716 import AprilTags
 import time
 import sys
 import os
 import glob
 import json
+import signal
+from concurrent.futures import ThreadPoolExecutor
+
 
 def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--check', '-c', action="store_true", dest="check", help="Check the commits for correctness")
     parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
-    parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="CRITICAL", help="Check the commits for correctness")
+    parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="WARNING", help="Check the commits for correctness")
     parser.add_argument('--make_config', action='store_true', help="Create a config file")
     parser.add_argument('--config', '-k', action="store", dest="config_file", default="configs/webcam.json", help='the config file to use')
 
     args = parser.parse_args()
+
+    file_handler = logging.FileHandler(filename=args.logfile)
+    stderr_handler = logging.StreamHandler(stream=sys.stderr)
+    handlers = [file_handler, stderr_handler]
+    logging.basicConfig(level=getattr(logging, args.loglevel), handlers=handlers)
+
+
+
     if args.make_config:
         print('Making config file')
         print('Warning: cameras must all have zero pitch and roll relative to the apriltags')
@@ -63,18 +74,17 @@ def main():
         print('Config file made')
         sys.exit()
     # use getattr to turn loglevel into integer
-    logging.basicConfig(filename=args.logfile, filemode='w')
-    logging.basicConfig(level=getattr(logging, args.loglevel))
+
 
     with open(args.config_file, 'r') as f:
         config=json.loads(f.read())
-    print('w')
     cameras = []
 
     for i in config:
         if not os.path.exists(i['port']):
-            logging.error("camera not connected")
+            logging.error("camera not connected %s", i['port'])
             sys.exit()
+        logging.info('opening camera %s', i['port'])
         cameras.append(Camera(i['port'],i['calibration'],i['pos']))
 
 # Keep these here as examples for logging
@@ -84,14 +94,49 @@ def main():
 #    logging.warning("warning test")
 #    logging.critical("critical test")
 
+
+
+    stopping = False
+    originalhandler = signal.getsignal(signal.SIGINT)
+    def handler(signum, frame):
+        nonlocal stopping
+        print('Signal handler called with signal', signum)
+        print('stopping loop')
+        stopping = True
+        signal.signal(signal.SIGINT, originalhandler)
+    signal.signal(signal.SIGINT, handler)
+
     DEATHSTARE.start(cameras)
 
-    while True:
-        for i in cameras:
-            i.update()
-            AprilTags.getPosition(i.frame, i.camera_matrix, None)
-        time.sleep(0.01)
+    aprilexecutor = ThreadPoolExecutor(max_workers=len(cameras))
 
+    lastframetime = 0
+    try:
+        while not stopping:
+            #cap at 10 FPS in case this loop isn't the only thing on the pi and we want to not constantly nail the cpu
+            newtime = time.time()
+            towait = .1-(newtime - lastframetime)
+            if towait > 0:
+              time.sleep(towait)
+            lastframetime = newtime
+            for cam in cameras:
+                cam.startupdate()
+            for cam in cameras:
+                cam.wait()
+
+            aprilfutures = []
+            for cam in cameras:
+                aprilfutures.append(aprilexecutor.submit(AprilTags.getPosition, cam.frame, cam.camera_matrix, None))
+            for future in aprilfutures:
+                detections = future.result()
+                if detections:
+                    print('\a', [d.yaw for d in detections])
+
+
+    finally:
+        aprilexecutor.shutdown()
+        for camera in cameras:
+            camera.shutdown()
 
 if __name__ == "__main__":
     main()
