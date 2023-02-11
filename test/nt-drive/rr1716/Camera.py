@@ -18,7 +18,7 @@ class Camera:
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
-        
+
         self.rectangles = None
         assert self.camera.isOpened()
         self.pos=position
@@ -44,6 +44,15 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
+        self.camera.set(cv2.CAP_PROP_BRIGHTNESS, 0)
+        self.camera.set(cv2.CAP_PROP_CONTRAST, 32)
+        self.camera.set(cv2.CAP_PROP_SATURATION, 128)
+        self.camera.set(cv2.CAP_PROP_HUE, 0)
+        self.camera.set(cv2.CAP_PROP_AUTO_WB, 0)
+        self.camera.set(cv2.CAP_PROP_GAMMA, 100)
+        self.camera.set(cv2.CAP_PROP_GAIN, 0)
+        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 3200)
+        self.camera.set(cv2.CAP_PROP_SHARPNESS, 2)
 
         self._stopping = False
         self._getframe = threading.Event()
