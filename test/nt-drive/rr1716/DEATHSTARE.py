@@ -123,8 +123,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
 
         gameobj.findCone(frame)
         #print(gameobj.getX(), gameobj.getY())
-        camera.add_rectangle([ int(gameobj.getX() - gameobj.getWidth() / 2), int(gameobj.getY() - gameobj.getHeight() / 2) ],
-                             [ int(gameobj.getX() + gameobj.getWidth() / 2), int(gameobj.getY() + gameobj.getHeight() / 2) ],
+        camera.add_rectangle([ int(gameobj.imgX - gameobj.getWidth() / 2), int(gameobj.imgY - gameobj.getHeight() / 2) ],
+                             [ int(gameobj.imgX + gameobj.getWidth() / 2), int(gameobj.imgY + gameobj.getHeight() / 2) ],
                              [ 0, 255, 0 ], 2)
         #gameobj.drawBoundRect(frame, [0,255,0])
         data = camera.get_jpg_bytes() 
