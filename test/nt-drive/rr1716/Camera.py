@@ -18,6 +18,8 @@ class Camera:
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
+        
+        self.rectangles = None
         assert self.camera.isOpened()
         self.pos=position
 
@@ -115,11 +117,16 @@ class Camera:
 
     def get_width(self):
         logging.debug("camera.get_width")
-        return len(self.frame)
+        return len(self.frame[0])
 
     def add_rectangle(self, start, end, color, thickness=2):
         logging.debug("camera.add_rectangle")
-        self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
+        self.rectangles = [ start, end, thickness ]
+        #self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
+
+    def clear_rectangle(self):
+        logging.debug("camera.clear_rectangle")
+        self.rectangles = None
 
     def get_jpg_bytes(self, flipped=False):
         # Let's block on this call if we alredy returned this frame
@@ -129,6 +136,10 @@ class Camera:
         self.last_frame_count = self.frame_count
         logging.debug("camera.get_jpg_bytes")
         frame = self.get_frame(flipped)
+        
+        if self.rectangles:
+            cv2.rectangle(self.frame, self.rectangles[0], self.rectangles[1], (0, 255, 0), self.rectangles[2])
+
         ret, buffer = cv2.imencode('.jpg', frame)
         jpg = buffer.tobytes()
         return jpg
