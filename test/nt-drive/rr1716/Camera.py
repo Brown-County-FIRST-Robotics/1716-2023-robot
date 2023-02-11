@@ -28,6 +28,8 @@ class Camera:
         test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
         assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
+        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
         raw_camera_matrix = np.array(calibration['cameraMatrix'])
         dist_coefficients = np.array(calibration['cameraDistortion'])
         processing_resolution = np.array(calibration['processingResolution'])
