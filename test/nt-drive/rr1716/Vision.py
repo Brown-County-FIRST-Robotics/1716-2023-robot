@@ -33,10 +33,13 @@ class GamePiece():
     #dimensions of bounding rectangle
     w = 0
     h = 0
+    imgX = 0
+    imgY = 0
     # is the cone upright?
     upright = False #Do not care about this value if this is a cube
     lower_color = np.array([ 0, 0, 0 ], np.uint8)
     upper_color = np.array([ 0xFF, 0xFF, 0xFF ], np.uint8)
+    notfound = False
 
     def setLowerColor(self, lower):
         self.lower_color = lower
@@ -90,6 +93,12 @@ class GamePiece():
     def setHeight(self, height):
         self.h = height
 
+    def getNotFound(self):
+        return self.notfound
+    
+    def setNotFound(self, isNotFound):
+        self.notfound = isNotFound
+
     # Returns a cone object when it attempts to find a
     # cone in an image (frame)
     # also passes in the lower color of the cone and upper color of the cone
@@ -100,14 +109,6 @@ class GamePiece():
         maskKone = cv2.inRange(hsv, self.lower_color, self.upper_color)
            
         gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-           
-        # cut out anything that isn't the cone
-        for i in range(len(blur)):
-            for j in range(len(blur[i])): 
-                if maskKone[i][j]:
-                    continue
-                blur[i,j] = 0 
     
         contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
         maskKone_copy = maskKone.copy()
@@ -116,7 +117,13 @@ class GamePiece():
         largestCont = 0
         largestBoundRectArea = 0
         x = y = w = h = 0
-        lx = ly = lw = lh = 0 
+        lx = ly = lw = lh = 0
+
+        if len(contours) == 0:
+            self.notfound = True
+            return
+        self.notfound = False
+
         #find largest contour
         for cont in contours:
             x,y,w,h = cv2.boundingRect(cont)
@@ -145,9 +152,12 @@ class GamePiece():
                         yellowBot += 1
             if yellowTop < yellowBot: 
                 upright = True
-    
-        self.setX(int(lx + lw / 2))
-        self.setY(int(ly + lh / 2))
+
+        frameDimensions = frame.shape
+        self.imgX = int(lx + lw / 2)
+        self.imgY = int(ly + lh / 2)
+        self.setX(int(lx + lw / 2) - int(frameDimensions[1] / 2))
+        self.setY(int(ly + lh / 2) - int(frameDimensions[0] / 2))
         self.setHeight(int(lh))
         self.setWidth(int(lw))
         self.setUpright(upright)
@@ -162,15 +172,7 @@ class GamePiece():
     
         maskKube = cv2.inRange(hsv, self.lower_color, self.upper_color)
              
-        gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-           
-        # cut out anything that isn't the cone
-        for i in range(len(blur)):
-            for j in range(len(blur[i])): 
-                if maskKube[i][j]:
-                    continue
-                blur[i,j] = 0 
+        gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY) 
     
         contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
         maskKube_copy = maskKube.copy()
@@ -180,6 +182,11 @@ class GamePiece():
         largestBoundRectArea = 0
         x = y = w = h = 0
         lx = ly = lw = lh = 0 
+        
+        if len(contours) == 0:
+            self.notfound = True
+            return
+
         #find largest contour
         RATIO_RANGE = 0.3
         for cont in contours:
@@ -192,21 +199,24 @@ class GamePiece():
                 ly = y
                 lw = w
                 lh = h 
-        self.setX(int(lx + lw / 2))
-        self.setY(int(ly + lh / 2))
+        frameDimensions = frame.shape
+        self.imgX = int(lx + lw / 2)
+        self.imgY = int(ly + lh / 2)
+        self.setX(int(lx + lw / 2) - int(frameDimensions[1] / 2))
+        self.setY(int(ly + lh / 2) - int(frameDimensions[0] / 2))
         self.setHeight(int(lh))
         self.setWidth(int(lw))
         self.setUpright(False) #don't care if cube is upright
 
     def drawBoundRect(self, frame, color):
-        cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), color, 4, cv2.LINE_AA)
+        cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), color, 4, cv2.LINE_AA)
 
     #green if frame
     def drawCone(self, frame):
         if self.isUpright():
-            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
+            cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
         else:
-            cv2.rectangle(frame, (int(self.x - self.w / 2), int(self.y - self.h / 2)), (int(self.x + self.w / 2), int(self.y + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
+            cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
 
 if __name__ == "__main__":
     # We're a module, never run anything here
