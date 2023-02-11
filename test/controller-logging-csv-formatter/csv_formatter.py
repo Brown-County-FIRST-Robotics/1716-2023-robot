@@ -1,5 +1,4 @@
 import csv
-import sys
 
 new_data = []
 cols = [0]
