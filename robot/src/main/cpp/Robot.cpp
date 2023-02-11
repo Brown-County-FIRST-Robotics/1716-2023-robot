@@ -29,6 +29,8 @@ void Robot::TeleopInit() {
 	}
 
 	robotRunning->SetBoolean(true);
+
+	frc::Shuffleboard::StartRecording();
 }
 
 void Robot::TeleopPeriodic() {
@@ -37,6 +39,7 @@ void Robot::TeleopPeriodic() {
 
 void Robot::DisabledInit() {
 	robotRunning->SetBoolean(false);
+	frc::Shuffleboard::StopRecording();
 }
 
 #ifndef RUNNING_FRC_TESTS
