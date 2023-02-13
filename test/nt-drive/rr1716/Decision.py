@@ -59,7 +59,40 @@ class StartFilter(Action):
         return None not in self.filter.lastApril # check if lastApril has a None, meaning it has not seen an apriltag
 
     def MakeChild(self):
-        return DriveToLocation(self.filter, self.cams, self.ntInterface, [0,0,0], self.referrer) # IMPORTANT: change
+        return AsyncSetHeight(self.filter, self.cams, self.ntInterface, 6 ,self.referrer) # IMPORTANT: change
+
+class AsyncSetHeight(Action):
+    def __init__(self, filter, cams, ntInterface, referrer, height):
+        super().__init__(filter, cams, ntInterface, referrer)
+        '''
+        0:Floor
+        1:portal
+        2:Low platform
+        3:Medium platform
+        4:High platform
+        5:Low cone node
+        6:High cone node
+        '''
+        self.height = height
+        if self.height==0:
+            self.ntInterface.SetArmFloor()
+        elif self.height==1:
+            self.ntInterface.SetArmPortal()
+        elif self.height==2:
+            self.ntInterface.SetArmLow()
+        elif self.height==3:
+            self.ntInterface.SetArmMedium()
+        elif self.height==4:
+            self.ntInterface.SetArmHigh()
+        elif self.height==5:
+            self.ntInterface.SetArmLowNode()
+        elif self.height==6:
+            self.ntInterface.SetArmHighNode()
+
+    def MakeChild(self):
+        if self.referrer=='auto':
+           return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)
+
 
 class DriveToLocation(Action):
     def __init__(self, filter, cams, ntInterface, location, referrer):
