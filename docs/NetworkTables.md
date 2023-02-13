@@ -1,22 +1,22 @@
 # NetworkTables
 
 ## `1716Drive`
-| Name              | Type    | Value                                                       |
-|-------------------|---------|-------------------------------------------------------------|
-| X                 | double  | The speed of the robot in the x direction                   |
-| Y                 | double  | The speed of the robot in the y direction                   |
-| Rotation          | double  | The speed of the robot in the rotation direction            |
-| isTank            | boolean | Whether the robot is in tank or mecanum mode                |
-| isMecanum         | boolean | Whether the robot is in mecanum or tank mode                |
-| startAutoBalance  | boolean | Tells the robot to start balancing                          |
-| pickupFloorPiece  | boolean | Tells the robot to pickup the piece on the floor            |
-| pickupPortalPiece | boolean | Tells the robot to pickup the piece from the portal         |
-| setLow            | boolean | Tells the robot to drop the piece on the lowest level       |
-| setMedium         | boolean | Tells the robot to drop the piece on the medium level       |
-| setHigh           | boolean | Tells the robot to drop the piece on the highest level      |
-| setLowNode        | boolean | Tells the robot to drop the piece on the lowest level node  |
-| setHighNode       | boolean | Tells the robot to drop the piece on the highest level node |
-| dropObject        | boolean | Tells the robot to drop piece it is holding                 |
+| Name             | Type    | Value                                                         |
+|------------------|---------|---------------------------------------------------------------|
+| x                | double  | The speed of the robot in the x direction                     |
+| y                | double  | The speed of the robot in the y direction                     |
+| rotation         | double  | The speed of the robot in the rotation direction              |
+| isTank           | boolean | Whether the robot is in tank or mecanum mode                  |
+| startAutoBalance | boolean | Tells the robot to start balancing                            |
+| setArmFloor      | boolean | Tells the robot to drop the piece on the lowest level         |
+| setArmPortal     | boolean | Tells the robot to drop the piece on the lowest level         |
+| pickupObject     | boolean | Tells the robot to turn on the intake                         |
+| setArmLow        | boolean | Tells the robot to set the arm on the lowest level            |
+| setArmMedium     | boolean | Tells the robot to set the arm to the medium level            |
+| setArmHigh       | boolean | Tells the robot to set the arm to the highest level           |
+| setArmLowNode    | boolean | Tells the robot to set the arm to the lowest level cone node  |
+| setArmHighNode   | boolean | Tells the robot to set the arm to the highest level cone node |
+| dropObject       | boolean | Tells the robot to drop piece it is holding                   |
 
 ### Notes on how some functions should work
 
@@ -35,11 +35,11 @@ see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.htm
 
 
 ## `1716Pigeon`
-| Name             | Type    | Value                                       |
-|------------------|---------|---------------------------------------------|
-| XAccel           | double  | The accelerometer output in the x direction |
-| YAccel           | double  | The accelerometer output in the Y direction |
-| Gyro             | double  | The gyroscope output in the yaw direction   |
+| Name   | Type    | Value                                       |
+|--------|---------|---------------------------------------------|
+| xAccel | double  | The accelerometer output in the x direction |
+| yAccel | double  | The accelerometer output in the Y direction |
+| gyro   | double  | The gyroscope output in the yaw direction   |
 
 
 ## `1716GameInfo`
