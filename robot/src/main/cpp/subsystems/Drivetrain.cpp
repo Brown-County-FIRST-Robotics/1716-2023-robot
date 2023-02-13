@@ -1,6 +1,11 @@
 #include "subsystems/Drivetrain.h"
 
-Drivetrain::Drivetrain() {
+Drivetrain::Drivetrain() : 
+	frontLeftEncoder{frontLeft.GetEncoder()}, 
+	frontRightEncoder{frontRight.GetEncoder()}, 
+	backLeftEncoder{backLeft.GetEncoder()}, 
+	backRightEncoder{backRight.GetEncoder()} 
+{
 	frontRight.SetInverted(true);
 	backRight.SetInverted(true);
 
@@ -107,4 +112,29 @@ void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
 
 frc::DoubleSolenoid::Value Drivetrain::GetSolenoid() {
 	return solenoidPos;
+}
+
+double Drivetrain::GetEncoder(int motorID) {
+	if (motorID == DrivetrainConst::FRONTLEFTID) {
+		return frontLeftEncoder.GetPosition();
+	}
+	else if (motorID == DrivetrainConst::FRONTRIGHTID) {
+		return frontRightEncoder.GetPosition();
+	}
+	else if (motorID == DrivetrainConst::BACKLEFTID) {
+		return backLeftEncoder.GetPosition();
+	}
+	else if (motorID == DrivetrainConst::BACKRIGHTID) {
+		return backRightEncoder.GetPosition();
+	}
+	else {
+		return 0;
+	}
+}
+
+void Drivetrain::ResetEncoders() {
+	frontLeftEncoder.SetPosition(0);
+	frontRightEncoder.SetPosition(0);
+	backLeftEncoder.SetPosition(0);
+	backRightEncoder.SetPosition(0);
 }

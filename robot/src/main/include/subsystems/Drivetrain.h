@@ -2,6 +2,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <rev/CANSparkMax.h>
+#include <rev/SparkMaxRelativeEncoder.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/TimedRobot.h> //units::scalar
@@ -38,11 +39,19 @@ public:
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
 
+	double GetEncoder(int motorID);
+	void ResetEncoders();
+
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax backLeft{DrivetrainConst::BACKLEFTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax backRight{DrivetrainConst::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
+
+	rev::SparkMaxRelativeEncoder frontLeftEncoder;
+	rev::SparkMaxRelativeEncoder frontRightEncoder;
+	rev::SparkMaxRelativeEncoder backLeftEncoder;
+	rev::SparkMaxRelativeEncoder backRightEncoder;
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
