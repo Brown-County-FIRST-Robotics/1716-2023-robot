@@ -2,6 +2,7 @@ import math
 
 from rr1716 import Vision
 from rr1716 import AprilTags
+from rr1716 import Strategy
 import cv2
 import numpy as np
 #from rr1716 import Filter
@@ -65,21 +66,27 @@ class DriveToLocation(Action):
         self.location = location
 
     def Step(self):
-        field_x,field_y,field_r=self.filter.getCurrentPos(self.ntInterface)
-        cx = math.cos((field_r)*math.pi/180)
+        field_x,field_y,field_r=self.GetFilter()
+        cx = math.cos((field_r) * math.pi / 180)
         cy = math.sin((field_r) * math.pi / 180)
 
         ax = math.cos((field_r+90) * math.pi / 180)
         ay = math.sin((field_r+90) * math.pi / 180)
 
-        offset_x=field_x-self.location[0]
+        offset_x = field_x - self.location[0]
         offset_y = field_y - self.location[1]
         offset_r = field_r - self.location[2]
 
-        self.ntInterface.Drive(0.1*(offset_x*cx+offset_y*cy),0.1*(offset_x*ax+offset_y*ay),0.1*offset_r)
+        self.ntInterface.Drive(Strategy.xy_p_factor*(offset_x*cx+offset_y*cy),Strategy.xy_p_factor*(offset_x*ax+offset_y*ay),Strategy.r_p_factor*offset_r)
         
     def ShouldEnd(self):
-        return False
+        field_x,field_y,field_r=self.GetFilter()
+        error=math.sqrt((field_x - self.location[0])**2+(field_y - self.location[1])**2)+Strategy.r_error_factor*math.fabs(field_r-self.location[2])
+        return error<Strategy.drive_error_threshold
+    
+    def MakeChild(self):
+        pass
+    
 
 
 def doCurrentAction(action):
