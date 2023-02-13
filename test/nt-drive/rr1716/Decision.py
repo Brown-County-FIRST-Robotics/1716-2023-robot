@@ -8,7 +8,8 @@ import numpy as np
 #from rr1716 import Filter
 
 class Action:
-    def __init__(self, filter, cams, ntInterface):
+    def __init__(self, filter, cams, ntInterface, referrer):
+        self.referrer = referrer
         self.ntInterface = ntInterface
         self.cams = cams
         self.filter = filter
@@ -41,8 +42,8 @@ class Action:
 
 
 class StartFilter(Action):
-    def __init__(self, filter, cams, ntInterface):
-        super().__init__(filter, cams, ntInterface)
+    def __init__(self, filter, cams, ntInterface, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
 
     def Step(self):
         robotLocation = None
@@ -58,11 +59,11 @@ class StartFilter(Action):
         return None not in self.filter.lastApril # check if lastApril has a None, meaning it has not seen an apriltag
 
     def MakeChild(self):
-        return DriveToLocation(self.filter, self.cams, self.ntInterface, [0,0,0]) # IMPORTANT: change
+        return DriveToLocation(self.filter, self.cams, self.ntInterface, [0,0,0], self.referrer) # IMPORTANT: change
 
 class DriveToLocation(Action):
-    def __init__(self, filter, cams, ntInterface, location):
-        super().__init__(filter, cams, ntInterface)
+    def __init__(self, filter, cams, ntInterface, location, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
         self.location = location
 
     def Step(self):
@@ -85,8 +86,18 @@ class DriveToLocation(Action):
         return error<Strategy.drive_error_threshold
     
     def MakeChild(self):
-        pass
-    
+        if self.referrer=='auto':
+            return AwaitSetHeight(self.filter, self.cams, self.ntInterface, self.referrer)
+
+class AwaitSetHeight(Action):
+    def __init__(self, filter, cams, ntInterface, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
+
+    def ShouldEnd(self):
+        return self.ntInterface.IsArmDone()
+
+    def MakeChild(self):
+        pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
 
 
 def doCurrentAction(action):
