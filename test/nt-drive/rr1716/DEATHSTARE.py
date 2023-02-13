@@ -6,6 +6,7 @@ from threading import Thread
 import rr1716
 import cv2
 import numpy as np
+import rr1716
 
 __COLOR_PICK_RANGE__ = 20
 
@@ -88,65 +89,6 @@ def picker_page():
     return render_template('picker.html')
 
 #Color picker
-# This function gets called by the /video_feed route below
-def gen_preview_picker(camera):  # generate frame by frame from camera
-    logging.debug("DEATHSTARE.gen_frames_picker")
-
-    col = []
-    with open("picked_color") as file:
-        for line in file:
-            for x in line.split():
-                col.append(int(x)) 
-
-    gameobj = rr1716.Vision.GamePiece()
-    lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
-    upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
-
-    for i in range(len(lower)):
-        if lower[i] < 0:
-            lower[i] = 0
-        if lower[i] > 255:
-            lower[i] = 255
-
-        if upper[i] < 0:
-            upper[i] = 0
-        if upper[i] > 255:
-            upper[i] = 255
-
-    gameobj.setLowerColor(np.array(lower, dtype=np.uint8))
-    gameobj.setUpperColor(np.array(upper, dtype=np.uint8))
-
-    # We want to loop this forever
-    while True:
-        hsv = camera.get_hsv()
-        frame = camera.get_frame()
-
-        gameobj.findCone(frame)
-        #print(gameobj.getX(), gameobj.getY())
-        camera.add_rectangle([ int(gameobj.imgX - gameobj.getWidth() / 2), int(gameobj.imgY - gameobj.getHeight() / 2) ],
-                             [ int(gameobj.imgX + gameobj.getWidth() / 2), int(gameobj.imgY + gameobj.getHeight() / 2) ],
-                             [ 0, 255, 0 ], 2)
-        #gameobj.drawBoundRect(frame, [0,255,0])
-        data = camera.get_jpg_bytes() 
-        
-        """
-        print(gameobj.getLowerColor(), gameobj.getUpperColor())
-
-        hsv = camera.get_hsv()
-        frame = camera.get_frame()
-        imgmask = cv2.inRange(hsv, gameobj.getLowerColor(), gameobj.getUpperColor())
-        res = cv2.bitwise_and(frame, frame, mask = imgmask)
-        imgray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-        ret, thresh = cv2.threshold(imgray, 127, 255, 0)
-
-        ret, jpeg = cv2.imencode('.jpg', imgmask)
-        data = jpeg.tobytes()
-        """
-
-        # Return the image to the browser
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n')  # concat frame one by one and show result
-
 @app.route('/preview')
 def preview_page():
     logging.debug("DEATHSTARE.preview")
@@ -157,10 +99,32 @@ def preview_image():
     logging.debug("DEATHSTARE.preview_image")
     the_camera = app.Cameras[0]
     #Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_preview_picker(the_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(rr1716.Vision.gen_preview_picker(the_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route("/pick")
 def pick():
+    app.Cameras[0].get_frame()
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
+    print("color: ", col) 
+    #write to file
+    file = open("picked_color", "w")
+    file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
+    file.close()
+    return redirect("/preview")
+
+@app.route("/pick_cone")
+def pick_cone():
+    app.Cameras[0].get_frame()
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
+    print("color: ", col) 
+    #write to file
+    file = open("picked_color", "w")
+    file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
+    file.close()
+    return redirect("/preview")
+
+@app.route("/pick_cube")
+def pick_cube():
     app.Cameras[0].get_frame()
     col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
     print("color: ", col) 

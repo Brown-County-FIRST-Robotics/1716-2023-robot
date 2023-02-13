@@ -28,13 +28,13 @@ def averageColor(frame, sampleRange):
 #GamePiece - can represent a cone or a cube
 class GamePiece():
     # position of cone in the image in terms of pixels
-    x = 0
-    y = 0
+    x = 0 #use this for decision
+    y = 0 #use this for decision
     #dimensions of bounding rectangle
     w = 0
     h = 0
-    imgX = 0
-    imgY = 0
+    imgX = 0 #image coordinates
+    imgY = 0 #image coordinates
     # is the cone upright?
     upright = False #Do not care about this value if this is a cube
     lower_color = np.array([ 0, 0, 0 ], np.uint8)
@@ -107,16 +107,15 @@ class GamePiece():
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
         maskKone = cv2.inRange(hsv, self.lower_color, self.upper_color)
-           
-        gray = cv2.cvtColor(hsv, cv2.COLOR_BGR2GRAY)
+          
+        res = cv2.bitwise_and(frame, frame, mask=maskKone)
+
+        gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     
         contours, hierarchy = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
-        maskKone_copy = maskKone.copy()
     
-        contours, hierarchy = cv2.findContours(image=maskKone, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-        largestCont = 0
-        largestBoundRectArea = 0
-        x = y = w = h = 0
+        #contours, hierarchy = cv2.findContours(image=maskKone, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+        largestBoundRectArea = -1
         lx = ly = lw = lh = 0
 
         if len(contours) == 0:
@@ -130,12 +129,12 @@ class GamePiece():
             area = w * h
             if area > largestBoundRectArea:
                 largestBoundRectArea = area
-                largestCont = cont
                 lx = x
                 ly = y
                 lw = w
                 lh = h
-        
+       
+        """
         # Determine if the cone is upright
         upright = False
         #check if the rectangle's dimensions are in
@@ -152,6 +151,7 @@ class GamePiece():
                         yellowBot += 1
             if yellowTop < yellowBot: 
                 upright = True
+        """
 
         frameDimensions = frame.shape
         self.imgX = int(lx + lw / 2)
@@ -160,7 +160,7 @@ class GamePiece():
         self.setY(int(ly + lh / 2) - int(frameDimensions[0] / 2))
         self.setHeight(int(lh))
         self.setWidth(int(lw))
-        self.setUpright(upright)
+        #self.setUpright(upright)
     
     # Returns a cube object when it attempts to find a
     # cube in an image (frame)
@@ -217,6 +217,65 @@ class GamePiece():
             cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,255,0], 4, cv2.LINE_AA)
         else:
             cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), [0,0,255], 4, cv2.LINE_AA)
+
+    def getLowerLeft(self):
+        return (int(self.imgX - self.getWidth() / 2), int(self.imgY - self.getHeight() / 2))
+
+    def getUpperRight(self):
+        return (int(self.imgX + self.getWidth() / 2), int(self.imgY + self.getHeight() / 2))
+
+#Color picker
+# This function gets called by the /video_feed route below
+def gen_preview_picker(camera):  # generate frame by frame from camera
+    logging.debug("Vision.gen_frames_picker")
+
+    col = []
+    with open("picked_color") as file:
+        for line in file:
+            for x in line.split():
+                col.append(int(x)) 
+
+    gameobj = GamePiece()
+    lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
+    upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
+
+    for i in range(len(lower)):
+        if lower[i] < 0:
+            lower[i] = 0
+        if lower[i] > 255:
+            lower[i] = 255
+
+        if upper[i] < 0:
+            upper[i] = 0
+        if upper[i] > 255:
+            upper[i] = 255
+
+    gameobj.setLowerColor(np.array(lower, dtype=np.uint8))
+    gameobj.setUpperColor(np.array(upper, dtype=np.uint8))
+
+    currentFrame = 0
+
+    # We want to loop this forever
+    while True:
+        frame = camera.get_frame()
+       
+        if camera.frame_count == currentFrame:
+            continue     
+        currentFrame = camera.frame_count
+
+        gameobj.findCone(frame)
+        #camera.add_rectangle([ int(gameobj.lx), int(gameobj.ly) ],
+        #                     [ int(gameobj.lx + gameobj.lw), int(gameobj.ly + gameobj.lh) ],
+        #                     [ 0, 255, 0 ], 2)
+        #data = camera.get_jpg_bytes()  
+        
+        cv2.rectangle(frame, gameobj.getLowerLeft(), gameobj.getUpperRight(), (0, 255, 0), 2)
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        data = jpeg.tobytes()
+
+        # Return the image to the browser
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n')  # concat frame one by one and show result
 
 if __name__ == "__main__":
     # We're a module, never run anything here
