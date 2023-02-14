@@ -269,8 +269,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
     cube = GamePiece()
     while len(col) < 3:
         col.append(0)
-    lower = [col[0] * 0.7, col[1] * 0.1, col[2] * 0.1]
-    upper = [col[0] * 1.4, col[1] * 4.0, col[2] * 4.0]
+    lower = [col[0] * 0.8, 0.0, 0.0]
+    upper = [col[0] * 1.2, 255.0, 255.0]
 
     for i in range(len(lower)):
         if lower[i] < 0:

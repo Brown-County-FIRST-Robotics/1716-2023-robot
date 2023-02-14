@@ -116,7 +116,7 @@ def pick():
 def pick_cone():
     app.Cameras[0].get_frame()
     col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
-    logging.log("cone color: ", col) 
+    logging.info("cone color: " + str(col)) 
     #write to file
     file = open("cone_picked_color", "w")
     file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
@@ -127,7 +127,7 @@ def pick_cone():
 def pick_cube():
     app.Cameras[0].get_frame()
     col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
-    logging.log("cube color: ", col) 
+    logging.info("cube color: " + str(col)) 
     #write to file
     file = open("cube_picked_color", "w")
     file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
