@@ -130,7 +130,18 @@ class AwaitSetHeight(Action):
         return self.ntInterface.IsArmDone()
 
     def MakeChild(self):
-        pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
+        if self.referrer=="auto":
+            return Drop(self.filter, self.cams, self.ntInterface, self.referrer)  # IMPORTANT: change
+
+class Drop(Action):
+    def __init__(self, filter, cams, ntInterface, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
+        self.ntInterface.DropObject()
+        self.ntInterface.RetractArm()
+
+    def MakeChild(self):
+        if self.referrer=="auto":
+            pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
 
 
 def doCurrentAction(action):
