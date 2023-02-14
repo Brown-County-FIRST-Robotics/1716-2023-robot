@@ -94,10 +94,11 @@ def main():
     while True:
         for i in cameras:
             i.update()
+            # Uncomment this code if we need to log apriltag data
+            # AprilTags.getPosition(i.get_gray(), i.camera_matrix, None)
         res=Decision.doCurrentAction(current_action)
         if res is not None:
             current_action=res
-        #AprilTags.getPosition(i.get_gray(), i.camera_matrix, None)
         time.sleep(0.01)
 
 

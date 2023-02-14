@@ -1,3 +1,4 @@
+import logging
 import math
 import apriltag
 import cv2
@@ -122,6 +123,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             if math.fabs(roll) > roll_threshold:
                 print(f'discarded a value (roll:{roll})')
                 continue
+            logging.info(f'yaw:{yaw}, lr:{left_right}, distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
     else:
