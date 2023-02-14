@@ -160,7 +160,22 @@ class GetOnStation(Action):
         self.ntInterface.Drive(0, 0, 0)
 
     def MakeChild(self):
-        pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
+        return AutoBalance(self.filter, self.cams, self.ntInterface, self.referrer)
+
+class AutoBalance(Action):
+    def __init__(self, filter, cams, ntInterface, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
+        self.ntInterface.StartAutoBalance()
+
+    def ShouldEnd(self):
+        return self.ntInterface.IsTeleop()
+
+    def End(self):
+        self.ntInterface.EndAutoBalance()
+
+    def MakeChild(self):
+        pass#if self.referrer=="auto":
+            #return GetOnStation(self.filter, self.cams, self.ntInterface, self.referrer)  # IMPORTANT: change
 
 
 def doCurrentAction(action):
