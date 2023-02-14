@@ -3,6 +3,7 @@
 import logging
 import numpy as np
 import cv2
+import os
 
 #use this for calibrating the color detector
 #pass in frame
@@ -230,14 +231,46 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
     logging.debug("Vision.gen_frames_picker")
 
     col = []
-    with open("picked_color") as file:
+    if os.path.exists("cone_picked_color"):
+        file = open("cone_picked_color", "r") 
+        for line in file:
+            for x in line.split():
+                col.append(int(x))
+        file.close()
+
+    cone = GamePiece()
+    while len(col) < 3:
+        col.append(0)
+    lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
+    upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
+   
+    for i in range(len(lower)):
+        if lower[i] < 0:
+            lower[i] = 0
+        if lower[i] > 255:
+            lower[i] = 255
+
+        if upper[i] < 0:
+            upper[i] = 0
+        if upper[i] > 255:
+            upper[i] = 255
+
+    cone.setLowerColor(np.array(lower, dtype=np.uint8))
+    cone.setUpperColor(np.array(upper, dtype=np.uint8))
+
+    col = []
+    if os.path.exists("cube_picked_color"):
+        file = open("cube_picked_color", "r") 
         for line in file:
             for x in line.split():
                 col.append(int(x)) 
+        file.close()
 
-    gameobj = GamePiece()
-    lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
-    upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
+    cube = GamePiece()
+    while len(col) < 3:
+        col.append(0)
+    lower = [col[0] * 0.7, col[1] * 0.1, col[2] * 0.1]
+    upper = [col[0] * 1.4, col[1] * 4.0, col[2] * 4.0]
 
     for i in range(len(lower)):
         if lower[i] < 0:
@@ -250,8 +283,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
         if upper[i] > 255:
             upper[i] = 255
 
-    gameobj.setLowerColor(np.array(lower, dtype=np.uint8))
-    gameobj.setUpperColor(np.array(upper, dtype=np.uint8))
+    cube.setLowerColor(np.array(lower, dtype=np.uint8))
+    cube.setUpperColor(np.array(upper, dtype=np.uint8)) 
 
     currentFrame = 0
 
@@ -263,13 +296,11 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
             continue     
         currentFrame = camera.frame_count
 
-        gameobj.findCone(frame)
-        #camera.add_rectangle([ int(gameobj.lx), int(gameobj.ly) ],
-        #                     [ int(gameobj.lx + gameobj.lw), int(gameobj.ly + gameobj.lh) ],
-        #                     [ 0, 255, 0 ], 2)
-        #data = camera.get_jpg_bytes()  
+        cone.findCone(frame)
+        cube.findCone(frame)  
         
-        cv2.rectangle(frame, gameobj.getLowerLeft(), gameobj.getUpperRight(), (0, 255, 0), 2)
+        cv2.rectangle(frame, cone.getLowerLeft(), cone.getUpperRight(), (0, 255, 0), 2)  
+        cv2.rectangle(frame, cube.getLowerLeft(), cube.getUpperRight(), (255, 0, 0), 2)
         ret, jpeg = cv2.imencode('.jpg', frame)
         data = jpeg.tobytes()
 
