@@ -150,6 +150,7 @@ class Drop(Action):
 class GetOnStation(Action):
     def __init__(self, filter, cams, ntInterface, referrer):
         super().__init__(filter, cams, ntInterface, referrer)
+        self.ntInterface.SwitchToTank()
         self.ntInterface.Drive(0,-1,0)
 
     def ShouldEnd(self):
@@ -172,6 +173,7 @@ class AutoBalance(Action):
 
     def End(self):
         self.ntInterface.EndAutoBalance()
+        self.ntInterface.SwitchToMecanum()
 
     def MakeChild(self):
         pass#if self.referrer=="auto":
