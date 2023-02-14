@@ -13,56 +13,43 @@ class NetworkTablesWrapper:
         self.game_table = NetworkTables.getTable('1716GameInfo')
         self.encoder_table = NetworkTables.getTable('1716Encoder')
 
-
     def Drive(self, x, y, r):
         self.drive_table.putNumber("x", x)
         self.drive_table.putNumber("y", y)
         self.drive_table.putNumber("rotation", r)
 
-
     def SwitchToTank(self):
         self.drive_table.putBoolean('isTank', True)
-
 
     def SwitchToMecanum(self):
         self.drive_table.putBoolean('isTank', False)
 
-
     def StartAutoBalance(self):
         self.drive_table.putBoolean('startAutoBalance', True)
-
 
     def EndAutoBalance(self):
         self.drive_table.putBoolean('startAutoBalance', False)
 
-
     def SetArmPortal(self):  # TODO:rename
         self.drive_table.putBoolean('setArmPortal', True)
-
 
     def SetArmFloor(self):  # TODO:rename
         self.drive_table.putBoolean('setArmFloor', True)
 
-
     def PickupObject(self):
         self.drive_table.putBoolean('pickupObject', True)
-
 
     def SetArmLow(self):  # TODO:rename
         self.drive_table.putBoolean('setArmLow', True)
 
-
     def SetArmMedium(self):  # TODO:rename
         self.drive_table.putBoolean('setArmMedium', True)
-
 
     def SetArmHigh(self):  # TODO:rename
         self.drive_table.putBoolean('setArmHigh', True)
 
-
     def SetArmHighNode(self):  # TODO:rename
         self.drive_table.putBoolean('setArmHighNode', True)
-
 
     def SetArmLowNode(self):  # TODO:rename
         self.drive_table.putBoolean('setArmLowNode', True)
@@ -70,9 +57,8 @@ class NetworkTablesWrapper:
     def RetractArm(self):
         self.drive_table.putBoolean('retractArm', True)
 
-
     def IsArmDone(self):
-        arm_values=[
+        arm_values = [
             self.drive_table.getBoolean('setArmLowNode', False),
             self.drive_table.getBoolean('setArmHighNode', False),
             self.drive_table.getBoolean('setArmLow', False),
@@ -83,10 +69,8 @@ class NetworkTablesWrapper:
         ]
         return True not in arm_values
 
-
     def DropObject(self):
         self.drive_table.putBoolean('dropObject', True)
-
 
     def GetAccel(self):
         x_accel = self.pigeon_table.getNumber('xAccel', -1)
@@ -97,7 +81,6 @@ class NetworkTablesWrapper:
             return None
         return x_accel, y_accel, z_accel
 
-
     def GetYaw(self):
         yaw = self.pigeon_table.getNumber('yaw', -1)
         if yaw == -1:
@@ -105,21 +88,17 @@ class NetworkTablesWrapper:
             return None
         return yaw
 
-
     def IsAutonomous(self):  # TODO:add tests
         val = self.game_table.getBoolean('isAutonomous', False)
         return val
-
 
     def IsTeleop(self):  # TODO:add tests
         val = self.game_table.getBoolean('isTeleop', False)
         return val
 
-
     def IsRedAlliance(self):  # TODO:add tests
         val = self.game_table.getBoolean('isRedAlliance', False)
         return val
-
 
     def GetMatchTime(self):  # TODO:add tests
         match_time = self.pigeon_table.getNumber('matchTime', -1)
@@ -127,7 +106,6 @@ class NetworkTablesWrapper:
             print('No match_time value')
             return None
         return match_time
-
 
     def GetEncoderVals(self):
         encoder_values = [
@@ -140,7 +118,6 @@ class NetworkTablesWrapper:
             print('Encoder value missing')
             return None
         return encoder_values
-
 
     def ResetEncoderVals(self):
         self.encoder_table.putBoolean('encoderReset', True)

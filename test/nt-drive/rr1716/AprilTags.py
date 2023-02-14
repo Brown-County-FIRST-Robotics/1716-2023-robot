@@ -3,8 +3,7 @@ import math
 import apriltag
 import cv2
 import numpy as np
-from rr1716 import positions
-
+from rr1716 import Positions
 
 tag_size = 8 / 2.54
 
@@ -40,7 +39,8 @@ class Detection:
             self.distance,
             self.RMSError
         ])
-        self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
+        self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in
+                                                                            np.dot(error_matrix, input_matrix).tolist()]
         if self.error > error_threshold:
             print(f'discarded a value (error:{self.error})')
 
@@ -53,7 +53,7 @@ class Detection:
         self.field_yaw = thetaCA
         self.field_x = camera_X
         self.field_y = camera_Y
-        return camera_X,camera_Y,thetaCA
+        return camera_X, camera_Y, thetaCA
 
 
 def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
@@ -70,7 +70,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :rtype: list(Detection objects)
     """
     # Check if image is grayscale
-    assert len(img.shape)==2, 'Image must be grayscale'
+    assert len(img.shape) == 2, 'Image must be grayscale'
 
     # AprilTag detector options
     options = apriltag.DetectorOptions(families='tag16h5',
@@ -107,17 +107,18 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             object_pts = np.array(ob_pts).reshape(4, 3)
 
             # Solve for rotation and translation
-            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points, camera_matrix,
+            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points,
+                                                                                 camera_matrix,
                                                                                  dist_coefficients,
                                                                                  flags=cv2.SOLVEPNP_ITERATIVE)
             assert good, 'something went wrong with solvePnP'
 
             # Map rotation_vector
-            pitch, yaw, roll = rotation_vector[0]*180/math.pi
+            pitch, yaw, roll = rotation_vector[0] * 180 / math.pi
 
-            left_right = (-translation_vector[0][0] - translation_vector[0][2] / 4)*2.54
-            up_down = ((translation_vector[0][1] + translation_vector[0][2] / 16) * 2)*2.54
-            distance = translation_vector[0][2]*2.54
+            left_right = (-translation_vector[0][0] - translation_vector[0][2] / 4) * 2.54
+            up_down = ((translation_vector[0][1] + translation_vector[0][2] / 16) * 2) * 2.54
+            distance = translation_vector[0][2] * 2.54
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
