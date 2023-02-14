@@ -16,6 +16,7 @@
 | setArmHigh       | boolean | Tells the robot to set the arm to the highest level           |
 | setArmLowNode    | boolean | Tells the robot to set the arm to the lowest level cone node  |
 | setArmHighNode   | boolean | Tells the robot to set the arm to the highest level cone node |
+| retractArm       | boolean | Tells the robot to retract the arm                            |
 | dropObject       | boolean | Tells the robot to drop piece it is holding                   |
 
 ### Notes on how some functions should work
@@ -39,7 +40,8 @@ see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.htm
 |--------|---------|---------------------------------------------|
 | xAccel | double  | The accelerometer output in the x direction |
 | yAccel | double  | The accelerometer output in the Y direction |
-| gyro   | double  | The gyroscope output in the yaw direction   |
+| zAccel | double  | The accelerometer output in the z direction |
+| yaw    | double  | The gyroscope output in the yaw direction   |
 
 
 ## `1716GameInfo`

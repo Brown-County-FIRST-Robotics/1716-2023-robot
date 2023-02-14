@@ -33,7 +33,7 @@ class NetworkTablesWrapper:
 
 
     def EndAutoBalance(self):
-        self.drive_table.putBoolean('startAutoBalance', True)
+        self.drive_table.putBoolean('startAutoBalance', False)
 
 
     def SetArmPortal(self):  # TODO:rename
@@ -67,6 +67,9 @@ class NetworkTablesWrapper:
     def SetArmLowNode(self):  # TODO:rename
         self.drive_table.putBoolean('setArmLowNode', True)
 
+    def RetractArm(self):
+        self.drive_table.putBoolean('retractArm', True)
+
 
     def IsArmDone(self):
         arm_values=[
@@ -88,31 +91,32 @@ class NetworkTablesWrapper:
     def GetAccel(self):
         x_accel = self.pigeon_table.getNumber('xAccel', -1)
         y_accel = self.pigeon_table.getNumber('yAccel', -1)
-        if x_accel == -1 or y_accel == -1:
+        z_accel = self.pigeon_table.getNumber('zAccel', -1)
+        if x_accel == -1 or y_accel == -1 or z_accel == -1:
             print(f'No {"y" if y_accel == -1 else "x"}Accel value has been set. ')
             return None
-        return x_accel, y_accel
+        return x_accel, y_accel, z_accel
 
 
-    def GetGyro(self):
-        gyro = self.pigeon_table.getNumber('gyro', -1)
-        if gyro == -1:
-            print('No gyro value')
+    def GetYaw(self):
+        yaw = self.pigeon_table.getNumber('yaw', -1)
+        if yaw == -1:
+            print('No yaw value')
             return None
-        return gyro
+        return yaw
 
 
-    def GetIsAutonomous(self):  # TODO:add tests
+    def IsAutonomous(self):  # TODO:add tests
         val = self.game_table.getBoolean('isAutonomous', False)
         return val
 
 
-    def GetIsTeleop(self):  # TODO:add tests
+    def IsTeleop(self):  # TODO:add tests
         val = self.game_table.getBoolean('isTeleop', False)
         return val
 
 
-    def GetIsRedAlliance(self):  # TODO:add tests
+    def IsRedAlliance(self):  # TODO:add tests
         val = self.game_table.getBoolean('isRedAlliance', False)
         return val
 
@@ -126,16 +130,16 @@ class NetworkTablesWrapper:
 
 
     def GetEncoderVals(self):
-        encvals = [
+        encoder_values = [
             self.encoder_table.getNumber('frontLeftEncoder', '-1'),
             self.encoder_table.getNumber('backLeftEncoder', '-1'),
             self.encoder_table.getNumber('frontRightEncoder', '-1'),
             self.encoder_table.getNumber('backRightEncoder', '-1')
         ]
-        if -1 in encvals:
+        if -1 in encoder_values:
             print('Encoder value missing')
             return None
-        return encvals
+        return encoder_values
 
 
     def ResetEncoderVals(self):
