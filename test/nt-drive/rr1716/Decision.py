@@ -144,7 +144,23 @@ class Drop(Action):
 
     def MakeChild(self):
         if self.referrer=="auto":
-            pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
+            return GetOnStation(self.filter, self.cams, self.ntInterface, self.referrer)  # IMPORTANT: change
+
+
+class GetOnStation(Action):
+    def __init__(self, filter, cams, ntInterface, referrer):
+        super().__init__(filter, cams, ntInterface, referrer)
+        self.ntInterface.Drive(0,-1,0)
+
+    def ShouldEnd(self):
+        accel = self.ntInterface.GetAccel()
+        return math.atan(accel[0]/accel[2])*180/math.pi<Strategy.accel_angle_threshold
+
+    def End(self):
+        self.ntInterface.Drive(0, 0, 0)
+
+    def MakeChild(self):
+        pass#return DriveToLocation(self.filter, self.cams, self.ntInterface, [0, 0, 0], self.referrer)  # IMPORTANT: change
 
 
 def doCurrentAction(action):

@@ -5,9 +5,11 @@ ________________________________________
 |                                       |
 |                origin                 |
 |6                                     3|
-|7  b charge                  r charge 2|
+|7   [|]b charge|        |r charge[|]  2|
 |8                                     1|
 |_______________________________________|
+
+[|] denotes an autonomous entrance
 
 y
 |
@@ -50,3 +52,13 @@ apriltagPositions = {
     '8':[-724.26, -293.84, 46.28, 0]
 }
 
+chargePlatformEntrances={ # TODO: add real values
+    "red":[
+        [0,0],
+        [0,1]
+    ],
+    "blue":[
+        [2,0],
+        [2,1]
+    ]
+}
