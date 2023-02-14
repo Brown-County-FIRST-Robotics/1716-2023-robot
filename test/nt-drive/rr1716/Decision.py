@@ -117,6 +117,9 @@ class DriveToLocation(Action):
         field_x,field_y,field_r=self.GetFilter()
         error=math.sqrt((field_x - self.location[0])**2+(field_y - self.location[1])**2)+Strategy.r_error_factor*math.fabs(field_r-self.location[2])
         return error<Strategy.drive_error_threshold
+
+    def End(self):
+        self.ntInterface.Drive(0,0,0)
     
     def MakeChild(self):
         if self.referrer=='auto':
