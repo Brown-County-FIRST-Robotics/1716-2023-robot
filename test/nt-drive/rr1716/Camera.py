@@ -19,7 +19,7 @@ class Camera:
 
         self.pos=position
 
-        video_size = calibration["calibrationResolution"]
+        video_size = tuple(calibration["calibrationResolution"])
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
         test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -29,10 +29,9 @@ class Camera:
         dist_coefficients = np.array(calibration['cameraDistortion'])
         processing_resolution = np.array(calibration['processingResolution'])
 
-        self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, video_size, 0,
-                                                           processing_resolution)
+        self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, tuple(video_size), 0,tuple(processing_resolution))
         self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
-                                                 processing_resolution, cv2.CV_16SC2)
+                                                 tuple(processing_resolution), cv2.CV_16SC2)
 
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
@@ -42,14 +41,13 @@ class Camera:
         logging.debug("Camera.update")
         success, frame = self.camera.read()
         frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
-        if success:
+        if success and frame is not None:
             self.frame = frame
             self.hsv = None
             self.gray = None
             self.frame_count = self.frame_count + 1
         else:
             logging.critical("Camera Read Failed %s" % self.device)
-
     def get_frame(self, flipped=False):
         if flipped:
             return cv2.flip(self.frame, 1)

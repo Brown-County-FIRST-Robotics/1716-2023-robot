@@ -133,10 +133,10 @@ class NetworkTablesWrapper:
     def GetEncoderVals(self):
         logging.debug(f'NetworkTablesWrapper.GetEncoderVals()')
         encoder_values = [
-            self.encoder_table.getNumber('frontLeftEncoder', '-1'),
-            self.encoder_table.getNumber('backLeftEncoder', '-1'),
-            self.encoder_table.getNumber('frontRightEncoder', '-1'),
-            self.encoder_table.getNumber('backRightEncoder', '-1')
+            self.encoder_table.getNumber('frontLeftEncoder', -1),
+            self.encoder_table.getNumber('backLeftEncoder', -1),
+            self.encoder_table.getNumber('frontRightEncoder', -1),
+            self.encoder_table.getNumber('backRightEncoder', -1)
         ]
         if -1 in encoder_values:
             print('Encoder value missing')

@@ -45,7 +45,7 @@ class Detection:
             print(f'discarded a value (error:{self.error})')
 
     def calcFieldPos(self):
-        pos = positions.apriltagPositions[str(self.tagID)]
+        pos = Positions.apriltagPositions[str(self.tagID)]
         camera_theta = 180 + self.yaw + pos[3]
         thetaCA = camera_theta - math.atan(self.left_right / self.distance) * 180 / math.pi
         camera_Y = pos[1] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.sin(thetaCA * math.pi / 180))

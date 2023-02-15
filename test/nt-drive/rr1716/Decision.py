@@ -22,7 +22,7 @@ class Action:
         april_futures = []
 
         for cam in self.cams:
-            april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.frame, cam.camera_matrix, None))
+            april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.get_gray(), cam.camera_matrix, None))
         for future in april_futures:
             detections = future.result()
             if detections is not None:
