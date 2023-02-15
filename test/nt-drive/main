@@ -9,6 +9,7 @@ from rr1716 import AprilTags
 from rr1716 import Decision
 from rr1716 import NetworkTables1716
 from rr1716 import Filter
+from concurrent.futures import ThreadPoolExecutor
 import time
 import sys
 import os
@@ -89,7 +90,8 @@ def main():
     DEATHSTARE.start(cameras)
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
-    current_action=Decision.StartFilter(filter, cameras, nt_table, 'auto')
+    april_executor = ThreadPoolExecutor(max_workers=len(cameras))
+    current_action=Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
 
     while True:
         for i in cameras:
