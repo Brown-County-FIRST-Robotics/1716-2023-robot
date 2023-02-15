@@ -3,20 +3,24 @@
 import logging
 import cv2
 import time
+import threading
 import numpy as np
 
 class Camera:
     def __init__(self, device, calibration, position):
-        logging.debug("camera.init")
+        logging.debug("camera init %s", device)
         self.frame = None
         self.hsv = None
         self.gray = None
+
         self.id = None
         self.frame_count = 0
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
 
+        self.rectangles = None
+        assert self.camera.isOpened()
         self.pos=position
 
         video_size = tuple(calibration["calibrationResolution"])
@@ -24,6 +28,8 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
         test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
         assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
+
+        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
         raw_camera_matrix = np.array(calibration['cameraMatrix'])
         dist_coefficients = np.array(calibration['cameraDistortion'])
@@ -36,18 +42,64 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
+        self.camera.set(cv2.CAP_PROP_BRIGHTNESS, 0)
+        self.camera.set(cv2.CAP_PROP_CONTRAST, 32)
+        self.camera.set(cv2.CAP_PROP_SATURATION, 128)
+        self.camera.set(cv2.CAP_PROP_HUE, 0)
+        self.camera.set(cv2.CAP_PROP_AUTO_WB, 0)
+        self.camera.set(cv2.CAP_PROP_GAMMA, 100)
+        self.camera.set(cv2.CAP_PROP_GAIN, 0)
+        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 3200)
+        self.camera.set(cv2.CAP_PROP_SHARPNESS, 2)
 
-    def update(self):
-        logging.debug("Camera.update")
-        success, frame = self.camera.read()
-        frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
-        if success and frame is not None:
-            self.frame = frame
+        self._stopping = False
+        self._getframe = threading.Event()
+        self._frameready = threading.Event()
+        self.thread = threading.Thread(target=self._thread)
+        self.thread.start()
+        self.update()
+        if self.frame is None:
+            self.shutdown()
+            raise Exception('camera intialization failed on ' + device)
+        
+
+    def _thread(self):
+        while not self._stopping:
+            success, frame = self.camera.read()
+            frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
+            if success and frame is not None:
+                self.frame = frame
+                self.frame_count = self.frame_count + 1
+            else:
+                self.frame=None
             self.hsv = None
             self.gray = None
-            self.frame_count = self.frame_count + 1
-        else:
-            logging.critical("Camera Read Failed %s" % self.device)
+
+            self._getframe.clear()
+            self._frameready.set()
+            self._getframe.wait()
+
+
+    def shutdown(self):
+        self._stopping = True
+        self._getframe.set()
+        self.thread.join()
+
+
+    def startupdate(self):
+        logging.debug("Camera update start")
+        if self._getframe.is_set():
+          self._frameready.wait()
+        self._frameready.clear()
+        self._getframe.set()
+
+    def update(self):
+        self.startupdate()
+        self._frameready.wait()
+        if self.frame is None:
+            logging.critical("Camera Read Failed")
+
+    
     def get_frame(self, flipped=False):
         if flipped:
             return cv2.flip(self.frame, 1)
@@ -72,25 +124,44 @@ class Camera:
 
     def get_width(self):
         logging.debug("camera.get_width")
-        return len(self.frame)
+        return len(self.frame[0])
 
     def add_rectangle(self, start, end, color, thickness=2):
         logging.debug("camera.add_rectangle")
-        self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
+        self.rectangles = [ start, end, thickness ]
+        #self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
+
+    def clear_rectangle(self):
+        logging.debug("camera.clear_rectangle")
+        self.rectangles = None
 
     def get_jpg_bytes(self, flipped=False):
         # Let's block on this call if we alredy returned this frame
         while self.frame_count <= self.last_frame_count:
-            time.sleep(0.01)
+            self._getframe.wait()
+            self.wait()
         self.last_frame_count = self.frame_count
         logging.debug("camera.get_jpg_bytes")
         frame = self.get_frame(flipped)
+        
+        if self.rectangles:
+            cv2.rectangle(self.frame, self.rectangles[0], self.rectangles[1], (0, 255, 0), self.rectangles[2])
+
         ret, buffer = cv2.imencode('.jpg', frame)
         jpg = buffer.tobytes()
         return jpg
+
+    def wait(self):
+       self._frameready.wait()
+
+
 if __name__ == "__main__":
-    # We're a module, never run anything here
-    pass
-else:
-    # Run things on import here
-    pass
+    try:
+        openCameras()        
+        print('started successfully')
+    finally:
+        for camera in Cameras:
+            camera.shutdown()
+            
+    print('done')
+    

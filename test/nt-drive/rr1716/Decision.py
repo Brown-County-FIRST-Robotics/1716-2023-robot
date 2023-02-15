@@ -203,6 +203,74 @@ def doCurrentAction(action):
 
 # TEST CODE GOES HERE
 if __name__ == "__main__":
+    import NetworkTables1716
+    import cv2
+    import numpy as np
+
+    gameobjects = [
+        Vision.GamePiece(),
+        Vision.GamePiece(),
+        Vision.GamePiece(),
+        Vision.GamePiece()
+    ]
+
+    gameobjects[0].x = -30
+    gameobjects[0].y = 0
+
+    gameobjects[1].notfound = True
+    gameobjects[2].notfound = True
+    gameobjects[3].notfound = True
+
+    nttable = NetworkTables1716.NetworkTablesWrapper()
+    cam = cv2.VideoCapture("/dev/video2")
+
+    ret, frame = cam.read()
+    avgColor = Vision.averageColor(frame, 20)
+
+    low = [ avgColor[0] * 0.3, avgColor[1] * 0.7, avgColor[2] * 0.7 ]
+    high = [ avgColor[0] * 3.3, avgColor[1] * 1.3, avgColor[2] * 1.3 ]
+    gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
+    gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
+
+    while True:
+        ret, frame = cam.read()
+        
+        gameobjects[0].findCone(frame)
+        gameobjects[0].drawBoundRect(frame, [0,255,0])
+
+        print(int(gameobjects[0].x), int(gameobjects[0].y))
+
+        scaledup = cv2.resize(frame, (int(frame.shape[1] * 1.6), int(frame.shape[0] * 1.6)),
+                              interpolation=cv2.INTER_AREA)
+        cv2.imshow("frame", scaledup)
+
+        decisionMade = decision(DecisionArg(gameobjects, False, 120))
+        print("rotation speed:", decisionMade.driveRotation, "speed:", decisionMade.driveSpeed) 
+        nttable.Drive(decisionMade.driveSpeed, 0.0, decisionMade.driveRotation)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
+        elif key == ord('1'):
+            avgColor = Vision.averageColor(frame, 100) 
+            low = [ avgColor[0] * 0.3, avgColor[1] * 0.5, avgColor[2] * 0.5 ]
+            high = [ avgColor[0] * 2.0, avgColor[1] * 2.0, avgColor[2] * 2.0 ]
+            
+            for i in range(3):
+                if low[i] < 0:
+                    low[i] = 0
+                elif low[i] > 255:
+                    low[i] = 255
+
+                if high[i] < 0:
+                    high[i] = 0
+                elif high[i] > 255:
+                    high[i] = 255
+            
+            print(low, high, avgColor)
+            gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
+            gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
+
     pass
 # initialize module here
 else:
