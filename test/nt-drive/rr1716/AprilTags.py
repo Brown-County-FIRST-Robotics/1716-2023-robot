@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from rr1716 import Positions
 
-tag_size = 8 / 2.54
+tag_size = 6
 
 
 class Detection:
@@ -116,17 +116,19 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             # Map rotation_vector
             pitch, yaw, roll = rotation_vector[0] * 180 / math.pi
 
-            left_right = (-translation_vector[0][0] - translation_vector[0][2] / 4) * 2.54
-            up_down = ((translation_vector[0][1] + translation_vector[0][2] / 16) * 2) * 2.54
+            left_right = translation_vector[0][0] * 2.54
+            up_down = -translation_vector[0][1] * 2.54
             distance = translation_vector[0][2] * 2.54
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
                 print(f'discarded a value (roll:{roll})')
                 continue
-            logging.info(f'yaw:{yaw}, lr:{left_right}, distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
+            logging.info(f'yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
+    if len(detections)==0:
+        return None
     return detections
 
 
