@@ -1,5 +1,8 @@
+#define _USE_MATH_DEFINES
+
 #include "commands/AutoSwitchDrive.h"
 
+#include <math.h>
 #include <utility>
 
 AutoSwitchDrive::AutoSwitchDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 

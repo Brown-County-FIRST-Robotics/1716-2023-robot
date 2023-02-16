@@ -20,8 +20,6 @@ private:
 	RobotContainer robotContainer;
 	frc2::Command* autonomousCommand = nullptr;
 
-	frc::DriverStation driverStation;
-
 	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> table;
 

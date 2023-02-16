@@ -12,7 +12,7 @@ void Robot::RobotInit() {
 	isRedAlliance = table->GetBooleanTopic("isRedAlliance").Publish();
 	matchTime = table->GetDoubleTopic("matchTime").Publish();
 
-	isRedAlliance.Set(driverStation.GetAlliance() == frc::DriverStation::Alliance::kRed);
+	isRedAlliance.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed);
 	isAutonomous.Set(false);
 	isTeleop.Set(false);
 	matchTime.Set(0);
@@ -21,7 +21,7 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 
-	matchTime.Set(driverStation.GetMatchTime());
+	matchTime.Set(frc::DriverStation::GetMatchTime());
 }
 
 void Robot::AutonomousInit() {
