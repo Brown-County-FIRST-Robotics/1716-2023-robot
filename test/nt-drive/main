@@ -116,16 +116,6 @@ def main():
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
     current_action=Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
 
-    while True:
-        for i in cameras:
-            i.update()
-            # Uncomment this code if we need to log apriltag data
-            # AprilTags.getPosition(i.get_gray(), i.camera_matrix, None)
-        res=Decision.doCurrentAction(current_action)
-        if res is not None:
-            current_action=res
-        time.sleep(0.01)
-
 
     lastframetime = 0
     try:
@@ -140,18 +130,12 @@ def main():
                 cam.startupdate()
             for cam in cameras:
                 cam.wait()
-
-            aprilfutures = []
-            for cam in cameras:
-                aprilfutures.append(aprilexecutor.submit(AprilTags.getPosition, cam.frame, cam.camera_matrix, None))
-            for future in aprilfutures:
-                detections = future.result()
-                if detections:
-                    print('\a', [d.yaw for d in detections])
+            res = Decision.doCurrentAction(current_action)
+            if res is not None:
+                current_action = res
 
 
     finally:
-        aprilexecutor.shutdown()
         for camera in cameras:
             camera.shutdown()
 
