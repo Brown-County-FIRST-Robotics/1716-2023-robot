@@ -139,8 +139,8 @@ class NetworkTablesWrapper:
             self.encoder_table.getNumber('backRightEncoder', -1)
         ]
         if -1 in encoder_values:
-            print('Encoder value missing')
-            return None
+            logging.warning('Encoder value missing. returning 0 instead')
+            return [0,0,0,0]
         return encoder_values
 
     def ResetEncoderVals(self):
