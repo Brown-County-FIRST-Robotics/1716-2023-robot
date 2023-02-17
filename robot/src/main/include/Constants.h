@@ -23,10 +23,10 @@ namespace SolenoidConst {
 // };
 
 namespace DrivetrainConst {
-	const int FRONTLEFTID = 1;
-	const int FRONTRIGHTID = 2;
-	const int BACKLEFTID = 3;
-	const int BACKRIGHTID = 4;
+	const int FRONTLEFTID = 39;
+	const int FRONTRIGHTID = 37;
+	const int BACKLEFTID = 32;
+	const int BACKRIGHTID = 36;
 	
 	const int PIGEONID = 20;
 

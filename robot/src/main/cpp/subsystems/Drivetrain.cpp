@@ -15,12 +15,12 @@ Drivetrain::Drivetrain() :
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
-		robotDrive.DriveCartesian(x, y, z);
-	}
-	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(x, 0, z);
-	}
+	// if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
+	robotDrive.DriveCartesian(x*.4, y*.4, z*.4);
+	// }
+	// else { //don't strafe in traction mode
+	// 	robotDrive.DriveCartesian(x, 0, z);
+	// }
 }
 
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
