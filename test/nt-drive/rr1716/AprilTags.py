@@ -50,6 +50,7 @@ class Detection:
         thetaCA = camera_theta - math.atan(self.left_right / self.distance) * 180 / math.pi
         camera_Y = pos[1] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.sin(thetaCA * math.pi / 180))
         camera_X = pos[0] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.cos(thetaCA * math.pi / 180))
+        thetaCA=thetaCA-360
         self.field_yaw = thetaCA
         self.field_x = camera_X
         self.field_y = camera_Y
@@ -70,12 +71,14 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :rtype: list(Detection objects)
     """
     # Check if image is grayscale
+    if img is None:
+        return None
     assert len(img.shape) == 2, 'Image must be grayscale'
 
     # AprilTag detector options
     options = apriltag.DetectorOptions(families='tag16h5',
                                        border=1,
-                                       nthreads=4,
+                                       nthreads=1,
                                        quad_decimate=1.0,
                                        quad_blur=0.0,
                                        refine_edges=True,
@@ -124,9 +127,10 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             if math.fabs(roll) > roll_threshold:
                 print(f'discarded a value (roll:{roll})')
                 continue
-            logging.info(f'yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
+            logging.info(f'april pos: yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
+            logging.info(f'field pos:yaw:{detections[-1].calcFieldPos()}')
     if len(detections)==0:
         return None
     return detections
