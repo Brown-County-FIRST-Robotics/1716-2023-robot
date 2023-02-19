@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
@@ -21,11 +22,19 @@ private:
 	Drivetrain* drivetrain;
 
 	nt::NetworkTableInstance networkTableInst; //the default networktables network
-	std::shared_ptr<nt::NetworkTable> table; //the table for driving
+	std::shared_ptr<nt::NetworkTable> drive_table; //the table for driving
+	std::shared_ptr<nt::NetworkTable> encoder_table; //the table for driving
+
 
 	nt::FloatSubscriber x; //x, y, and rotational values
 	nt::FloatSubscriber y;
 	nt::FloatSubscriber z;
+
+	nt::FloatPublisher fl_encoder;
+	nt::FloatPublisher bl_encoder;
+	nt::FloatPublisher fr_encoder;
+	nt::FloatPublisher br_encoder;
+
 
 	nt::FloatPublisher yaw;
 	nt::FloatPublisher forwBack;

@@ -49,13 +49,13 @@ void RobotContainer::ConfigureButtonBindings() {
 		.Until([this] { return controller.GetPOV() == 180; }));
 		//Backwards driving (left on D-Pad)
 
-	// frc2::Trigger([this] { return controller.GetPOV() == 90; }).OnTrue(AutoBalance(&drivetrain)
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			AutoBalance(&drivetrain)
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetPOV() == 180; }));
-	// 	//Auto balancing (right on D-Pad)
+	 frc2::Trigger([this] { return controller.GetPOV() == 90; }).OnTrue(AutoBalance(&drivetrain)
+	 	.FinallyDo(
+	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
+	 			AutoBalance(&drivetrain)
+	 			.Until([this] { return controller.GetPOV() == 180; })); })
+	 	.Until([this] { return controller.GetPOV() == 180; }));
+	 	//Auto balancing (right on D-Pad)
 
 	frc2::Trigger([this] { return controller.GetPOV() == 0; }).OnTrue(RasPiDrive(&drivetrain)
 		.FinallyDo(
