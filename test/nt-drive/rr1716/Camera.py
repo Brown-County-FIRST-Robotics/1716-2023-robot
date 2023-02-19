@@ -46,7 +46,7 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_CONTRAST, 32)
         self.camera.set(cv2.CAP_PROP_SATURATION, 128)
         self.camera.set(cv2.CAP_PROP_HUE, 0)
-        self.camera.set(cv2.CAP_PROP_AUTO_WB, 0)
+        self.camera.set(cv2.CAP_PROP_AUTO_WB, 1)
         self.camera.set(cv2.CAP_PROP_GAMMA, 100)
         self.camera.set(cv2.CAP_PROP_GAIN, 0)
         self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 3200)
@@ -114,6 +114,8 @@ class Camera:
 
     def get_gray(self):
         logging.debug("camera.get_gray")
+        if self.frame is None:
+            return None
         if self.gray is None:
             self.gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         return self.gray
