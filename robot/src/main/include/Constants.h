@@ -6,21 +6,7 @@ namespace SolenoidConst {
 	const units::second_t SOLENOIDSETLENGTH = 3_ms;
 }
 
-// enum Arm {
-// 	SHOOTERMOTOR1ID = 6,
-// 	SHOOTERMOTOR2ID = 7,
 
-// 	SHOOTERSOLENOIDFORWARDID = 0,
-// 	SHOOTERSOLENOIDREVERSEID = 1,
-
-// 	CLIMBERSOLENOIDFORWARDID = 2,
-// 	CLIMBERSOLENOIDREVERSEID = 3
-// };
-
-// enum ArmAngle {
-// 	ANGLEMOTOR1ID = 10,
-// 	ANGLEMOTOR2ID = 11
-// };
 
 namespace DrivetrainConst {
 	const int FRONTLEFTID = 1;//39;
@@ -50,3 +36,28 @@ namespace PIDConst {
 	const double INTEGRALFACTOR = 0;
 	const double DERIVATIVEFACTOR = 0;
 };
+
+
+namespace ArmConst
+{	
+	const int SHOULDERID = -1;
+	const int ELBOWID = -1;
+
+	const int SHOULDERSWITCHID=-1;
+	const int ELBOWSWITCHID=-1;
+
+	const double SHOULDERANGLEGROUND=-1;
+	const double SHOULDERANGLERETRACT=-1;
+	const double SHOULDERANGLEHIGHNODE=-1;
+	const double SHOULDERANGLELOWNODE=-1;
+	const double SHOULDERANGLELOWPLATFORM=-1;
+	const double SHOULDERANGLEHIGHPLATFORM=-1;
+
+	const double ELBOWANGLEGROUND=-1;
+	const double ELBOWANGLERETRACT=-1;
+	const double ELBOWANGLEHIGHNODE=-1;
+	const double ELBOWANGLELOWNODE=-1;
+	const double ELBOWANGLELOWPLATFORM=-1;
+	const double ELBOWANGLEHIGHPLATFORM=-1;
+
+} 
