@@ -9,6 +9,7 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
 	drive_table = networkTableInst.GetTable("1716Drive");
 	encoder_table=networkTableInst.GetTable("1716Encoder");	
+	pigeon_table=networkTableInst.GetTable("1716Pigeon");
 
 	x = drive_table->GetFloatTopic("x").Subscribe(0.0, {.pollStorage = 1}); //set the x, y, and rotation listeners 
 	y = drive_table->GetFloatTopic("y").Subscribe(0.0, {.pollStorage = 1}); //with a default of 0 and a memory of 1 term
@@ -20,8 +21,9 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 	br_encoder=encoder_table->GetFloatTopic("backRightEncoder").Publish();
 
 
-	forwBack = drive_table->GetFloatTopic("xAccel").Publish();
-	leftRight = drive_table->GetFloatTopic("yAccel").Publish();
+	xAccel = drive_table->GetFloatTopic("xAccel").Publish();
+	yAccel = drive_table->GetFloatTopic("yAccel").Publish();
+	zAccel = drive_table->GetFloatTopic("zAccel").Publish();
 	yaw = drive_table->GetFloatTopic("yaw").Publish();
 }
 
@@ -45,8 +47,10 @@ void RasPiDrive::Execute() {
 
 
 	yaw.Set(drivetrain->GetYaw());
-	forwBack.Set(drivetrain->GetY());
-	leftRight.Set(drivetrain->GetX());
+	yAccel.Set(drivetrain->GetY());
+	xAccel.Set(drivetrain->GetX());
+	zAccel.Set(drivetrain->GetZ());
+
 }
 
 void RasPiDrive::End(bool interrupted) {

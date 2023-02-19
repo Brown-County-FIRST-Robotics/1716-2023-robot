@@ -24,6 +24,8 @@ private:
 	nt::NetworkTableInstance networkTableInst; //the default networktables network
 	std::shared_ptr<nt::NetworkTable> drive_table; //the table for driving
 	std::shared_ptr<nt::NetworkTable> encoder_table; //the table for driving
+	std::shared_ptr<nt::NetworkTable> pigeon_table; //the table for driving
+
 
 
 	nt::FloatSubscriber x; //x, y, and rotational values
@@ -37,6 +39,7 @@ private:
 
 
 	nt::FloatPublisher yaw;
-	nt::FloatPublisher forwBack;
-	nt::FloatPublisher leftRight;
+	nt::FloatPublisher yAccel;
+	nt::FloatPublisher xAccel;
+	nt::FloatPublisher zAccel;
 };
