@@ -120,8 +120,8 @@ class DriveToLocation(Action):
         offset_y = field_y - self.location[1]
         offset_r = field_r - self.location[2]
 
-        self.nt_interface.Drive(Strategy.xy_p_factor * (offset_x * cx + offset_y * cy),
-                               Strategy.xy_p_factor * (offset_x * ax + offset_y * ay), Strategy.r_p_factor * offset_r)
+        self.nt_interface.Drive(-Strategy.xy_p_factor * (offset_x * cx + offset_y * cy),
+                               -Strategy.xy_p_factor * (offset_x * ax + offset_y * ay), Strategy.r_p_factor * offset_r)
 
     def ShouldEnd(self):
         field_x, field_y, field_r = self.GetFilter()
