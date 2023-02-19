@@ -15,7 +15,7 @@ class NetworkTablesWrapper:
         self.encoder_table = NetworkTables.getTable('1716Encoder')
 
     def Drive(self, x, y, r):
-        logging.debug(f'NetworkTablesWrapper.Drive({x},{y},{r})')
+        logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
         self.drive_table.putNumber("x", x)
         self.drive_table.putNumber("y", y)
         self.drive_table.putNumber("rotation", r)
@@ -145,7 +145,7 @@ class NetworkTablesWrapper:
 
     def ResetEncoderVals(self):
         logging.debug(f'NetworkTablesWrapper.ResetEncoderVals')
-        self.encoder_table.putBoolean('encoderReset', True)
+        self.encoder_table.putBoolean('resetEncoder', True)
 
 
 if __name__ == "__main__":

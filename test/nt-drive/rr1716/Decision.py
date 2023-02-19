@@ -1,5 +1,5 @@
 import math
-
+import logging
 from rr1716 import Vision
 from rr1716 import AprilTags
 from rr1716 import Strategy
@@ -30,6 +30,7 @@ class Action:
                 break
         if robotLocation is not None:
             self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+        logging.info(f'filter pos: {self.filter.getCurrentPos(self.nt_interface)}')
         return self.filter.getCurrentPos(self.nt_interface)
 
     def GetGameObjects(self):
@@ -99,7 +100,7 @@ class AsyncSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [0, 0, 0], self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, 0, 0], self.referrer)
 
 
 class DriveToLocation(Action):
