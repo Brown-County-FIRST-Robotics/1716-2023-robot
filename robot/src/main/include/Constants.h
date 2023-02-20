@@ -60,4 +60,10 @@ namespace ArmConst
 	const double ELBOWANGLELOWPLATFORM=-1;
 	const double ELBOWANGLEHIGHPLATFORM=-1;
 
+	const double ELBOW_P=-1;
+	const double SHOULDER_P=-1;
+
+	const double ELBOW_THRESHOLD=-1;
+	const double SHOULDER_THRESHOLD=-1;
+
 } 
