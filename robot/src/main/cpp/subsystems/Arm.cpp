@@ -25,3 +25,16 @@ bool Arm::SetToAngle(double elbow_ang, double shoulder_ang){
 }
 
 
+bool Arm::ZeroArm(){
+	if(!elbowSwitch.Get())
+		elbow.Set(ArmConst::ELBOW_HOMING_SPEED);
+	else
+		elbow.Set(0);
+	if(!shoulderSwitch.Get())
+		shoulder.Set(ArmConst::SHOULDER_HOMING_SPEED);
+	else
+		shoulder.Set(0);
+	return shoulderSwitch.Get() && elbowSwitch.Get();
+}
+
+

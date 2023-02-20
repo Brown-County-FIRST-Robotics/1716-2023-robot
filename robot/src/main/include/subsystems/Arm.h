@@ -9,18 +9,18 @@
 #include <ctre/Phoenix.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticHub.h>
+#include <frc/DigitalInput.h>
 
 #include "Constants.h"
 
-class Arm : public frc2::SubsystemBase {
+class Arm : public frc2::SubsystemBase
+{
 public:
 	Arm();
 
-	
 	void Periodic() override;
 	bool SetToAngle(double elbow_ang, double shoulder_ang);
-
-
+	bool Arm::ZeroArm();
 
 private:
 	rev::CANSparkMax shoulder{ArmConst::SHOULDERID, rev::CANSparkMax::MotorType::kBrushless};
@@ -29,4 +29,6 @@ private:
 	rev::SparkMaxRelativeEncoder elbowEncoder;
 	rev::SparkMaxRelativeEncoder shoulderEncoder;
 
+	frc::DigitalInput elbowSwitch{ArmConst::ELBOWSWITCHID};
+	frc::DigitalInput shoulerSwitch{ArmConst::SHOULDERSWITCHID};
 };

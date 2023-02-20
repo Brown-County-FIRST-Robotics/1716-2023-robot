@@ -66,4 +66,7 @@ namespace ArmConst
 	const double ELBOW_THRESHOLD=-1;
 	const double SHOULDER_THRESHOLD=-1;
 
+	const double ELBOW_HOMING_SPEED=-1;
+	const double SHOULDER_HOMING_SPEED=-1;
+
 } 
