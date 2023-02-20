@@ -34,6 +34,10 @@ bool Arm::ZeroArm(){
 		shoulder.Set(ArmConst::SHOULDER_HOMING_SPEED);
 	else
 		shoulder.Set(0);
+	if(shoulderSwitch.Get()&&elbowSwitch.Get()){
+		elbowEncoder.SetPosition(0);
+		shoulderEncoder.SetPosition(0);
+	}
 	return shoulderSwitch.Get() && elbowSwitch.Get();
 }
 
