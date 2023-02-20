@@ -1,10 +1,11 @@
+import logging
 import math
 import apriltag
 import cv2
 import numpy as np
-from .positions import *
+from rr1716 import Positions
 
-tag_size = 8 / 2.54
+tag_size = 6
 
 
 class Detection:
@@ -38,26 +39,29 @@ class Detection:
             self.distance,
             self.RMSError
         ])
-        self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in np.dot(error_matrix, input_matrix).tolist()]
+        self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in
+                                                                            np.dot(error_matrix, input_matrix).tolist()]
         if self.error > error_threshold:
             print(f'discarded a value (error:{self.error})')
 
     def calcFieldPos(self):
-        pos = apriltagPositions[self.tagID]
+        pos = Positions.apriltagPositions[str(self.tagID)]
         camera_theta = 180 + self.yaw + pos[3]
         thetaCA = camera_theta - math.atan(self.left_right / self.distance) * 180 / math.pi
         camera_Y = pos[1] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.sin(thetaCA * math.pi / 180))
         camera_X = pos[0] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.cos(thetaCA * math.pi / 180))
+        thetaCA=thetaCA-360
         self.field_yaw = thetaCA
         self.field_x = camera_X
         self.field_y = camera_Y
+        return camera_X, camera_Y, thetaCA
 
 
 def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
     """
     This function takes an image and returns the position of apriltags in the image
 
-    :param img: The image you want to find apriltags in
+    :param img: The image you want to find apriltags in (must be grayscale)
     :param camera_matrix: The camera's calibration matrix
     :param dist_coefficients: The distortion coefficients of the camera
     :param valid_tags: (Default: 1-9) The apriltags to look for
@@ -66,13 +70,15 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :return: A list of Detection objects, or None if it fails
     :rtype: list(Detection objects)
     """
-    # Convert Images to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Check if image is grayscale
+    if img is None:
+        return None
+    assert len(img.shape) == 2, 'Image must be grayscale'
 
     # AprilTag detector options
     options = apriltag.DetectorOptions(families='tag16h5',
                                        border=1,
-                                       nthreads=4,
+                                       nthreads=1,
                                        quad_decimate=1.0,
                                        quad_blur=0.0,
                                        refine_edges=True,
@@ -83,7 +89,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     # Create a detector with given options
     detector = apriltag.Detector(options)
     # Find the apriltags
-    detection_results = detector.detect(gray)
+    detection_results = detector.detect(img)
 
     detections = []
     if len(detection_results) > 0:  # Check if there are any apriltags
@@ -104,24 +110,29 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             object_pts = np.array(ob_pts).reshape(4, 3)
 
             # Solve for rotation and translation
-            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points, camera_matrix,
+            good, rotation_vector, translation_vector, rms = cv2.solvePnPGeneric(object_pts, image_points,
+                                                                                 camera_matrix,
                                                                                  dist_coefficients,
                                                                                  flags=cv2.SOLVEPNP_ITERATIVE)
             assert good, 'something went wrong with solvePnP'
 
             # Map rotation_vector
-            pitch, yaw, roll = rotation_vector[0]*180/math.pi
+            pitch, yaw, roll = rotation_vector[0] * 180 / math.pi
 
-            left_right = (-translation_vector[0][0] - translation_vector[0][2] / 4)*2.54
-            up_down = ((translation_vector[0][1] + translation_vector[0][2] / 16) * 2)*2.54
-            distance = translation_vector[0][2]*2.54
+            left_right = translation_vector[0][0] * 2.54
+            up_down = -translation_vector[0][1] * 2.54
+            distance = translation_vector[0][2] * 2.54
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
                 print(f'discarded a value (roll:{roll})')
                 continue
+            logging.info(f'april pos: yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right, distance, rms,
                                         detection.tag_id))
+            logging.info(f'field pos:yaw:{detections[-1].calcFieldPos()}')
+    if len(detections)==0:
+        return None
     return detections
 
 

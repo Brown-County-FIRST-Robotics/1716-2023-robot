@@ -1,84 +1,208 @@
-import Vision
+import math
+import logging
+from rr1716 import Vision
+from rr1716 import AprilTags
+from rr1716 import Strategy
+import cv2
+import numpy as np
+# from rr1716 import Filter
 
-class DecisionArg:
-    closestObjFrames = [ None, #Camera 1
-                         None, #Camera 2
-                         None, #Camera 3
-                         None  #Camera 4
-                       ]
-    #is the robot holding someting?
-    holdingSomething = False
-    #in seconds
-    timeLeft = 120
 
-    def __init__(self, objectsInFrames, holding, gameTimeLeft):
-        self.closestObjFrames = objectsInFrames
-        self.holdingSomething = holding
-        self.timeLeft = gameTimeLeft
-    
-    def getClosest(self):
-        return self.closestObjFrames
-    def isHolding(self):
-        return self.holdingSomething
-    def getTimeLeft(self):
-        return self.timeLeft
+class Action:
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        self.referrer = referrer
+        self.nt_interface = nt_interface
+        self.cams = cams
+        self.filter = filter
+        self.april_executor = april_executor
 
-class DecisionOutput:
-    #switch from mecanum to tank or tank to mecanum
-    switchMode = False
-    #speed of rotation
-    driveRotation = 0
-    driveSpeed = 0
-    #0 = do nothing, 1 = put down, 2 = pick up
-    grabberAction = 0
-    #whether the robot should start the auto balance
-    startBalance = False
 
-    def __init__(self, switchDriveMode, rotation, speed, grabAction, balance):
-        self.switchMode = switchDriveMode
-        self.driveRotation = rotation
-        self.driveSpeed = speed
-        self.grabberAction = grabAction
-        self.startBalance = balance
-    
-    def getSwitchMode(self):
-        return self.switchMode
-    def getDriveRotation(self):
-        return self.driveRotation
-    def getGrabberAction(self):
-        return self.grabberAction
-    def getStartBalance(self):
-        return self.startBalance
-    def getDriveSpeed(self):
-        return self.driveSpeed
+    def GetFilter(self):
+        robotLocation = None
+        april_futures = []
 
-#returns a DecisionOutput object with data to be sent
-#to networktables
-def decision(info):
-    closest = info.getClosest()
+        for cam in self.cams:
+            april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.get_gray(), cam.camera_matrix, None))
+        for future in april_futures:
+            detections = future.result()
+            if detections is not None:
+                robotLocation=detections[0]
+                break
+        if robotLocation is not None:
+            self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+        logging.info(f'filter pos: {self.filter.getCurrentPos(self.nt_interface)}')
+        return self.filter.getCurrentPos(self.nt_interface)
 
-    #Attempt to center the object in the front camera
-    if not info.isHolding():
-        for i in range(len(closest)):
-            obj = closest[i]
+    def GetGameObjects(self):
+        pass
 
-            if obj.notfound:
-                continue
-            
-            #too close!
-            if (obj.w > 100 or obj.h > 400): 
-                return DecisionOutput(False, 0.0, 0.0, 0, False)
+    def Step(self):
+        pass
 
-            if(obj.x < -20): 
-                return DecisionOutput(False, -0.1, 0.1, 0, False)
-            elif(obj.x > 20): 
-                return DecisionOutput(False, 0.1, 0.1, 0, False)
-            else: 
-                return DecisionOutput(False, 0, 0, 0, False)
+    def ShouldEnd(self):
+        return True
 
-    return DecisionOutput(False, 0.0, 0.0, 0, False)
+    def End(self):
+        pass
 
-#TEST CODE GOES HERE
+    def MakeChild(self):
+        pass
+
+
+class StartFilter(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+
+    def Step(self):
+        robotLocation = None
+        for camera in self.cams:
+            res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None)  # check for apriltag
+            if res is not None and res != []:  # TODO: change?
+                robotLocation = res[0]  # TODO: change?
+                break
+        if robotLocation is not None:
+            self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+
+    def ShouldEnd(self):
+        return None not in self.filter.lastApril  # check if lastApril has a None, meaning it has not seen an apriltag
+
+    def MakeChild(self):
+        return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
+
+
+class AsyncSetHeight(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer, height):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        '''
+        0:Floor
+        1:portal
+        2:Low platform
+        3:Medium platform
+        4:High platform
+        5:Low cone node
+        6:High cone node
+        '''
+        self.height = height
+        if self.height == 0:
+            self.nt_interface.SetArmFloor()
+        elif self.height == 1:
+            self.nt_interface.SetArmPortal()
+        elif self.height == 2:
+            self.nt_interface.SetArmLow()
+        elif self.height == 3:
+            self.nt_interface.SetArmMedium()
+        elif self.height == 4:
+            self.nt_interface.SetArmHigh()
+        elif self.height == 5:
+            self.nt_interface.SetArmLowNode()
+        elif self.height == 6:
+            self.nt_interface.SetArmHighNode()
+
+    def MakeChild(self):
+        if self.referrer == 'auto':
+            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, 0, 0], self.referrer)
+
+
+class DriveToLocation(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.location = location
+
+    def Step(self):
+        field_x, field_y, field_r = self.GetFilter()
+        cx = math.cos(field_r * math.pi / 180)
+        cy = math.sin(field_r * math.pi / 180)
+
+        ax = math.cos((field_r + 90) * math.pi / 180)
+        ay = math.sin((field_r + 90) * math.pi / 180)
+
+        offset_x = field_x - self.location[0]
+        offset_y = field_y - self.location[1]
+        offset_r = field_r - self.location[2]
+
+        self.nt_interface.Drive(-Strategy.xy_p_factor * (offset_x * cx + offset_y * cy),
+                               -Strategy.xy_p_factor * (offset_x * ax + offset_y * ay), Strategy.r_p_factor * offset_r)
+
+    def ShouldEnd(self):
+        field_x, field_y, field_r = self.GetFilter()
+        error = math.sqrt((field_x - self.location[0]) ** 2 + (
+                    field_y - self.location[1]) ** 2) + Strategy.r_error_factor * math.fabs(field_r - self.location[2])
+        return error < Strategy.drive_error_threshold
+
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+
+    def MakeChild(self):
+        if self.referrer == 'auto':
+            return AwaitSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+
+
+class AwaitSetHeight(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+
+    def ShouldEnd(self):
+        return self.nt_interface.IsArmDone()
+
+    def MakeChild(self):
+        if self.referrer == "auto":
+            return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+
+
+class Drop(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.nt_interface.DropObject()
+        self.nt_interface.RetractArm()
+
+    def MakeChild(self):
+        if self.referrer == "auto":
+            return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+
+
+class GetOnStation(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.nt_interface.SwitchToTank()
+        self.nt_interface.Drive(0, -1, 0)
+
+    def ShouldEnd(self):
+        accel = self.nt_interface.GetAccel()
+        return math.atan(accel[0] / accel[2]) * 180 / math.pi < Strategy.accel_angle_threshold
+
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+
+    def MakeChild(self):
+        return AutoBalance(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+
+
+class AutoBalance(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.nt_interface.StartAutoBalance()
+
+    def ShouldEnd(self):
+        return self.nt_interface.IsTeleop() and self.referrer=='auto'
+
+    def End(self):
+        self.nt_interface.EndAutoBalance()
+        self.nt_interface.SwitchToMecanum()
+
+    def MakeChild(self):
+        pass  # if self.referrer=="auto":
+        # return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+
+
+def doCurrentAction(action):
+    action.Step()
+    if action.ShouldEnd():
+        action.End()
+        return action.MakeChild()
+    return None
+
+
+# TEST CODE GOES HERE
 if __name__ == "__main__":
     import NetworkTables1716
     import cv2
@@ -149,6 +273,6 @@ if __name__ == "__main__":
             gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
 
     pass
-#initialize module here
+# initialize module here
 else:
     pass

@@ -6,6 +6,10 @@ import logging
 from rr1716 import Camera
 from rr1716 import DEATHSTARE
 from rr1716 import AprilTags
+from rr1716 import Decision
+from rr1716 import NetworkTables1716
+from rr1716 import Filter
+from concurrent.futures import ThreadPoolExecutor
 import time
 import sys
 import os
@@ -107,8 +111,11 @@ def main():
     signal.signal(signal.SIGINT, handler)
 
     DEATHSTARE.start(cameras)
+    nt_table = NetworkTables1716.NetworkTablesWrapper()
+    filter=Filter.Filter()
+    april_executor = ThreadPoolExecutor(max_workers=len(cameras))
+    current_action=Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
 
-    aprilexecutor = ThreadPoolExecutor(max_workers=len(cameras))
 
     lastframetime = 0
     try:
@@ -123,18 +130,12 @@ def main():
                 cam.startupdate()
             for cam in cameras:
                 cam.wait()
-
-            aprilfutures = []
-            for cam in cameras:
-                aprilfutures.append(aprilexecutor.submit(AprilTags.getPosition, cam.frame, cam.camera_matrix, None))
-            for future in aprilfutures:
-                detections = future.result()
-                if detections:
-                    print('\a', [d.yaw for d in detections])
+            res = Decision.doCurrentAction(current_action)
+            if res is not None:
+                current_action = res
 
 
     finally:
-        aprilexecutor.shutdown()
         for camera in cameras:
             camera.shutdown()
 
