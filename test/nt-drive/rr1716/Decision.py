@@ -145,7 +145,7 @@ class AwaitSetHeight(Action):
         return self.nt_interface.IsArmDone()
 
     def MakeChild(self):
-        if self.referrer == "auto":
+        if self.referrer == 'auto':
             return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
 
 
@@ -156,7 +156,7 @@ class Drop(Action):
         self.nt_interface.RetractArm()
 
     def MakeChild(self):
-        if self.referrer == "auto":
+        if self.referrer == 'auto':
             return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
 
 
@@ -190,9 +190,34 @@ class AutoBalance(Action):
         self.nt_interface.SwitchToMecanum()
 
     def MakeChild(self):
-        pass  # if self.referrer=="auto":
-        # return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+        return GetDriverCommand(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
 
+
+class GetDriverCommand(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+
+    def ShouldEnd(self):
+        place = self.nt_interface.GetPlacement()
+        if place is not None:
+            self.referrer=f'dropoff_{place}'
+            return True
+        pickup=self.nt_interface.GetPickup()
+        if pickup is not None:
+            self.referrer=f'pickup_{pickup}'
+            return True
+        return False
+
+    def End(self):
+        self.nt_interface.ResetPlacement()
+        self.nt_interface.ResetPickp()
+
+    def MakeChild(self):
+        if self.referrer[:7]=='dropoff':
+            armHeights={1:6,2:4,3:6,4:6,5:4,6:6,7:6,8:4,9:6,10: 5,11: 3,12: 5,13: 5,14: 3,15: 5,16: 5,17: 3,18: 5,19: 0,20: 0,21: 0,22: 0,23: 0,24: 0,25: 0,26: 0,27: 0}
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer, armHeights[int(self.referrer.split('_')[-1])])
+        if self.referrer[:6]=='pickup':
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer, 1)
 
 def doCurrentAction(action):
     action.Step()
@@ -203,7 +228,7 @@ def doCurrentAction(action):
 
 
 # TEST CODE GOES HERE
-if __name__ == "__main__":
+if __name__ == '__main__':
     import NetworkTables1716
     import cv2
     import numpy as np
