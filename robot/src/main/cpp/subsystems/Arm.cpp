@@ -2,22 +2,23 @@
 #include <math.h>
 
 Arm::Arm() : 
-	elbowEncoder{elbow.GetEncoder()}, 
 	shoulderEncoder{shoulder.GetEncoder()}, 
+	elbowEncoder{elbow.GetEncoder()}
 {
-	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 }
 
-bool Arm::SetToAngle(double elbow_ang, double shoulder_ang){
-	double elbow_pos=elbowEncoder.GetPosition();
-	elbow.Set(ArmConst::ELBOW_P*(elbow_pos-elbow_ang));
-	double shoulder_pos=shoulderEncoder.GetPosition();
-	shoulder.Set(ArmConst::SHOULDER_P*(shoulder_pos-shoulder_ang));
+bool Arm::SetToAngle(double shoulderAngle, double elbowAngle){
+	double shoulderPos = shoulderEncoder.GetPosition();
+	shoulder.Set(ArmConst::PROPORTIONAL[0] * (shoulderPos - shoulderAngle));
 
-	if(fabs(elbow_pos-elbow_ang)<ArmConst::ELBOW_THRESHOLD){
+	double elbowPos=elbowEncoder.GetPosition();
+	elbow.Set(ArmConst::PROPORTIONAL[1] * (elbowPos - elbowAngle));
+
+	if(fabs(elbowPos-elbow_ang)<ArmConst::ELBOW_THRESHOLD){
 		return true;
-	}elif(fabs(shoulder_pos-shoulder_ang)<ArmConst::SHOULDER_THRESHOLD){
+	}elif(fabs(shoulderPos-shoulder_ang)<ArmConst::SHOULDER_THRESHOLD){
 		return true;
 	}else{
 		return false;
