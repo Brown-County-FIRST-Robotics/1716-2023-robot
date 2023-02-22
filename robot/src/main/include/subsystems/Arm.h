@@ -12,8 +12,7 @@ public:
 	Arm();
 
 	bool SetToAngle(double shoulderAngle, double elbowAngle);
-	bool SetSpeed(double shoulderSpeed, double elbowSpeed);
-	bool ZeroArm();
+	bool Zero();
 
 private:
 	rev::CANSparkMax shoulder{ArmConst::ID[0], rev::CANSparkMax::MotorType::kBrushless};
@@ -22,6 +21,6 @@ private:
 	rev::SparkMaxRelativeEncoder shoulderEncoder;
 	rev::SparkMaxRelativeEncoder elbowEncoder;
 
-	frc::DigitalInput shoulerSwitch{ArmConst::LIMIT_SWITCH_ID[0]};
+	frc::DigitalInput shoulderSwitch{ArmConst::LIMIT_SWITCH_ID[0]};
 	frc::DigitalInput elbowSwitch{ArmConst::LIMIT_SWITCH_ID[1]};
 };

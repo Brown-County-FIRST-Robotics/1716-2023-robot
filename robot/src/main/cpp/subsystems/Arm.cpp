@@ -13,33 +13,31 @@ bool Arm::SetToAngle(double shoulderAngle, double elbowAngle){
 	double shoulderPos = shoulderEncoder.GetPosition();
 	shoulder.Set(ArmConst::PROPORTIONAL[0] * (shoulderPos - shoulderAngle));
 
-	double elbowPos=elbowEncoder.GetPosition();
+	double elbowPos = elbowEncoder.GetPosition();
 	elbow.Set(ArmConst::PROPORTIONAL[1] * (elbowPos - elbowAngle));
 
-	if(fabs(elbowPos-elbow_ang)<ArmConst::ELBOW_THRESHOLD){
+	if ((fabs(shoulderPos - shoulderAngle) < ArmConst::THRESHOLD) && (fabs(elbowPos - elbowAngle) < ArmConst::THRESHOLD))
 		return true;
-	}elif(fabs(shoulderPos-shoulder_ang)<ArmConst::SHOULDER_THRESHOLD){
-		return true;
-	}else{
+	else
 		return false;
-	}
 }
 
-
-bool Arm::ZeroArm(){
-	if(!elbowSwitch.Get())
-		elbow.Set(ArmConst::ELBOW_HOMING_SPEED);
-	else
-		elbow.Set(0);
+bool Arm::Zero(){
 	if(!shoulderSwitch.Get())
-		shoulder.Set(ArmConst::SHOULDER_HOMING_SPEED);
+		shoulder.Set(ArmConst::ZEROING_SPEED);
 	else
 		shoulder.Set(0);
-	if(shoulderSwitch.Get()&&elbowSwitch.Get()){
+
+	if(!elbowSwitch.Get())
+		elbow.Set(ArmConst::ZEROING_SPEED);
+	else
+		elbow.Set(0);
+
+	if(shoulderSwitch.Get() && elbowSwitch.Get()){
 		elbowEncoder.SetPosition(0);
 		shoulderEncoder.SetPosition(0);
+		return true;
 	}
-	return shoulderSwitch.Get() && elbowSwitch.Get();
+	else
+		return false;
 }
-
-
