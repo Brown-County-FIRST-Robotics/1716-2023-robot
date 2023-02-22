@@ -16,14 +16,14 @@ class Detection:
         self.RMSError = rms_error
         self.tagID = tag_id
 
-        self.field_yaw = -1
-        self.field_x = -1
-        self.field_y = -1
+        self.field_yaw = None
+        self.field_x = None
+        self.field_y = None
 
-        self.yaw_std = -1
-        self.left_right_std = -1
-        self.distance_std = -1
-        self.error = -1
+        self.yaw_std = None
+        self.left_right_std = None
+        self.distance_std = None
+        self.error = None
 
     def calcError(self, error_matrix=None, error_threshold=3000):  # TODO: add error threshold
         if error_matrix is None:
@@ -42,7 +42,7 @@ class Detection:
         self.yaw_std, self.left_right_std, self.distance_std, self.error = [i[0] for i in
                                                                             np.dot(error_matrix, input_matrix).tolist()]
         if self.error > error_threshold:
-            print(f'discarded a value (error:{self.error})')
+            logging.info(f'discarded a value (error:{self.error})')
 
     def calcFieldPos(self):
         pos = Positions.apriltagPositions[str(self.tagID)]
@@ -68,7 +68,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     :param roll_threshold: (Default: 0.3 radians/17 degrees) The maximum roll of the apriltag. Helps remove false detections.
     :param check_hamming: (Default: True) Checks if the hamming value is 0
     :return: A list of Detection objects, or None if it fails
-    :rtype: list(Detection objects)
+    :rtype: list(Detection objects), or None if no apriltags are found
     """
     # Check if image is grayscale
     if img is None:
@@ -125,7 +125,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
 
             # Check if roll is within limit
             if math.fabs(roll) > roll_threshold:
-                print(f'discarded a value (roll:{roll})')
+                logging.info(f'discarded a value (roll:{roll})')
                 continue
             logging.info(f'april pos: yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right, distance, rms,
