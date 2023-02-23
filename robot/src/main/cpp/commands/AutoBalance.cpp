@@ -3,7 +3,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 AutoBalance::AutoBalance(Drivetrain* drive) 
-	: CommandHelper{frc2::PIDController{PIDConst::PROPORTIONALFACTOR, PIDConst::INTEGRALFACTOR, PIDConst::DERIVATIVEFACTOR}, 
+	: CommandHelper{frc2::PIDController{PIDConst::PROPORTIONAL_FACTOR, PIDConst::INTEGRAL_FACTOR, PIDConst::DERIVATIVE_FACTOR}, 
 	[drive] { return drive->GetPitch(); },
 	0,
 

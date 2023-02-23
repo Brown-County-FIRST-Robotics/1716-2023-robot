@@ -9,6 +9,10 @@
 #include <ctre/Phoenix.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/PneumaticHub.h>
+#include <networktables/FloatTopic.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "Constants.h"
 
@@ -65,4 +69,22 @@ private:
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
 
 	int waitTicksNeeded = -1;
+
+	//Networktables:
+	nt::NetworkTableInstance networkTableInst;
+
+	std::shared_ptr<nt::NetworkTable> driveTable;
+	std::shared_ptr<nt::NetworkTable> encoderTable;
+	std::shared_ptr<nt::NetworkTable> pigeonTable;
+
+	nt::FloatPublisher flEncoder;
+	nt::FloatPublisher blEncoder;
+	nt::FloatPublisher frEncoder;
+	nt::FloatPublisher brEncoder;
+	nt::BooleanEntry resetEncodersEntry;
+
+	nt::FloatPublisher yaw;
+	nt::FloatPublisher xAccel;
+	nt::FloatPublisher yAccel;
+	nt::FloatPublisher zAccel;
 };
