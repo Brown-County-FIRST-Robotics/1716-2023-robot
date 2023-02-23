@@ -21,15 +21,14 @@ Drivetrain::Drivetrain() :
 	pigeonTable = networkTableInst.GetTable("1716Pigeon");
 
 	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
-	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
 	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
+	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
 	brEncoder = encoderTable->GetFloatTopic("backRightEncoder").Publish();
 	resetEncodersEntry = encoderTable->GetBooleanTopic("resetEncoder").GetEntry(false);
 	
-	xAccel = driveTable->GetFloatTopic("xAccel").Publish();
-	yAccel = driveTable->GetFloatTopic("yAccel").Publish();
-	zAccel = driveTable->GetFloatTopic("zAccel").Publish();
-	yaw = driveTable->GetFloatTopic("yaw").Publish();
+	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
+	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
+	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
@@ -109,10 +108,9 @@ void Drivetrain::Periodic() {
 	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
 	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
 
-	yaw.Set(GetYaw());
-	yAccel.Set(GetY());
 	xAccel.Set(GetX());
-	zAccel.Set(GetZ());
+	yAccel.Set(GetY());
+	yaw.Set(GetYaw());
 }
 
 void Drivetrain::ToggleSolenoid() {

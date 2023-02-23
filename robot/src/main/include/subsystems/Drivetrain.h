@@ -86,5 +86,4 @@ private:
 	nt::FloatPublisher yaw;
 	nt::FloatPublisher xAccel;
 	nt::FloatPublisher yAccel;
-	nt::FloatPublisher zAccel;
 };
