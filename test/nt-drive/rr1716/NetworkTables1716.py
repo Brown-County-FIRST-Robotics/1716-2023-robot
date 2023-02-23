@@ -13,11 +13,7 @@ class NetworkTablesWrapper:
         self.pigeon_table = NetworkTables.getTable('1716Pigeon')
         self.game_table = NetworkTables.getTable('1716GameInfo')
         self.encoder_table = NetworkTables.getTable('1716Encoder')
-        smartdashboard_table=NetworkTables.getTable('Shuffleboard')
-        self.place_table = smartdashboard_table.getSubTable('Place').getSubTable('Placement Positions')
-        self.pickup_table = smartdashboard_table.getSubTable('Pick Up').getSubTable('Pick Up Positions')
-        self.positions= ('<1>','[2]','<3>','<4>','[5]','<6>','<7>','[8]','<9>','<10>','[11]','<12>','<13>','[14]','<15>','<16>','[17]','<18>','(19)','(20)','(21)','(22)','(23)','(24)','(25)','(26)','(27)')
-
+        self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
@@ -154,28 +150,18 @@ class NetworkTablesWrapper:
 
     def GetPlacement(self):
         logging.debug(f'NetworkTablesWrapper.GetPlacement')
-        for i in self.positions:
-            if self.place_table.getBoolean(i,False):
-                return int(i[1:-1])
-        return -1
-
-    def ResetPlacement(self):
-        logging.debug(f'NetworkTablesWrapper.ResetPlacement')
-        for i in self.positions:
-            self.place_table.putBoolean(i,False)
+        pos = self.dashboard_table.getNumberArray('placePos',[-1,-1])
+        if pos==[-1,-1]:
+            return None
+        return pos
 
     def GetPickup(self):
         logging.debug(f'NetworkTablesWrapper.GetPickup')
-        if self.pickup_table.getBoolean('Left Slide',False):
-            return 'left'
-        if self.pickup_table.getBoolean('Right Slide',False):
-            return 'right'
-        return None
+        pos=self.dashboard_table.getNumber('pickupPos',-1)
+        if pos==-1:
+            return None
+        return pos
 
-    def ResetPickup(self):
-        logging.debug(f'NetworkTablesWrapper.ResetPickup')
-        self.pickup_table.putBoolean('Left Slide',False)
-        self.pickup_table.putBoolean('Right Slide',False)
 
 if __name__ == '__main__':
     # TEST CODE
