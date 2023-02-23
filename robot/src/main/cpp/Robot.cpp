@@ -47,20 +47,25 @@ void Robot::RobotInit() {
 			.WithWidget(frc::BuiltInWidgets::kToggleButton)
 			.GetEntry();
 	}
-
+	
 	//Update networktables info
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
-	table = networkTableInst.GetTable("1716GameInfo");
+	dashboardTable = networkTableInst.GetTable("1716DashboardInput");
+	gameInfoTable = networkTableInst.GetTable("1716GameInfo");
 
-	isAutonomous = table->GetBooleanTopic("isAutonomous").Publish();
-	isTeleop = table->GetBooleanTopic("isTeleop").Publish();
-	isRedAlliance = table->GetBooleanTopic("isRedAlliance").Publish();
-	matchTime = table->GetDoubleTopic("matchTime").Publish();
+	isAutonomous = gameInfoTable->GetBooleanTopic("isAutonomous").Publish();
+	isTeleop = gameInfoTable->GetBooleanTopic("isTeleop").Publish();
+	isRedAlliance = gameInfoTable->GetBooleanTopic("isRedAlliance").Publish();
+	matchTime = gameInfoTable->GetDoubleTopic("matchTime").Publish();
 
 	isRedAlliance.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed);
 	isAutonomous.Set(false);
 	isTeleop.Set(false);
 	matchTime.Set(0);
+
+	//Pickup and place selector
+	pickUpPublisher = dashboardTable->GetIntegerTopic("pickUpPos").Publish();
+	placePublisher = dashboardTable->GetIntegerArrayTopic("placePos").Publish();
 }
 
 void Robot::RobotPeriodic() {
@@ -69,16 +74,19 @@ void Robot::RobotPeriodic() {
 	//Update matchtime networktables variable
 	matchTime.Set(frc::DriverStation::GetMatchTime());
 
-	//Pickup and place position selector
+	//Pickup and place position selectors:
+	//Pick up
 	for (int i = 0; i < 3; i++) {
 		if (pickUpPos[i]->GetBoolean(false) && i != currentPickUp) {
 			if (currentPickUp != -1) {
 				pickUpPos[currentPickUp]->SetBoolean(false);
 			}
 			currentPickUp = i;
+			pickUpPublisher.Set(i + 1);
 		}
 	}
 
+	//Place
 	for (int r = 0; r < 3; r++) {
 		for (int c = 0; c < 9; c++) {
 			if (placePos[r][c]->GetBoolean(false) && (currentPlace[0] != r || currentPlace[1] != c)) {
@@ -87,6 +95,11 @@ void Robot::RobotPeriodic() {
 				}
 				currentPlace[0] = r;
 				currentPlace[1] = c;
+
+				placeCoords.clear();
+				placeCoords.push_back(r + 1);
+				placeCoords.push_back(c + 1);
+				placePublisher.Set(placeCoords); //this builds, DO NOT CHANGE
 			}
 		}
 	}
