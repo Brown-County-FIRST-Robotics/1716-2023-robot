@@ -27,10 +27,11 @@
 | Name              | Type    | Value                                    |
 |-------------------|---------|------------------------------------------|
 | frontLeftEncoder  | double  | The position according to the encoder    |
-| backLeftEncoder   | double  | The position according to the encoder    |
 | frontRightEncoder | double  | The position according to the encoder    |
+| backLeftEncoder   | double  | The position according to the encoder    |
 | backRightEncoder  | double  | The position according to the encoder    |
 | resetEncoder      | boolean | Reset the position of the encoders to 0  |
+
 see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.html#aa1a4166c3a802a2379500ba5b979a64f) and [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_spark_max_relative_encoder.html)
 
 
@@ -51,3 +52,9 @@ see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.htm
 | matchTime       | double   | The time remaining in the match                |
 
 To get these values, see [the wpilib documentation](https://github.wpilib.org/allwpilib/docs/release/cpp/classfrc_1_1_driver_station.html). 
+
+## `1716DashboardInput`
+| Name      | Type          | Value                                                                                                           |
+|-----------|---------------|-----------------------------------------------------------------------------------------------------------------|
+| pickUpPos | integer       | The location to pick up a gameobject from, ranging from 1-3, left to right                                      |
+| placePos  | integer array | The location to place a gameobject at, index 0 is row, 1 is column, top left to bottom right, 3 rows, 9 columns |
