@@ -21,8 +21,11 @@ class Robot : public frc::TimedRobot {
 	
 private:
 	RobotContainer robotContainer;
+
+	//Autonomous
 	frc2::Command* autonomousCommand = nullptr;
 
+	//Update networktable info
 	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> table;
 
@@ -30,8 +33,8 @@ private:
 	nt::BooleanPublisher isTeleop;
 	nt::BooleanPublisher isRedAlliance;
 	nt::DoublePublisher matchTime;
-	nt::GenericEntry* robotRunning;
 
+	//Selector for pickup and placement positions
 	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Pick Up")
 		.GetLayout("Pick Up Positions", frc::BuiltInLayouts::kGrid)
 		.WithSize(4, 2)
