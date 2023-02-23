@@ -5,8 +5,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 
 void Robot::RobotInit() {
-	robotRunning = frc::Shuffleboard::GetTab("Controller").Add("Robot Running", false).GetEntry();
-
+	//Pickup and placement position selector
 	pickUpPos[0] = pickUpGrid
 		.Add("Drop", false)
 		.WithPosition(0, 0)
@@ -48,20 +47,46 @@ void Robot::RobotInit() {
 			.WithWidget(frc::BuiltInWidgets::kToggleButton)
 			.GetEntry();
 	}
+	
+	//Update networktables info
+	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	dashboardTable = networkTableInst.GetTable("1716DashboardInput");
+	gameInfoTable = networkTableInst.GetTable("1716GameInfo");
+
+	isAutonomous = gameInfoTable->GetBooleanTopic("isAutonomous").Publish();
+	isTeleop = gameInfoTable->GetBooleanTopic("isTeleop").Publish();
+	isRedAlliance = gameInfoTable->GetBooleanTopic("isRedAlliance").Publish();
+	matchTime = gameInfoTable->GetDoubleTopic("matchTime").Publish();
+
+	isRedAlliance.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed);
+	isAutonomous.Set(false);
+	isTeleop.Set(false);
+	matchTime.Set(0);
+
+	//Pickup and place selector
+	pickUpPublisher = dashboardTable->GetIntegerTopic("pickUpPos").Publish();
+	placePublisher = dashboardTable->GetIntegerArrayTopic("placePos").Publish();
 }
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 
+	//Update matchtime networktables variable
+	matchTime.Set(frc::DriverStation::GetMatchTime());
+
+	//Pickup and place position selectors:
+	//Pick up
 	for (int i = 0; i < 3; i++) {
 		if (pickUpPos[i]->GetBoolean(false) && i != currentPickUp) {
 			if (currentPickUp != -1) {
 				pickUpPos[currentPickUp]->SetBoolean(false);
 			}
 			currentPickUp = i;
+			pickUpPublisher.Set(i + 1);
 		}
 	}
 
+	//Place
 	for (int r = 0; r < 3; r++) {
 		for (int c = 0; c < 9; c++) {
 			if (placePos[r][c]->GetBoolean(false) && (currentPlace[0] != r || currentPlace[1] != c)) {
@@ -70,38 +95,53 @@ void Robot::RobotPeriodic() {
 				}
 				currentPlace[0] = r;
 				currentPlace[1] = c;
+
+				placeCoords.clear();
+				placeCoords.push_back(r + 1);
+				placeCoords.push_back(c + 1);
+				placePublisher.Set(placeCoords); //this builds, DO NOT CHANGE
 			}
 		}
 	}
 }
 
 void Robot::AutonomousInit() {
+	//Autonomous
 	autonomousCommand = robotContainer.GetAutonomousCommand();
 
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Schedule();
 	}
 
-	robotRunning->SetBoolean(true);
+	//Networktables variable update
+	isAutonomous.Set(true);
 }
 
 void Robot::TeleopInit() {
+	//Autonomous
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Cancel();
     	autonomousCommand = nullptr;
 	}
 
-	robotRunning->SetBoolean(true);
+	//Networktables
+	isAutonomous.Set(false);
+	isTeleop.Set(true);
 
+	//Controller logging
 	frc::Shuffleboard::StartRecording();
 }
 
 void Robot::TeleopPeriodic() {
+	//Controller logging
 	robotContainer.UpdateControllerLogging();
 }
 
 void Robot::DisabledInit() {
-	robotRunning->SetBoolean(false);
+	//Networktables
+	isTeleop.Set(false);
+	
+	//Controller Logging
 	frc::Shuffleboard::StopRecording();
 }
 

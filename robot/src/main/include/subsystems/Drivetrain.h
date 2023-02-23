@@ -2,6 +2,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <rev/CANSparkMax.h>
+#include <rev/SparkMaxRelativeEncoder.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/TimedRobot.h> //units::scalar
@@ -38,21 +39,29 @@ public:
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
 
+	double GetEncoder(int motorID);
+	void ResetEncoders();
+
 private:
-	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backLeft{DrivetrainConst::BACKLEFTID, rev::CANSparkMax::MotorType::kBrushless};
-	rev::CANSparkMax backRight{DrivetrainConst::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontLeft{DrivetrainConst::FRONT_LEFT_ID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax frontRight{DrivetrainConst::FRONT_RIGHT_ID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backLeft{DrivetrainConst::BACK_LEFT_ID, rev::CANSparkMax::MotorType::kBrushless};
+	rev::CANSparkMax backRight{DrivetrainConst::BACK_RIGHT_ID, rev::CANSparkMax::MotorType::kBrushless};
+
+	rev::SparkMaxRelativeEncoder frontLeftEncoder;
+	rev::SparkMaxRelativeEncoder frontRightEncoder;
+	rev::SparkMaxRelativeEncoder backLeftEncoder;
+	rev::SparkMaxRelativeEncoder backRightEncoder;
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
+	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
 
-	frc::PneumaticHub hub{DrivetrainConst::HUBID};
- 	frc::DoubleSolenoid solenoid0 = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID0FORWARDID, DrivetrainConst::SOLENOID0REVERSEID);
- 	frc::DoubleSolenoid solenoid1 = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID1FORWARDID, DrivetrainConst::SOLENOID1REVERSEID);
- 	frc::DoubleSolenoid solenoid2 = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID2FORWARDID, DrivetrainConst::SOLENOID2REVERSEID);
- 	frc::DoubleSolenoid solenoid3 = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID3FORWARDID, DrivetrainConst::SOLENOID3REVERSEID);
+	frc::PneumaticHub hub{DrivetrainConst::HUB_ID};
+ 	frc::DoubleSolenoid flSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FL_SOLENOID_ID[0], DrivetrainConst::FL_SOLENOID_ID[1]);
+ 	frc::DoubleSolenoid frSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FR_SOLENOID_ID[0], DrivetrainConst::FR_SOLENOID_ID[1]);
+ 	frc::DoubleSolenoid blSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BL_SOLENOID_ID[0], DrivetrainConst::BL_SOLENOID_ID[1]);
+ 	frc::DoubleSolenoid brSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BR_SOLENOID_ID[0], DrivetrainConst::BR_SOLENOID_ID[1]);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
 
 	int waitTicksNeeded = -1;

@@ -2,8 +2,15 @@
 
 #include <frc/TimedRobot.h>
 #include <frc2/command/Command.h>
+#include <frc/DriverStation.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/DoubleTopic.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <networktables/IntegerArrayTopic.h>
+#include <networktables/IntegerTopic.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "RobotContainer.h"
 
@@ -18,10 +25,20 @@ class Robot : public frc::TimedRobot {
 	
 private:
 	RobotContainer robotContainer;
+
+	//Autonomous
 	frc2::Command* autonomousCommand = nullptr;
 
-	nt::GenericEntry* robotRunning;
+	//Update networktable info
+	nt::NetworkTableInstance networkTableInst;
+	std::shared_ptr<nt::NetworkTable> gameInfoTable;
 
+	nt::BooleanPublisher isAutonomous;
+	nt::BooleanPublisher isTeleop;
+	nt::BooleanPublisher isRedAlliance;
+	nt::DoublePublisher matchTime;
+
+	//Selector for pickup and placement positions
 	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Pick Up")
 		.GetLayout("Pick Up Positions", frc::BuiltInLayouts::kGrid)
 		.WithSize(4, 2)
@@ -39,6 +56,12 @@ private:
 
 	nt::GenericEntry* pickUpPos[3];
 	nt::GenericEntry* placePos[3][9];
+
+	nt::NetworkTableInstance networkTableInst;
+	std::shared_ptr<nt::NetworkTable> dashboardTable;
+	nt::IntegerPublisher pickUpPublisher;
+	nt::IntegerArrayPublisher placePublisher;
+	std::vector<int64_t> placeCoords;
 
 	int currentPickUp = -1;
 	int currentPlace[2] = {-1, -1};
