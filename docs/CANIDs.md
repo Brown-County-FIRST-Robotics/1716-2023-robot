@@ -2,8 +2,6 @@
 
 ## Drivetrain Motors (1-10)
 
-Any motors in or related to the drivetrain.
-
 |Component|ID|
 |-|-|
 |Front Left Drive|1|
@@ -13,7 +11,7 @@ Any motors in or related to the drivetrain.
 
 ## Drivetrain Solenoids (11-20)
 
-Any solenoids related to the drivetrain. Double solenoids have two IDs, one for forward and one for reverse.
+Double solenoids have two IDs, one for forward and one for reverse.
 
 |Component|ID|
 |-|-|
