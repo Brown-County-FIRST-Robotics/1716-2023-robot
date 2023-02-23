@@ -31,7 +31,7 @@ private:
 
 	//Update networktable info
 	nt::NetworkTableInstance networkTableInst;
-	std::shared_ptr<nt::NetworkTable> table;
+	std::shared_ptr<nt::NetworkTable> gameInfoTable;
 
 	nt::BooleanPublisher isAutonomous;
 	nt::BooleanPublisher isTeleop;
@@ -58,7 +58,7 @@ private:
 	nt::GenericEntry* placePos[3][9];
 
 	nt::NetworkTableInstance networkTableInst;
-	std::shared_ptr<nt::NetworkTable> placementTable; //placeholder name
+	std::shared_ptr<nt::NetworkTable> dashboardTable;
 	nt::IntegerPublisher pickUpPublisher;
 	nt::IntegerArrayPublisher placePublisher;
 	std::vector<int64_t> placeCoords;
