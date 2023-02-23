@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <utility>
+#include <math.h>
 
 AutoSwitchDrive::AutoSwitchDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 
 	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))

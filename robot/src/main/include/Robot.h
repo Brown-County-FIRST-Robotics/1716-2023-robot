@@ -5,15 +5,18 @@
 #include <frc/DriverStation.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleTopic.h>
+#include <frc/shuffleboard/ShuffleboardLayout.h>
+#include <frc/shuffleboard/Shuffleboard.h>
 
 #include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
-public:
- 	void RobotInit() override;
+ public:
+	void RobotInit() override;
 	void RobotPeriodic() override;
 	void AutonomousInit() override;
 	void TeleopInit() override;
+	void TeleopPeriodic() override;
 	void DisabledInit() override;
 	
 private:
@@ -27,4 +30,26 @@ private:
 	nt::BooleanPublisher isTeleop;
 	nt::BooleanPublisher isRedAlliance;
 	nt::DoublePublisher matchTime;
+	nt::GenericEntry* robotRunning;
+
+	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Pick Up")
+		.GetLayout("Pick Up Positions", frc::BuiltInLayouts::kGrid)
+		.WithSize(4, 2)
+		.WithProperties({
+			{"Number of rows", nt::Value::MakeInteger(1)},
+			{"Number of columns", nt::Value::MakeInteger(3)},
+			{"Label Position", nt::Value::MakeString("HIDDEN")}});
+	frc::ShuffleboardLayout& placeGrid = frc::Shuffleboard::GetTab("Place")
+		.GetLayout("Placement Positions", frc::BuiltInLayouts::kGrid)
+		.WithSize(10, 4)
+		.WithProperties({
+			{"Number of rows", nt::Value::MakeInteger(3)},
+			{"Number of columns", nt::Value::MakeInteger(9)},
+			{"Label Position", nt::Value::MakeString("HIDDEN")}});
+
+	nt::GenericEntry* pickUpPos[3];
+	nt::GenericEntry* placePos[3][9];
+
+	int currentPickUp = -1;
+	int currentPlace[2] = {-1, -1};
 };

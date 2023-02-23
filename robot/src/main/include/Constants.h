@@ -1,6 +1,8 @@
 #pragma once
 // #include <units/time.h>
+#include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
+#include <string>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
