@@ -6,12 +6,12 @@ Each subsystem on the robot gets 50 IDs, with the first 20 set aside for output 
 
 |Component|ID|
 |---|---|
-|Front Left Drive|0|
-|Front Right Drive|1|
-|Back Left Drive|2|
-|Back Right Drive|3|
+|Front Left Motor|0|
+|Front Right Motor|1|
+|Back Left Motor|2|
+|Back Right Motor|3|
 |||
-|Pnuematics Control Module|10|
+|Pneumatic Hub|10|
 |||
 |Pigeon|20|
 
@@ -27,7 +27,7 @@ Each subsystem on the robot gets 50 IDs, with the first 20 set aside for output 
 
 ## Solenoids
 
-Solenoids have their own separate ID system off of the PCM, ranging from 1-16 on REV. Double solenoids have two IDs, one for forward and one for reverse.
+Solenoids have their own separate ID system off of the Pneumatic Hub, ranging from 1-16. Double solenoids have two IDs, one for forward and one for reverse.
 
 |Solenoid|ID(s)|
 |---|---|
