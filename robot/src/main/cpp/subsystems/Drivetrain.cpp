@@ -12,6 +12,23 @@ Drivetrain::Drivetrain() :
 	//robotDrive.SetSafetyEnabled(false); //delete this later
 
 	solenoidPos = frSolenoid.Get();
+
+	//networktables value updates
+	networkTableInst = nt::NetworkTableInstance::GetDefault();
+
+	driveTable = networkTableInst.GetTable("1716Drive");
+	encoderTable = networkTableInst.GetTable("1716Encoder");	
+	pigeonTable = networkTableInst.GetTable("1716Pigeon");
+
+	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
+	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
+	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
+	brEncoder = encoderTable->GetFloatTopic("backRightEncoder").Publish();
+	resetEncodersEntry = encoderTable->GetBooleanTopic("resetEncoder").GetEntry(false);
+	
+	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
+	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
+	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
@@ -79,6 +96,21 @@ void Drivetrain::Periodic() {
 		brSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
 	}
 	waitTicksNeeded--;
+
+	//Networktables
+	if (resetEncodersEntry.Get()) {
+		ResetEncoders();
+		resetEncodersEntry.Set(false);
+	}
+
+	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID));
+	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID));
+	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
+	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
+
+	xAccel.Set(GetX());
+	yAccel.Set(GetY());
+	yaw.Set(GetYaw());
 }
 
 void Drivetrain::ToggleSolenoid() {

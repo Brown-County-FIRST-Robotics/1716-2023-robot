@@ -17,6 +17,10 @@ using namespace frc2;
 RobotContainer::RobotContainer() {
 	InitControllerLogging();
 
+	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	driveTable = networkTableInst.GetTable("1716Drive");
+	startAutoBalance = driveTable->GetBooleanTopic("startAutoBalance").GetEntry(false);
+
 	ConfigureButtonBindings();
 	
 	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, 
@@ -82,6 +86,14 @@ void RobotContainer::ConfigureButtonBindings() {
 	// 				[this] { return controller.GetBButton(); } )
 	// 			.Until([this] { return controller.GetPOV() == 180; })); })
 	// 	.Until([this] { return controller.GetPOV() == 180; }));
+
+	frc2::Trigger([this] { bool b = startAutoBalance.Get(); startAutoBalance.Set(false); return b; }) //start auto balance remotely
+		.OnTrue(AutoBalance(&drivetrain)
+	 	.FinallyDo(
+	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
+				AutoBalance(&drivetrain)
+	 				.Until([this] { return controller.GetPOV() == 180; })); 
+			}));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

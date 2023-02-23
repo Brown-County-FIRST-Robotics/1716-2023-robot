@@ -28,9 +28,9 @@ private:
 
 	void UpdateBrake(bool brake);
 
-	frc::SlewRateLimiter<units::scalar> xAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
-	frc::SlewRateLimiter<units::scalar> yAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
-	frc::SlewRateLimiter<units::scalar> zAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
+	frc::SlewRateLimiter<units::scalar> xAccelerationCap{DrivetrainConst::ACCELERATION_CAP / 1_s};
+	frc::SlewRateLimiter<units::scalar> yAccelerationCap{DrivetrainConst::ACCELERATION_CAP / 1_s};
+	frc::SlewRateLimiter<units::scalar> zAccelerationCap{DrivetrainConst::ACCELERATION_CAP / 1_s};
 
 	double CloserToZero(double value1, double value2);
 

@@ -4,6 +4,9 @@
 #include <frc2/command/button/CommandXboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Commands.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/BooleanTopic.h>
 
 #include "subsystems/Drivetrain.h"
 #include "commands/DriveBackThenBalance.h"
@@ -20,6 +23,10 @@ private:
 	Drivetrain drivetrain;
 
 	void ConfigureButtonBindings();
+
+	nt::NetworkTableInstance networkTableInst;
+	std::shared_ptr<nt::NetworkTable> driveTable;
+	nt::BooleanEntry startAutoBalance;
 
 	void InitControllerLogging();
 
