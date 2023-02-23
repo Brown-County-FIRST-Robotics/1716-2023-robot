@@ -5,8 +5,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 
 void Robot::RobotInit() {
-	robotRunning = frc::Shuffleboard::GetTab("Controller").Add("Robot Running", false).GetEntry();
-
+	//Pickup and placement position selector
 	pickUpPos[0] = pickUpGrid
 		.Add("Drop", false)
 		.WithPosition(0, 0)
@@ -48,11 +47,29 @@ void Robot::RobotInit() {
 			.WithWidget(frc::BuiltInWidgets::kToggleButton)
 			.GetEntry();
 	}
+
+	//Update networktables info
+	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	table = networkTableInst.GetTable("1716GameInfo");
+
+	isAutonomous = table->GetBooleanTopic("isAutonomous").Publish();
+	isTeleop = table->GetBooleanTopic("isTeleop").Publish();
+	isRedAlliance = table->GetBooleanTopic("isRedAlliance").Publish();
+	matchTime = table->GetDoubleTopic("matchTime").Publish();
+
+	isRedAlliance.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed);
+	isAutonomous.Set(false);
+	isTeleop.Set(false);
+	matchTime.Set(0);
 }
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 
+	//Update matchtime networktables variable
+	matchTime.Set(frc::DriverStation::GetMatchTime());
+
+	//Pickup and place position selector
 	for (int i = 0; i < 3; i++) {
 		if (pickUpPos[i]->GetBoolean(false) && i != currentPickUp) {
 			if (currentPickUp != -1) {
@@ -76,32 +93,42 @@ void Robot::RobotPeriodic() {
 }
 
 void Robot::AutonomousInit() {
+	//Autonomous
 	autonomousCommand = robotContainer.GetAutonomousCommand();
 
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Schedule();
 	}
 
-	robotRunning->SetBoolean(true);
+	//Networktables variable update
+	isAutonomous.Set(true);
 }
 
 void Robot::TeleopInit() {
+	//Autonomous
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Cancel();
     	autonomousCommand = nullptr;
 	}
 
-	robotRunning->SetBoolean(true);
+	//Networktables
+	isAutonomous.Set(false);
+	isTeleop.Set(true);
 
+	//Controller logging
 	frc::Shuffleboard::StartRecording();
 }
 
 void Robot::TeleopPeriodic() {
+	//Controller logging
 	robotContainer.UpdateControllerLogging();
 }
 
 void Robot::DisabledInit() {
-	robotRunning->SetBoolean(false);
+	//Networktables
+	isTeleop.Set(false);
+	
+	//Controller Logging
 	frc::Shuffleboard::StopRecording();
 }
 

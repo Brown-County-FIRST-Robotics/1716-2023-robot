@@ -2,6 +2,7 @@
 
 #include "commands/AutoSwitchDrive.h"
 
+#include <math.h>
 #include <utility>
 #include <math.h>
 
