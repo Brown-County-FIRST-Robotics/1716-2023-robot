@@ -2,6 +2,8 @@
 
 #include <frc/TimedRobot.h>
 #include <frc2/command/Command.h>
+#include <frc/shuffleboard/ShuffleboardLayout.h>
+#include <frc/shuffleboard/Shuffleboard.h>
 
 #include "RobotContainer.h"
 
@@ -19,4 +21,25 @@ private:
 	frc2::Command* autonomousCommand = nullptr;
 
 	nt::GenericEntry* robotRunning;
+
+	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Pick Up")
+		.GetLayout("Pick Up Positions", frc::BuiltInLayouts::kGrid)
+		.WithSize(4, 2)
+		.WithProperties({
+			{"Number of rows", nt::Value::MakeInteger(1)},
+			{"Number of columns", nt::Value::MakeInteger(3)},
+			{"Label Position", nt::Value::MakeString("HIDDEN")}});
+	frc::ShuffleboardLayout& placeGrid = frc::Shuffleboard::GetTab("Place")
+		.GetLayout("Placement Positions", frc::BuiltInLayouts::kGrid)
+		.WithSize(10, 4)
+		.WithProperties({
+			{"Number of rows", nt::Value::MakeInteger(3)},
+			{"Number of columns", nt::Value::MakeInteger(9)},
+			{"Label Position", nt::Value::MakeString("HIDDEN")}});
+
+	nt::GenericEntry* pickUpPos[3];
+	nt::GenericEntry* placePos[3][9];
+
+	int currentPickUp = -1;
+	int currentPlace[2] = {-1, -1};
 };
