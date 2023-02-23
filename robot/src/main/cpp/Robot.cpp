@@ -48,20 +48,29 @@ void Robot::RobotInit() {
 			.WithWidget(frc::BuiltInWidgets::kToggleButton)
 			.GetEntry();
 	}
+
+	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	placementTable = networkTableInst.GetTable("1716Placement"); //placeholder table
+	
+	pickUpPublisher = placementTable->GetIntegerTopic("pickUpPos").Publish();
+	placePublisher = placementTable->GetIntegerArrayTopic("placePos").Publish();
 }
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
 
+	//Pick up
 	for (int i = 0; i < 3; i++) {
 		if (pickUpPos[i]->GetBoolean(false) && i != currentPickUp) {
 			if (currentPickUp != -1) {
 				pickUpPos[currentPickUp]->SetBoolean(false);
 			}
 			currentPickUp = i;
+			pickUpPublisher.Set(i + 1);
 		}
 	}
 
+	//Place
 	for (int r = 0; r < 3; r++) {
 		for (int c = 0; c < 9; c++) {
 			if (placePos[r][c]->GetBoolean(false) && (currentPlace[0] != r || currentPlace[1] != c)) {
@@ -70,6 +79,7 @@ void Robot::RobotPeriodic() {
 				}
 				currentPlace[0] = r;
 				currentPlace[1] = c;
+				placePublisher.Set(nt::IntegerArraySubscriber::ParamType::);
 			}
 		}
 	}

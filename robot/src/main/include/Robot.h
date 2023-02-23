@@ -4,6 +4,10 @@
 #include <frc2/command/Command.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <networktables/IntegerArrayTopic.h>
+#include <networktables/IntegerTopic.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "RobotContainer.h"
 
@@ -39,6 +43,11 @@ private:
 
 	nt::GenericEntry* pickUpPos[3];
 	nt::GenericEntry* placePos[3][9];
+
+	nt::NetworkTableInstance networkTableInst;
+	std::shared_ptr<nt::NetworkTable> placementTable; //placeholder name
+	nt::IntegerPublisher pickUpPublisher;
+	nt::IntegerArrayPublisher placePublisher;
 
 	int currentPickUp = -1;
 	int currentPlace[2] = {-1, -1};
