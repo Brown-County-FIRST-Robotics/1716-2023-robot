@@ -1,9 +1,10 @@
 #pragma once
+#include <iostream>
 
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
-// #include <networktables/FloatArrayTopic.h>
 #include <networktables/FloatTopic.h>
+#include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 
@@ -21,13 +22,25 @@ private:
 	Drivetrain* drivetrain;
 
 	nt::NetworkTableInstance networkTableInst; //the default networktables network
-	std::shared_ptr<nt::NetworkTable> table; //the table for driving
+	std::shared_ptr<nt::NetworkTable> driveTable;
+	std::shared_ptr<nt::NetworkTable> encoderTable;
+	std::shared_ptr<nt::NetworkTable> pigeonTable;
+
+
 
 	nt::FloatSubscriber x; //x, y, and rotational values
 	nt::FloatSubscriber y;
 	nt::FloatSubscriber z;
 
+	nt::FloatPublisher flEncoder;
+	nt::FloatPublisher blEncoder;
+	nt::FloatPublisher frEncoder;
+	nt::FloatPublisher brEncoder;
+
+	nt::BooleanEntry resetEncoders;
+
 	nt::FloatPublisher yaw;
-	nt::FloatPublisher forwBack;
-	nt::FloatPublisher leftRight;
+	nt::FloatPublisher xAccel;
+	nt::FloatPublisher yAccel;
+	nt::FloatPublisher zAccel;
 };

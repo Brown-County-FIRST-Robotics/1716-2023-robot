@@ -30,7 +30,7 @@
 | backLeftEncoder   | double  | The position according to the encoder    |
 | frontRightEncoder | double  | The position according to the encoder    |
 | backRightEncoder  | double  | The position according to the encoder    |
-| encoderReset      | boolean | Reset the position of the encoders to 0  |
+| resetEncoder      | boolean | Reset the position of the encoders to 0  |
 see [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_c_a_n_spark_max.html#aa1a4166c3a802a2379500ba5b979a64f) and [this](https://codedocs.revrobotics.com/cpp/classrev_1_1_spark_max_relative_encoder.html)
 
 
