@@ -24,7 +24,8 @@ private:
 	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> driveTable;
 
-	nt::FloatSubscriber x; //x, y, and rotational values
+	nt::FloatSubscriber x;
 	nt::FloatSubscriber y;
 	nt::FloatSubscriber z;
+	nt::BooleanSubscriber isTank;
 };
