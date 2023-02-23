@@ -48,6 +48,7 @@ private:
 	std::shared_ptr<nt::NetworkTable> placementTable; //placeholder name
 	nt::IntegerPublisher pickUpPublisher;
 	nt::IntegerArrayPublisher placePublisher;
+	std::vector<int64_t> placeCoords;
 
 	int currentPickUp = -1;
 	int currentPlace[2] = {-1, -1};

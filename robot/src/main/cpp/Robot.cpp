@@ -79,7 +79,11 @@ void Robot::RobotPeriodic() {
 				}
 				currentPlace[0] = r;
 				currentPlace[1] = c;
-				placePublisher.Set(nt::IntegerArraySubscriber::ParamType::);
+
+				placeCoords.clear();
+				placeCoords.push_back(r + 1);
+				placeCoords.push_back(c + 1);
+				placePublisher.Set(placeCoords); //this builds, DO NOT CHANGE
 			}
 		}
 	}
