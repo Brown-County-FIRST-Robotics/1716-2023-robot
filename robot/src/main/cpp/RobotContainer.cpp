@@ -10,6 +10,7 @@
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
 #include "commands/AutoSwitchDrive.h"
+#include "commands/ArmTeleopControl.h"
 
 using frc::XboxController;
 using namespace frc2;
@@ -28,6 +29,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ));
+
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller.GetPOV(); }).ToPtr());
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
@@ -87,13 +90,14 @@ void RobotContainer::ConfigureButtonBindings() {
 	// 			.Until([this] { return controller.GetPOV() == 180; })); })
 	// 	.Until([this] { return controller.GetPOV() == 180; }));
 
-	frc2::Trigger([this] { bool b = startAutoBalance.Get(); startAutoBalance.Set(false); return b; }) //start auto balance remotely
+	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
 		.OnTrue(AutoBalance(&drivetrain)
 	 	.FinallyDo(
 	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
 				AutoBalance(&drivetrain)
 	 				.Until([this] { return controller.GetPOV() == 180; })); 
-			}));
+			})
+		.Until([this] { return !startAutoBalance.Get(); }));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

@@ -57,7 +57,6 @@ private:
 	nt::GenericEntry* pickUpPos[3];
 	nt::GenericEntry* placePos[3][9];
 
-	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> dashboardTable;
 	nt::IntegerPublisher pickUpPublisher;
 	nt::IntegerArrayPublisher placePublisher;
