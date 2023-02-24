@@ -13,6 +13,7 @@ public:
 
 	bool SetToAngle(double shoulderAngle, double elbowAngle);
 	bool Zero();
+	double GetEncoder(int motorID);
 
 private:
 	rev::CANSparkMax shoulder{ArmConst::ID[0], rev::CANSparkMax::MotorType::kBrushless};

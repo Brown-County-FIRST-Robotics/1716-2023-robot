@@ -41,3 +41,15 @@ bool Arm::Zero(){
 	else
 		return false;
 }
+
+double Arm::GetEncoder(int motorID) {
+	if (motorID == ArmConst::ID[0]) {
+		return shoulderEncoder.GetPosition() / 42.0;
+	}
+	else if (motorID == ArmConst::ID[1]) {
+		return elbowEncoder.GetPosition() / 42.0;
+	}
+	else {
+		return 0;
+	}
+}
