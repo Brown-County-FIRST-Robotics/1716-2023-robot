@@ -31,7 +31,9 @@ Solenoids have their own separate ID system off of the Pneumatic Hub, ranging fr
 
 |Solenoid|ID(s)|
 |---|---|
-|Front Left|0, 1|
-|Front Right|2, 3|
-|Back Left|4, 5|
-|Back Right|6, 7|
+|Drivetrain|0, 1|
+|Upper Arm Brake|2, 3|
+|Upper Arm Direction|4, 5|
+|Forearm Brake|6, 7|
+|Forearm Direction|8, 9|
+|Claw|10, 11|
