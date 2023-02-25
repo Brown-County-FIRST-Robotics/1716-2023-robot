@@ -9,6 +9,7 @@
 #include <networktables/BooleanTopic.h>
 
 #include "subsystems/Drivetrain.h"
+#include "subsystems/Arm.h"
 #include "commands/DriveBackThenBalance.h"
 
 class RobotContainer {
@@ -21,6 +22,7 @@ private:
 	frc2::CommandXboxController controller{0};
 	
 	Drivetrain drivetrain;
+	Arm arm;
 
 	void ConfigureButtonBindings();
 

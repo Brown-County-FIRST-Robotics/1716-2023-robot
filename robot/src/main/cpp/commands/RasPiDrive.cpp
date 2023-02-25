@@ -13,7 +13,7 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 	y = driveTable->GetFloatTopic("y").Subscribe(0.0, {.pollStorage = 1}); //with a default of 0 and a memory of 1 term
 	z = driveTable->GetFloatTopic("rotation").Subscribe(0.0, {.pollStorage = 1});
 	isTank = driveTable->GetBooleanTopic("isTank").Subscribe(false);
-
+	
 }
 
 void RasPiDrive::Execute() {

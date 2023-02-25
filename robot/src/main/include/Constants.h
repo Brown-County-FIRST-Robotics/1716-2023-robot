@@ -53,4 +53,7 @@ namespace ArmConst
 	const double THRESHOLD = -1; //error threshold in degrees
 
 	const double ZEROING_SPEED = -1; //speed at which they zero on the limit switches
+
+	const double UPPER_ARM_LENGTH = 0;
+	const double FOREARM_LENGTH = 0;
 };
