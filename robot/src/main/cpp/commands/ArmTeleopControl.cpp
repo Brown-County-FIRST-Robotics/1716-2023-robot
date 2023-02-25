@@ -3,7 +3,7 @@
 #include <utility>
 
 ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<int()> POV) 
-	: arm(subsystem), pov(std::move(POV)), claw(std::move(clawButton))
+	: arm(subsystem), pov(std::move(POV))
 {
 	AddRequirements(subsystem);
 }
