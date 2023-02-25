@@ -6,12 +6,12 @@ Drivetrain::Drivetrain() :
 	backLeftEncoder{backLeft.GetEncoder()}, 
 	backRightEncoder{backRight.GetEncoder()} 
 {
+	frontLeft.SetInverted(false);
 	frontRight.SetInverted(true);
+	backLeft.SetInverted(false);
 	backRight.SetInverted(true);
 
-	//robotDrive.SetSafetyEnabled(false); //delete this later
-
-	solenoidPos = frSolenoid.Get();
+	robotDrive.SetSafetyEnabled(false); //delete this later
 
 	//networktables value updates
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
@@ -32,12 +32,12 @@ Drivetrain::Drivetrain() :
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	// if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
-	robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
-	// }
-	// else { //don't strafe in traction mode
-	// 	robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
-	// }
+	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
+		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+	}
+	else { //don't strafe in traction mode
+		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+	}
 }
 
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
@@ -90,10 +90,7 @@ int16_t Drivetrain::GetZ() {
 
 void Drivetrain::Periodic() {
 	if (waitTicksNeeded == 0) {
-		flSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
-		frSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
-		blSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
-		brSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
+		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
 	}
 	waitTicksNeeded--;
 
@@ -115,17 +112,11 @@ void Drivetrain::Periodic() {
 
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
-		flSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
-		frSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
-		blSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
-		brSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
 		solenoidPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
-		flSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
-		frSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
-		blSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
-		brSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
@@ -133,10 +124,7 @@ void Drivetrain::ToggleSolenoid() {
 }
 
 void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
-	flSolenoid.Set(position);
-	frSolenoid.Set(position);
-	blSolenoid.Set(position);
-	brSolenoid.Set(position);
+	solenoid.Set(position);
 	solenoidPos = position;
 	
 	waitTicksNeeded = DrivetrainConst::WAIT_TICKS;

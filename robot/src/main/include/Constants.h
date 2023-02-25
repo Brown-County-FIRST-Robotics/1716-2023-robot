@@ -2,10 +2,11 @@
 // #include <units/time.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
-#include <string>
+#include <frc/PneumaticHub.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
+	static frc::PneumaticHub hub{10}; //for making solenoids
 };
 
 namespace DrivetrainConst {
@@ -18,13 +19,8 @@ namespace DrivetrainConst {
 	
 	const int PIGEON_ID = 20;
 
-	const int HUB_ID = 42;
-
 	//0 is forward, 1 is reverse
-	const int FL_SOLENOID_ID[2] = {0, 1};
-	const int FR_SOLENOID_ID[2] = {2, 3};
-	const int BL_SOLENOID_ID[2] = {4, 5};
-	const int BR_SOLENOID_ID[2] = {6, 7};
+	const int SOLENOID_ID[2] = {0, 1};
 
 	const int WAIT_TICKS = 3; //solenoids
 

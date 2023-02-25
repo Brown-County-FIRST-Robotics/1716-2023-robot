@@ -14,7 +14,7 @@ void TeleopDrive::Execute() {
 	zSquare = z() * fabs(z());
 
 	drivetrain->Drive(
-		-CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
+		CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
 		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
 		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
 

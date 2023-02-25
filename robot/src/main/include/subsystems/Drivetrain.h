@@ -8,7 +8,6 @@
 #include <frc/TimedRobot.h> //units::scalar
 #include <ctre/Phoenix.h>
 #include <frc/DoubleSolenoid.h>
-#include <frc/PneumaticHub.h>
 #include <networktables/FloatTopic.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
@@ -61,12 +60,8 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
 
-	frc::PneumaticHub hub{DrivetrainConst::HUB_ID};
- 	frc::DoubleSolenoid flSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FL_SOLENOID_ID[0], DrivetrainConst::FL_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid frSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FR_SOLENOID_ID[0], DrivetrainConst::FR_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid blSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BL_SOLENOID_ID[0], DrivetrainConst::BL_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid brSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BR_SOLENOID_ID[0], DrivetrainConst::BR_SOLENOID_ID[1]);
-	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
+ 	frc::DoubleSolenoid solenoid = SolenoidConst::hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
+	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 
 	int waitTicksNeeded = -1;
 
