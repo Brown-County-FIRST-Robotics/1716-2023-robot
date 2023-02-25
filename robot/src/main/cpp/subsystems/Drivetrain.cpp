@@ -148,16 +148,16 @@ frc::DoubleSolenoid::Value Drivetrain::GetSolenoid() {
 
 double Drivetrain::GetEncoder(int motorID) {
 	if (motorID == DrivetrainConst::FRONT_LEFT_ID) {
-		return frontLeftEncoder.GetPosition()/42.0;
+		return frontLeftEncoder.GetPosition() / 42.0;
 	}
 	else if (motorID == DrivetrainConst::FRONT_RIGHT_ID) {
-		return frontRightEncoder.GetPosition()/42.0;
+		return frontRightEncoder.GetPosition() / 42.0;
 	}
 	else if (motorID == DrivetrainConst::BACK_LEFT_ID) {
-		return backLeftEncoder.GetPosition()/42.0;
+		return backLeftEncoder.GetPosition() / 42.0;
 	}
 	else if (motorID == DrivetrainConst::BACK_RIGHT_ID) {
-		return backRightEncoder.GetPosition()/42.0;
+		return backRightEncoder.GetPosition() / 42.0;
 	}
 	else {
 		return 0;
