@@ -20,6 +20,7 @@ public:
 
 private:
 	frc2::CommandXboxController controller{0};
+	frc2::CommandXboxController controller2{1};
 	
 	Drivetrain drivetrain;
 	Arm arm;

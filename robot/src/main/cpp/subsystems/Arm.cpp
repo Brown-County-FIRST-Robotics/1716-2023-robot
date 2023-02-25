@@ -3,81 +3,102 @@
 #include "subsystems/Arm.h"
 #include <math.h>
 
-Arm::Arm() : 
-	shoulderEncoder{shoulder.GetEncoder()}, 
-	elbowEncoder{elbow.GetEncoder()}
-{
-	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-}
+Arm::Arm() {}
 
-bool Arm::SetToPosition(double xGoal, double yGoal) {
-	x = xGoal;
-	y = yGoal;
-	double shoulderAngleGoal = (acos(((ArmConst::UPPER_ARM_LENGTH*ArmConst::UPPER_ARM_LENGTH) 
-		+ (xGoal*xGoal) + (yGoal*yGoal) - (ArmConst::FOREARM_LENGTH*ArmConst::FOREARM_LENGTH))
-		/ ((2 * ArmConst::UPPER_ARM_LENGTH) * sqrt((xGoal*xGoal) + (yGoal*yGoal))))
-		+ atan2(yGoal, xGoal))
-		* (180 / M_PI);
-	double elbowAngleGoal = (acos(((ArmConst::UPPER_ARM_LENGTH*ArmConst::UPPER_ARM_LENGTH) - (xGoal*xGoal) + (ArmConst::FOREARM_LENGTH*ArmConst::FOREARM_LENGTH) - (yGoal*yGoal))
-		/ (2 * ArmConst::UPPER_ARM_LENGTH * ArmConst::FOREARM_LENGTH)))
-		* (180 / M_PI);
-
-	double shoulderPos = GetEncoder(ArmConst::ID[0]);
-	double elbowPos = GetEncoder(ArmConst::ID[1]);
-
-	shoulder.Set(ArmConst::PROPORTIONAL[0] * (shoulderPos - shoulderAngleGoal));
-	elbow.Set(ArmConst::PROPORTIONAL[1] * (elbowPos - elbowAngleGoal));
-
-	if ((fabs(shoulderPos - shoulderAngleGoal) < ArmConst::THRESHOLD) && (fabs(elbowPos - elbowAngleGoal) < ArmConst::THRESHOLD))
-		return true;
-	else
-		return false;
-}
-
-double Arm::GetEncoder(int motorID) {
-	if (motorID == ArmConst::ID[0]) {
-		return shoulderEncoder.GetPosition() / 42.0;
+void Arm::Periodic() {
+	if (directionTicks == 0) {
+		upperArmDirection.Set(frc::DoubleSolenoid::Value::kOff);
+		forearmDirection.Set(frc::DoubleSolenoid::Value::kOff);
 	}
-	else if (motorID == ArmConst::ID[1]) {
-		return elbowEncoder.GetPosition() / 42.0;
+	directionTicks--;
+
+	if (upperArmBrakeTicks == 0) {
+		upperArmBrake.Set(frc::DoubleSolenoid::Value::kOff);
 	}
-	else {
-		return 0;
+	upperArmBrakeTicks--;
+	
+	if (forearmBrakeTicks == 0) {
+		forearmBrake.Set(frc::DoubleSolenoid::Value::kOff);
 	}
-}
+	forearmBrakeTicks--;
 
-bool Arm::Zero(){
-	if(!shoulderSwitch.Get())
-		shoulder.Set(ArmConst::ZEROING_SPEED);
-	else
-		shoulder.Set(0);
-
-	if(!elbowSwitch.Get())
-		elbow.Set(ArmConst::ZEROING_SPEED);
-	else
-		elbow.Set(0);
-
-	if(shoulderSwitch.Get() && elbowSwitch.Get()){
-		elbowEncoder.SetPosition(0);
-		shoulderEncoder.SetPosition(0);
-		x = 0;
-		y = 0;
-		return true;
+	if (clawTicks == 0) {
+		claw.Set(frc::DoubleSolenoid::Value::kOff);
 	}
-	else
-		return false;
+	clawTicks--;
 }
 
-double Arm::getX() {
-	return x;
+void Arm::ToggleDirection() {
+	if (direction == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		upperArmDirection.Set(frc::DoubleSolenoid::Value::kForward);
+		forearmDirection.Set(frc::DoubleSolenoid::Value::kForward);
+		direction = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		upperArmDirection.Set(frc::DoubleSolenoid::Value::kReverse);
+		forearmDirection.Set(frc::DoubleSolenoid::Value::kReverse);
+		direction = frc::DoubleSolenoid::Value::kReverse;
+	}
+	
+	directionTicks = SolenoidConst::WAIT_TICKS;
 }
 
-double Arm::getY() {
-	return y;
+void Arm::SetDirection(frc::DoubleSolenoid::Value value) {
+	upperArmDirection.Set(value);
+	forearmDirection.Set(value);
+	direction = value;
+	
+	directionTicks = SolenoidConst::WAIT_TICKS;
 }
 
-void Arm::SetMotorsZero() {
-	shoulder.Set(0);
-	elbow.Set(0);
+frc::DoubleSolenoid::Value Arm::GetDirection() {
+	return direction;
+}
+
+void Arm::ToggleUpperArmActive() {
+	if (upperArmActive == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		upperArmBrake.Set(frc::DoubleSolenoid::Value::kForward);
+		upperArmActive = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		upperArmBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+		upperArmActive = frc::DoubleSolenoid::Value::kReverse;
+	}
+	
+	upperArmBrakeTicks = SolenoidConst::WAIT_TICKS;
+}
+
+void Arm::SetUpperArmActive(frc::DoubleSolenoid::Value value) {
+	upperArmBrake.Set(value);
+	upperArmActive = value;
+	
+	upperArmBrakeTicks = SolenoidConst::WAIT_TICKS;
+}
+
+frc::DoubleSolenoid::Value Arm::GetUpperArmActive() {
+	return upperArmActive;
+}
+
+void Arm::ToggleForearmActive() {
+	if (forearmActive == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		forearmBrake.Set(frc::DoubleSolenoid::Value::kForward);
+		forearmActive = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		forearmBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+		forearmActive = frc::DoubleSolenoid::Value::kReverse;
+	}
+	
+	forearmBrakeTicks = SolenoidConst::WAIT_TICKS;
+}
+
+void Arm::SetForearmActive(frc::DoubleSolenoid::Value value) {
+	forearmBrake.Set(value);
+	forearmActive = value;
+	
+	forearmBrakeTicks = SolenoidConst::WAIT_TICKS;
+}
+
+frc::DoubleSolenoid::Value Arm::GetForearmActive() {
+	return forearmActive;
 }

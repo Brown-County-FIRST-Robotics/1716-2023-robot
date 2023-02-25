@@ -1,7 +1,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/RunCommand.h>
+#include <frc2/command/StartEndCommand.h>
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -38,7 +38,7 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}).ToPtr());
+	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes (controlled with D-Pad, cancelled on D-Pad down) 
@@ -97,6 +97,17 @@ void RobotContainer::ConfigureButtonBindings() {
 				AutoBalance(&drivetrain)
 	 				.Until([this] { return controller.GetBackButton(); })); 
 			}).Until([this] { return !startAutoBalance.Get(); }));
+
+	//Arm:
+	controller2.Y().OnTrue(frc2::InstantCommand([this] {arm.SetDirection(frc::DoubleSolenoid::Value::kForward);}, {&arm}).ToPtr());
+
+	controller2.A().OnTrue(frc2::InstantCommand([this] {arm.SetDirection(frc::DoubleSolenoid::Value::kReverse);}, {&arm}).ToPtr());
+
+	controller2.LeftBumper().WhileTrue(frc2::StartEndCommand([this] { arm.SetUpperArmActive(frc::DoubleSolenoid::Value::kForward); }, 
+		[this] { arm.SetUpperArmActive(frc::DoubleSolenoid::Value::kReverse); }, {&arm}).ToPtr());
+
+	controller2.RightBumper().WhileTrue(frc2::StartEndCommand([this] { arm.SetForearmActive(frc::DoubleSolenoid::Value::kForward); }, 
+		[this] { arm.SetForearmActive(frc::DoubleSolenoid::Value::kReverse); }, {&arm}).ToPtr());
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

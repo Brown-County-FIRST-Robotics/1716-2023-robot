@@ -7,6 +7,7 @@
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
 	static frc::PneumaticHub hub{10}; //for making solenoids
+	const int WAIT_TICKS = 3;
 };
 
 namespace DrivetrainConst {
@@ -22,8 +23,6 @@ namespace DrivetrainConst {
 	//0 is forward, 1 is reverse
 	const int SOLENOID_ID[2] = {0, 1};
 
-	const int WAIT_TICKS = 3; //solenoids
-
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };
 
@@ -35,25 +34,10 @@ namespace PIDConst {
 
 namespace ArmConst
 { 
-	//for arrays: 0 is shoulder, 1 is elbow
-	const int ID[2] = {-1, -1};
-
-	const int LIMIT_SWITCH_ID[2] = {-1, -1};
-
-	const double GROUND_ANGLE[2] = {-1, -1}; //reaching the ground
-	const double SHELF_ANGLE[2] = {-1, -1}; //reaching for a cone on the sliding shelf for pickup
-	const double RETRACT_ANGLE[2] = {-1, -1}; //retracting into the robot
-	const double HIGH_NODE_ANGLE[2] = {-1, -1}; //cone placement angles
-	const double LOW_NODE_ANGLE[2] = {-1, -1};
-	const double LOW_PLATFORM_ANGLE[2] = {-1, -1}; //cube placement angles
-	const double HIGH_PLATFORM_ANGLE[2] = {-1, -1};
-
-	const double PROPORTIONAL[2] = {1, 1};
-
-	const double THRESHOLD = -1; //error threshold in degrees
-
-	const double ZEROING_SPEED = -1; //speed at which they zero on the limit switches
-
-	const double UPPER_ARM_LENGTH = 0;
-	const double FOREARM_LENGTH = 0;
+	//0 is forward, 1 is reverse
+	const int UPPER_ARM_BRAKE_ID[2] = {2, 3};
+	const int UPPER_ARM_DIRECTION_ID[2] = {4, 5};
+	const int FOREARM_BRAKE_ID[2] = {6, 7};
+	const int FOREARM_DIRECTION_ID[2] = {8, 9};
+	const int CLAW_ID[2] = {10, 11};
 };
