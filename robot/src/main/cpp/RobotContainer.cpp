@@ -40,37 +40,37 @@ void RobotContainer::ConfigureButtonBindings() {
 
 	//Drive modes (controlled with D-Pad, cancelled on D-Pad down) 
 	//(uses a VERY hacky solution which sets the default command to preserve the drive mode between solenoid toggles):
-	frc2::Trigger([this] { return controller.GetPOV() == 270; }).OnTrue(TeleopDrive(&drivetrain, 
-		[this] { return -controller.GetLeftY(); }, 
-		[this] { return controller.GetLeftX(); }, 
-		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetBButton(); } )
-		.FinallyDo(
-			[this](bool interrupted) { drivetrain.SetDefaultCommand(
-				TeleopDrive(&drivetrain, 
-				[this] { return -controller.GetLeftY(); }, 
-				[this] { return controller.GetLeftX(); }, 
-				[this] { return controller.GetRightX(); },
-				[this] { return controller.GetBButton(); } )
-				.Until([this] { return controller.GetPOV() == 180; })); })
-		.Until([this] { return controller.GetPOV() == 180; }));
-		//Backwards driving (left on D-Pad)
+	// frc2::Trigger([this] { return controller.GetPOV() == 270; }).OnTrue(TeleopDrive(&drivetrain, 
+	// 	[this] { return -controller.GetLeftY(); }, 
+	// 	[this] { return controller.GetLeftX(); }, 
+	// 	[this] { return controller.GetRightX(); },
+	// 	[this] { return controller.GetBButton(); } )
+	// 	.FinallyDo(
+	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
+	// 			TeleopDrive(&drivetrain, 
+	// 			[this] { return -controller.GetLeftY(); }, 
+	// 			[this] { return controller.GetLeftX(); }, 
+	// 			[this] { return controller.GetRightX(); },
+	// 			[this] { return controller.GetBButton(); } )
+	// 			.Until([this] { return controller.GetPOV() == 180; })); })
+	// 	.Until([this] { return controller.GetPOV() == 180; }));
+	// 	//Backwards driving
 
-	 frc2::Trigger([this] { return controller.GetPOV() == 90; }).OnTrue(AutoBalance(&drivetrain)
+	controller.X().OnTrue(AutoBalance(&drivetrain)
 	 	.FinallyDo(
 	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
 	 			AutoBalance(&drivetrain)
 	 			.Until([this] { return controller.GetPOV() == 180; })); })
-	 	.Until([this] { return controller.GetPOV() == 180; }));
-	 	//Auto balancing (right on D-Pad)
+	 	.Until([this] { return controller.GetBackButton(); }));
+	 	//Auto balancing
 
-	frc2::Trigger([this] { return controller.GetPOV() == 0; }).OnTrue(RasPiDrive(&drivetrain)
+	controller.Y().OnTrue(RasPiDrive(&drivetrain)
 		.FinallyDo(
 			[this](bool interrupted) { drivetrain.SetDefaultCommand(
 				RasPiDrive(&drivetrain)
 				.Until([this] { return controller.GetPOV() == 180; })); })
-		.Until([this] { return controller.GetPOV() == 180; }));
-		//RasPi control (up on D-Pad)
+		.Until([this] { return controller.GetBackButton(); }));
+		//RasPi control
 
 	// controller.Start().OnTrue(AutoSwitchDrive(&drivetrain, 
 	// 	[this] { return -controller.GetLeftY(); }, 
@@ -92,7 +92,7 @@ void RobotContainer::ConfigureButtonBindings() {
 	 	.FinallyDo(
 	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
 				AutoBalance(&drivetrain)
-	 				.Until([this] { return controller.GetPOV() == 180; })); 
+	 				.Until([this] { return controller.GetBackButton(); })); 
 			}));
 }
 

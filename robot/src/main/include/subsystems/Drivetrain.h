@@ -40,8 +40,11 @@ public:
 	int16_t GetZ();
 
 	void ToggleSolenoid();
+	void ToggleSolenoid(int id[2]);
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
+	void SetSolenoid(int id[2], frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
+	frc::DoubleSolenoid::Value GetSolenoid(int id[2]);
 
 	double GetEncoder(int motorID);
 	void ResetEncoders();
@@ -61,12 +64,9 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
 
-	frc::PneumaticHub hub{DrivetrainConst::HUB_ID};
- 	frc::DoubleSolenoid flSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FL_SOLENOID_ID[0], DrivetrainConst::FL_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid frSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FR_SOLENOID_ID[0], DrivetrainConst::FR_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid blSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BL_SOLENOID_ID[0], DrivetrainConst::BL_SOLENOID_ID[1]);
- 	frc::DoubleSolenoid brSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BR_SOLENOID_ID[0], DrivetrainConst::BR_SOLENOID_ID[1]);
-	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kOff;
+	frc::PneumaticHub hub{DrivetrainConst::HUB_ID}; //move to somewhere else
+ 	frc::DoubleSolenoid frontSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::FRONT_SOLENOID_ID[0], DrivetrainConst::FRONT_SOLENOID_ID[1]);
+ 	frc::DoubleSolenoid backSolenoid = hub.MakeDoubleSolenoid(DrivetrainConst::BACK_SOLENOID_ID[0], DrivetrainConst::BACK_SOLENOID_ID[1]);
 
 	int waitTicksNeeded = -1;
 

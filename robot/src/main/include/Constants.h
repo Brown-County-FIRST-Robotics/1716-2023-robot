@@ -18,13 +18,11 @@ namespace DrivetrainConst {
 	
 	const int PIGEON_ID = 20;
 
-	const int HUB_ID = 42;
+	const int HUB_ID = 10;
 
 	//0 is forward, 1 is reverse
-	const int FL_SOLENOID_ID[2] = {0, 1};
-	const int FR_SOLENOID_ID[2] = {2, 3};
-	const int BL_SOLENOID_ID[2] = {4, 5};
-	const int BR_SOLENOID_ID[2] = {6, 7};
+	const int FRONT_SOLENOID_ID[2] = {0, 1};
+	const int BACK_SOLENOID_ID[2] = {2, 3};
 
 	const int WAIT_TICKS = 3; //solenoids
 
