@@ -3,102 +3,87 @@
 #include "subsystems/Arm.h"
 #include <math.h>
 
-Arm::Arm() {}
+Arm::Arm() {
+	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+	shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
+	shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
+}
 
 void Arm::Periodic() {
-	if (directionTicks == 0) {
-		upperArmDirection.Set(frc::DoubleSolenoid::Value::kOff);
-		forearmDirection.Set(frc::DoubleSolenoid::Value::kOff);
-	}
-	directionTicks--;
+	if (directionTicks == 0)
+		armDirection.Set(frc::DoubleSolenoid::Value::kOff);
+	else if (directionTicks > -1)
+		directionTicks--;
 
-	if (upperArmBrakeTicks == 0) {
-		upperArmBrake.Set(frc::DoubleSolenoid::Value::kOff);
-	}
-	upperArmBrakeTicks--;
-	
-	if (forearmBrakeTicks == 0) {
-		forearmBrake.Set(frc::DoubleSolenoid::Value::kOff);
-	}
-	forearmBrakeTicks--;
+	if (brakeTicks == 0)
+		armBrake.Set(frc::DoubleSolenoid::Value::kOff);
+	else if (brakeTicks > -1)
+		brakeTicks--;
 
-	if (clawTicks == 0) {
+	if (clawTicks == 0)
 		claw.Set(frc::DoubleSolenoid::Value::kOff);
-	}
-	clawTicks--;
+	else if (clawTicks > -1)
+		clawTicks--;
 }
 
-void Arm::ToggleDirection() {
-	if (direction == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
-		upperArmDirection.Set(frc::DoubleSolenoid::Value::kForward);
-		forearmDirection.Set(frc::DoubleSolenoid::Value::kForward);
-		direction = frc::DoubleSolenoid::Value::kForward;
+void Arm::SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position) {
+	shoulder.SetSoftLimit(direction, position);
+}
+
+void Arm::SetShoulder(double speed) {
+	shoulder.Set(speed);
+}
+
+void Arm::ToggleArmDirection() {
+	if (directionPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		armDirection.Set(frc::DoubleSolenoid::Value::kForward);
+		directionPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
-		upperArmDirection.Set(frc::DoubleSolenoid::Value::kReverse);
-		forearmDirection.Set(frc::DoubleSolenoid::Value::kReverse);
-		direction = frc::DoubleSolenoid::Value::kReverse;
+		armDirection.Set(frc::DoubleSolenoid::Value::kReverse);
+		directionPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
 	directionTicks = SolenoidConst::WAIT_TICKS;
 }
 
-void Arm::SetDirection(frc::DoubleSolenoid::Value value) {
-	upperArmDirection.Set(value);
-	forearmDirection.Set(value);
-	direction = value;
+void Arm::SetArmDirection(frc::DoubleSolenoid::Value value) {
+	armDirection.Set(value);
+	directionPos = value;
 	
 	directionTicks = SolenoidConst::WAIT_TICKS;
 }
 
-frc::DoubleSolenoid::Value Arm::GetDirection() {
-	return direction;
+frc::DoubleSolenoid::Value Arm::GetArmDirection() {
+	return directionPos;
 }
 
-void Arm::ToggleUpperArmActive() {
-	if (upperArmActive == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
-		upperArmBrake.Set(frc::DoubleSolenoid::Value::kForward);
-		upperArmActive = frc::DoubleSolenoid::Value::kForward;
+void Arm::ToggleArmActive() {
+	if (brakePos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		armBrake.Set(frc::DoubleSolenoid::Value::kForward);
+		brakePos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
-		upperArmBrake.Set(frc::DoubleSolenoid::Value::kReverse);
-		upperArmActive = frc::DoubleSolenoid::Value::kReverse;
+		armBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+		brakePos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
-	upperArmBrakeTicks = SolenoidConst::WAIT_TICKS;
+	brakeTicks = SolenoidConst::WAIT_TICKS;
 }
 
-void Arm::SetUpperArmActive(frc::DoubleSolenoid::Value value) {
-	upperArmBrake.Set(value);
-	upperArmActive = value;
-	
-	upperArmBrakeTicks = SolenoidConst::WAIT_TICKS;
-}
-
-frc::DoubleSolenoid::Value Arm::GetUpperArmActive() {
-	return upperArmActive;
-}
-
-void Arm::ToggleForearmActive() {
-	if (forearmActive == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
-		forearmBrake.Set(frc::DoubleSolenoid::Value::kForward);
-		forearmActive = frc::DoubleSolenoid::Value::kForward;
+void Arm::SetArmActive(bool active) {
+	if (active) {
+		armBrake.Set(frc::DoubleSolenoid::Value::kForward);
+		brakePos = frc::DoubleSolenoid::Value::kForward;
 	}
-	else { //if not reverse, set to reverse
-		forearmBrake.Set(frc::DoubleSolenoid::Value::kReverse);
-		forearmActive = frc::DoubleSolenoid::Value::kReverse;
+	else {
+		armBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+		brakePos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
-	forearmBrakeTicks = SolenoidConst::WAIT_TICKS;
+	brakeTicks = SolenoidConst::WAIT_TICKS;
 }
 
-void Arm::SetForearmActive(frc::DoubleSolenoid::Value value) {
-	forearmBrake.Set(value);
-	forearmActive = value;
-	
-	forearmBrakeTicks = SolenoidConst::WAIT_TICKS;
-}
-
-frc::DoubleSolenoid::Value Arm::GetForearmActive() {
-	return forearmActive;
+frc::DoubleSolenoid::Value Arm::GetArmActive() {
+	return brakePos;
 }

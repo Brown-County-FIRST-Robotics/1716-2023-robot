@@ -34,10 +34,12 @@ namespace PIDConst {
 
 namespace ArmConst
 { 
+	const int SHOULDER_ID = 50;
+
 	//0 is forward, 1 is reverse
-	const int UPPER_ARM_BRAKE_ID[2] = {2, 3};
-	const int UPPER_ARM_DIRECTION_ID[2] = {4, 5};
-	const int FOREARM_BRAKE_ID[2] = {6, 7};
-	const int FOREARM_DIRECTION_ID[2] = {8, 9};
-	const int CLAW_ID[2] = {10, 11};
+	const int ARM_BRAKE_ID[2] = {2, 3};
+	const int ARM_DIRECTION_ID[2] = {4, 5};
+	const int CLAW_ID[2] = {6, 7};
+
+	const int SHOULDER_SPEED = .5;
 };

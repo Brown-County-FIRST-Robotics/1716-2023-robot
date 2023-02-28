@@ -7,7 +7,10 @@
 
 class ArmTeleopControl : public frc2::CommandHelper<frc2::CommandBase, ArmTeleopControl> {
 public:
-	explicit ArmTeleopControl(Arm* subsystem, std::function<int()> POV);
+	explicit ArmTeleopControl(Arm* subsystem, 
+		std::function<double()> shoulderAxis, 
+		std::function<bool()> armUpButton, 
+		std::function<bool()> armDownButton);
 
 	void Execute() override;
 	
@@ -16,5 +19,10 @@ public:
 private:
 	Arm* arm;
 
-	std::function<int()> pov;
+	std::function<double()> shoulder;
+	std::function<bool()> armUp;
+	std::function<bool()> armDown;
+
+	bool armUpPressed = false;
+	bool armDownPressed = false;
 };

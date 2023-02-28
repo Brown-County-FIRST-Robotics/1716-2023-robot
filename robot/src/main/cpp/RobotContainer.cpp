@@ -9,7 +9,6 @@
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
-#include "commands/AutoSwitchDrive.h"
 #include "commands/ArmTeleopControl.h"
 
 using frc::XboxController;
@@ -30,7 +29,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller.GetPOV(); }).ToPtr());
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetLeftY(); }, 
+		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
@@ -75,21 +75,6 @@ void RobotContainer::ConfigureButtonBindings() {
 		.Until([this] { return controller.GetBackButton(); }));
 		//RasPi control
 
-	// controller.Start().OnTrue(AutoSwitchDrive(&drivetrain, 
-	// 	[this] { return -controller.GetLeftY(); }, 
-	// 	[this] { return controller.GetLeftX(); }, 
-	// 	[this] { return controller.GetRightX(); },
-	// 	[this] { return controller.GetBButton(); } )
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			AutoSwitchDrive(&drivetrain, 
-	// 				[this] { return -controller.GetLeftY(); }, 
-	// 				[this] { return controller.GetLeftX(); }, 
-	// 				[this] { return controller.GetRightX(); },
-	// 				[this] { return controller.GetBButton(); } )
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetPOV() == 180; }));
-
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
 		.OnTrue(AutoBalance(&drivetrain)
 	 	.FinallyDo(
@@ -97,17 +82,6 @@ void RobotContainer::ConfigureButtonBindings() {
 				AutoBalance(&drivetrain)
 	 				.Until([this] { return controller.GetBackButton(); })); 
 			}).Until([this] { return !startAutoBalance.Get(); }));
-
-	//Arm:
-	controller2.Y().OnTrue(frc2::InstantCommand([this] {arm.SetDirection(frc::DoubleSolenoid::Value::kForward);}, {&arm}).ToPtr());
-
-	controller2.A().OnTrue(frc2::InstantCommand([this] {arm.SetDirection(frc::DoubleSolenoid::Value::kReverse);}, {&arm}).ToPtr());
-
-	controller2.LeftBumper().WhileTrue(frc2::StartEndCommand([this] { arm.SetUpperArmActive(frc::DoubleSolenoid::Value::kForward); }, 
-		[this] { arm.SetUpperArmActive(frc::DoubleSolenoid::Value::kReverse); }, {&arm}).ToPtr());
-
-	controller2.RightBumper().WhileTrue(frc2::StartEndCommand([this] { arm.SetForearmActive(frc::DoubleSolenoid::Value::kForward); }, 
-		[this] { arm.SetForearmActive(frc::DoubleSolenoid::Value::kReverse); }, {&arm}).ToPtr());
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

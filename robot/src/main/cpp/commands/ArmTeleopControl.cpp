@@ -2,44 +2,34 @@
 
 #include <utility>
 
-ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<int()> POV) 
-	: arm(subsystem), pov(std::move(POV))
+ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoulderAxis, 
+	std::function<bool()> armUpButton, std::function<bool()> armDownButton) :
+	shoulder(std::move(shoulderAxis)), armUp(std::move(armUpButton)), armDown(std::move(armDownButton))
 {
 	AddRequirements(subsystem);
 }
 
 void ArmTeleopControl::Execute() {
-	switch (pov()) {
-		case 0:
-			arm->SetToPosition(arm->getX(), arm->getY() + 1);
-			break;
-		case 45:
-			arm->SetToPosition(arm->getX() + 1, arm->getY() + 1);
-			break;
-		case 90:
-			arm->SetToPosition(arm->getX() + 1, arm->getY());
-			break;
-		case 135:
-			arm->SetToPosition(arm->getX() + 1, arm->getY() - 1);
-			break;
-		case 180:
-			arm->SetToPosition(arm->getX(), arm->getY() - 1);
-			break;
-		case 225:
-			arm->SetToPosition(arm->getX() - 1, arm->getY() - 1);
-			break;
-		case 270:
-			arm->SetToPosition(arm->getX() - 1, arm->getY());
-			break;
-		case 315:
-			arm->SetToPosition(arm->getX() - 1, arm->getY() + 1);
-			break;
-		case -1:
-			arm->SetToPosition(arm->getX(), arm->getY());
-			break;
+	if ((!armUpPressed && armUp())) {
+		arm->SetArmDirection(frc::DoubleSolenoid::Value::kForward);
+		arm->SetArmActive(true);
+		armUpPressed = true;
 	}
+	else if ((!armDownPressed && armDown())) {
+		arm->SetArmDirection(frc::DoubleSolenoid::Value::kReverse);
+		arm->SetArmActive(true);
+		armDownPressed = true;
+	}
+	else if ((armUpPressed && !armUp()) || (armDownPressed && !armDown())) {
+		arm->SetArmActive(false);
+		armUpPressed = false;
+		armDownPressed = false;
+	}
+
+	arm->SetShoulder(-shoulder() * ArmConst::SHOULDER_SPEED);
 }
 
 void ArmTeleopControl::End(bool interrupted) {
-	arm->SetMotorsZero();
+	arm->SetArmActive(false);
+	arm->SetShoulder(0);
 }
