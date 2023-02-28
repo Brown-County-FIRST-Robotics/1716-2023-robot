@@ -87,3 +87,7 @@ void Arm::SetArmActive(bool active) {
 frc::DoubleSolenoid::Value Arm::GetArmActive() {
 	return brakePos;
 }
+
+double Arm::GetArmAngle() {
+	return armPotentiometer.Get();
+}

@@ -3,6 +3,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DoubleSolenoid.h>
 #include <rev/CANSparkMax.h>
+#include <frc/AnalogPotentiometer.h>
 
 #include "Constants.h"
 
@@ -23,6 +24,8 @@ public:
 	void SetArmActive(bool active);
 	frc::DoubleSolenoid::Value GetArmActive();
 
+	double GetArmAngle();
+
 private:
 	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 
@@ -36,4 +39,6 @@ private:
 
 	frc::DoubleSolenoid::Value directionPos = frc::DoubleSolenoid::Value::kReverse;
 	frc::DoubleSolenoid::Value brakePos = frc::DoubleSolenoid::Value::kReverse;
+
+	frc::AnalogPotentiometer armPotentiometer{ArmConst::ARM_POTENTIOMETER_ID};
 };
