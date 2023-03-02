@@ -1,6 +1,6 @@
 # FIRST team 1716 Redbird Robotics 2023
 
-## Software Is Eating Our Robot
+## Software Is Eating Our Team
 If you're here following the URL from our publication about some of the software lessons learned this season, welcome!
 
 A PDF version of the publication (will be here soon)
