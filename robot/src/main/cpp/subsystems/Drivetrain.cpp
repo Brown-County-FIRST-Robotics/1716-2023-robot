@@ -31,6 +31,28 @@ Drivetrain::Drivetrain() :
 	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
 }
 
+void Drivetrain::Periodic() {
+	if (waitTicksNeeded == 0) {
+		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
+	}
+	waitTicksNeeded--;
+
+	//Networktables
+	if (resetEncodersEntry.Get()) {
+		ResetEncoders();
+		resetEncodersEntry.Set(false);
+	}
+
+	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID));
+	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID));
+	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
+	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
+
+	xAccel.Set(GetX());
+	yAccel.Set(GetY());
+	yaw.Set(GetYaw());
+}
+
 void Drivetrain::Drive(double x, double y, double z) {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
 		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
@@ -88,28 +110,6 @@ int16_t Drivetrain::GetZ() {
 	return accelerometer[2];
 }
 
-void Drivetrain::Periodic() {
-	if (waitTicksNeeded == 0) {
-		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
-	}
-	waitTicksNeeded--;
-
-	//Networktables
-	if (resetEncodersEntry.Get()) {
-		ResetEncoders();
-		resetEncodersEntry.Set(false);
-	}
-
-	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID));
-	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID));
-	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
-	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
-
-	xAccel.Set(GetX());
-	yAccel.Set(GetY());
-	yaw.Set(GetYaw());
-}
-
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
 		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
@@ -120,14 +120,14 @@ void Drivetrain::ToggleSolenoid() {
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
-	waitTicksNeeded = DrivetrainConst::WAIT_TICKS;
+	waitTicksNeeded = SolenoidConst::WAIT_TICKS;
 }
 
 void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
 	solenoid.Set(position);
 	solenoidPos = position;
 	
-	waitTicksNeeded = DrivetrainConst::WAIT_TICKS;
+	waitTicksNeeded = SolenoidConst::WAIT_TICKS;
 }
 
 frc::DoubleSolenoid::Value Drivetrain::GetSolenoid() {

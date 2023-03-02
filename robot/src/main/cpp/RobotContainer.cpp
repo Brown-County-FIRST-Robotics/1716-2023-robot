@@ -1,7 +1,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc2/command/RunCommand.h>
+#include <frc2/command/StartEndCommand.h>
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -9,7 +9,6 @@
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
 #include "commands/RasPiDrive.h"
-#include "commands/AutoSwitchDrive.h"
 #include "commands/ArmTeleopControl.h"
 
 using frc::XboxController;
@@ -30,7 +29,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller.GetPOV(); }).ToPtr());
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetLeftY(); }, 
+		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
@@ -38,7 +38,7 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}).ToPtr());
+	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes (controlled with D-Pad, cancelled on D-Pad down) 
@@ -74,21 +74,6 @@ void RobotContainer::ConfigureButtonBindings() {
 				.Until([this] { return controller.GetPOV() == 180; })); })
 		.Until([this] { return controller.GetBackButton(); }));
 		//RasPi control
-
-	// controller.Start().OnTrue(AutoSwitchDrive(&drivetrain, 
-	// 	[this] { return -controller.GetLeftY(); }, 
-	// 	[this] { return controller.GetLeftX(); }, 
-	// 	[this] { return controller.GetRightX(); },
-	// 	[this] { return controller.GetBButton(); } )
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			AutoSwitchDrive(&drivetrain, 
-	// 				[this] { return -controller.GetLeftY(); }, 
-	// 				[this] { return controller.GetLeftX(); }, 
-	// 				[this] { return controller.GetRightX(); },
-	// 				[this] { return controller.GetBButton(); } )
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetPOV() == 180; }));
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
 		.OnTrue(AutoBalance(&drivetrain)
