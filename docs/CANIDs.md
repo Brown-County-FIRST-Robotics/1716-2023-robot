@@ -6,10 +6,10 @@ Each subsystem on the robot gets 50 IDs, with the first 20 set aside for output 
 
 |Component|ID|
 |---|---|
-|Front Left Motor|0|
-|Front Right Motor|1|
-|Back Left Motor|2|
-|Back Right Motor|3|
+|Front Left Motor|1|
+|Front Right Motor|2|
+|Back Left Motor|3|
+|Back Right Motor|4|
 |||
 |Pneumatic Hub|10|
 |||
