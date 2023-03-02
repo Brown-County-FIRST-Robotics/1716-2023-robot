@@ -6,6 +6,10 @@
 # MIT License
 #
 
+#note that this is simply a copy retrieved by running wget https://raw.githubusercontent.com/RPi-Distro/rpi-source/ceee03b5fb9cee65dd933f4784bb455cfa872a76/rpi-source
+
+
+
 import io
 import os
 import struct
