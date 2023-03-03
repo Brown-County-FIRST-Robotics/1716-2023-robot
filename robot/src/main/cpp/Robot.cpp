@@ -1,12 +1,9 @@
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 
 void Robot::RobotInit() {
-	SolenoidConst::HUB.DisableCompressor();
-
 	//Pickup and placement position selector
 	pickUpPos[0] = pickUpGrid
 		.Add("Drop", false)

@@ -12,6 +12,7 @@
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <frc/shuffleboard/Shuffleboard.h>
 
 #include "Constants.h"
 
@@ -62,6 +63,7 @@ private:
 
  	frc::DoubleSolenoid solenoid = SolenoidConst::HUB.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kReverse;
+	nt::GenericEntry* solenoidIndicator;
 
 	int waitTicksNeeded = -1;
 

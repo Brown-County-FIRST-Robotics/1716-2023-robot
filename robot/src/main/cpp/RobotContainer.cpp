@@ -1,4 +1,3 @@
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc2/command/StartEndCommand.h>
@@ -39,7 +38,9 @@ RobotContainer::RobotContainer() {
 	// autonomousChooser.AddOption("Back Up", &frc2::ParallelDeadlineGroup(frc2::WaitCommand(2.0_s),
 	// 	frc2::StartEndCommand([this] {drivetrain.Drive(-.2, 0, 0);}, [this] {drivetrain.Drive(0, 0, 0);}, {&drivetrain})));
 	// autonomousChooser.AddOption("Nothing", &frc2::InstantCommand());
-	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
+
+	frc::Shuffleboard::GetTab("Drive")
+		.Add("Autonomous Routine", &autonomousChooser);
 }
 
 void RobotContainer::ConfigureButtonBindings() {

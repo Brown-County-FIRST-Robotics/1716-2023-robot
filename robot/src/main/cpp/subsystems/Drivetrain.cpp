@@ -29,6 +29,10 @@ Drivetrain::Drivetrain() :
 	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
 	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
 	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
+
+	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
+		.Add("Drive Solenoid", false)
+		.GetEntry();
 }
 
 void Drivetrain::Periodic() {
@@ -113,10 +117,12 @@ int16_t Drivetrain::GetZ() {
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
 		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoidIndicator->SetBoolean(true);
 		solenoidPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
 		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoidIndicator->SetBoolean(false);
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
@@ -125,6 +131,11 @@ void Drivetrain::ToggleSolenoid() {
 
 void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
 	solenoid.Set(position);
+	if (position == frc::DoubleSolenoid::Value::kForward)
+		solenoidIndicator->SetBoolean(true);
+	else
+		solenoidIndicator->SetBoolean(false);
+
 	solenoidPos = position;
 	
 	waitTicksNeeded = SolenoidConst::WAIT_TICKS;

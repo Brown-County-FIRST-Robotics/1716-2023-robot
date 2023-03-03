@@ -27,7 +27,7 @@ public:
 	double GetArmAngle();
 
 private:
-	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+	// rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 
 	frc::DoubleSolenoid armBrake = SolenoidConst::HUB.MakeDoubleSolenoid(ArmConst::ARM_BRAKE_ID[0], ArmConst::ARM_BRAKE_ID[1]);
 	frc::DoubleSolenoid armDirection = SolenoidConst::HUB.MakeDoubleSolenoid(ArmConst::ARM_DIRECTION_ID[0], ArmConst::ARM_DIRECTION_ID[1]);

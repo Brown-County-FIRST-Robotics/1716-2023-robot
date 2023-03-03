@@ -4,7 +4,7 @@
 #include <math.h>
 
 Arm::Arm() {
-	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+	// shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
 	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
 }
@@ -31,7 +31,7 @@ void Arm::Periodic() {
 // }
 
 void Arm::SetShoulder(double speed) {
-	shoulder.Set(speed);
+	// shoulder.Set(speed);
 }
 
 void Arm::ToggleArmDirection() {
