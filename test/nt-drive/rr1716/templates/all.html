@@ -23,7 +23,16 @@ Pick Camera {{ num }}
 {%endfor%}
     </div>
 </div>
-
+<p id="apriltag"></p>
 <button onclick="window.location.href='/picker'">Color Picker</button>
+<script>
+
+async function getApriltag(){
+    let apriltag_output=fetch('/apriltags');
+    document.getElementById('apriltag').innerText=await apriltag_output.text();
+}
+setInterval(getApriltag, 200);
+
+</script>
 </body>
 </html>
