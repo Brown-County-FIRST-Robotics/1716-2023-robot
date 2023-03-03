@@ -13,7 +13,7 @@ public:
 
 	void Periodic() override;
 
-	void SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position);
+	// void SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position);
 	void SetShoulder(double speed);
 
 	void ToggleArmDirection();
@@ -29,9 +29,9 @@ public:
 private:
 	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 
-	frc::DoubleSolenoid armBrake = SolenoidConst::hub.MakeDoubleSolenoid(ArmConst::ARM_BRAKE_ID[0], ArmConst::ARM_BRAKE_ID[1]);
-	frc::DoubleSolenoid armDirection = SolenoidConst::hub.MakeDoubleSolenoid(ArmConst::ARM_DIRECTION_ID[0], ArmConst::ARM_DIRECTION_ID[1]);
-	frc::DoubleSolenoid claw = SolenoidConst::hub.MakeDoubleSolenoid(ArmConst::CLAW_ID[0], ArmConst::CLAW_ID[1]);
+	frc::DoubleSolenoid armBrake = SolenoidConst::HUB.MakeDoubleSolenoid(ArmConst::ARM_BRAKE_ID[0], ArmConst::ARM_BRAKE_ID[1]);
+	frc::DoubleSolenoid armDirection = SolenoidConst::HUB.MakeDoubleSolenoid(ArmConst::ARM_DIRECTION_ID[0], ArmConst::ARM_DIRECTION_ID[1]);
+	frc::DoubleSolenoid claw = SolenoidConst::HUB.MakeDoubleSolenoid(ArmConst::CLAW_ID[0], ArmConst::CLAW_ID[1]);
 
 	int directionTicks = -1;
 	int brakeTicks = -1;

@@ -5,8 +5,8 @@
 
 Arm::Arm() {
 	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-	shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
-	shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
+	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
+	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
 }
 
 void Arm::Periodic() {
@@ -26,9 +26,9 @@ void Arm::Periodic() {
 		clawTicks--;
 }
 
-void Arm::SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position) {
-	shoulder.SetSoftLimit(direction, position);
-}
+// void Arm::SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position) {
+// 	shoulder.SetSoftLimit(direction, position);
+// }
 
 void Arm::SetShoulder(double speed) {
 	shoulder.Set(speed);

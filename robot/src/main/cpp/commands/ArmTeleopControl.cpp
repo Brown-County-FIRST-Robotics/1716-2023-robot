@@ -26,7 +26,7 @@ void ArmTeleopControl::Execute() {
 		armDownPressed = false;
 	}
 
-	arm->SetShoulder(-shoulder() * ArmConst::SHOULDER_SPEED);
+	arm->SetShoulder(shoulder() * ArmConst::SHOULDER_SPEED);
 }
 
 void ArmTeleopControl::End(bool interrupted) {

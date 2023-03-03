@@ -6,7 +6,7 @@
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
-	static frc::PneumaticHub hub{10}; //for making solenoids
+	static frc::PneumaticHub HUB{10}; //for making solenoids
 	const int WAIT_TICKS = 3;
 };
 

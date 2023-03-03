@@ -60,7 +60,7 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
 
- 	frc::DoubleSolenoid solenoid = SolenoidConst::hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
+ 	frc::DoubleSolenoid solenoid = SolenoidConst::HUB.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 
 	int waitTicksNeeded = -1;
