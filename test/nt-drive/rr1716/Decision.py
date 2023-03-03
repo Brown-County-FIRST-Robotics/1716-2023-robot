@@ -195,6 +195,8 @@ class AutoBalance(Action):
         pass  # if self.referrer=="auto":
         # return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
 
+def convert(inp):
+    return [int(i) for i in inp]
 
 class AddScreenVals(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -231,15 +233,15 @@ class AddScreenVals(Action):
         april_futures = []
         for cam in self.cams:
             april_futures.append(self.april_executor.submit(AprilTags.getCoords, cam.get_gray()))
-        for future in april_futures:
+        for cam, future in zip(self.cams,april_futures):
             detections = future.result()
-            for detection, cam in zip(detections,self.cams):
-                cam.add_rectangle(detection[0],detection[2], [0,0,255])
-                self.cone.findCone(cam.frame)
-                cam.frame=self.cone.drawBoundRect(cam.frame, [255,0,0])
-                self.cone.findCube(cam.frame)
-                cam.frame = self.cone.drawBoundRect(cam.frame, [0, 255, 0])
-
+            for detection in detections:
+                cam.add_rectangle(convert(detection[0]),convert(detection[2]), [0,0,255])
+            self.cone.findCone(cam.frame)
+            print(self.cone.notfound)
+            cam.frame=self.cone.drawBoundRect(cam.frame, [255,0,0])
+            self.cone.findCube(cam.frame)
+            cam.frame = self.cone.drawBoundRect(cam.frame, [0, 255, 0])
 
     def ShouldEnd(self):
         return False
