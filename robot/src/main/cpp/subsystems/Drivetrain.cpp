@@ -1,10 +1,11 @@
 #include "subsystems/Drivetrain.h"
 
-Drivetrain::Drivetrain() :
+Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	frontLeftEncoder{frontLeft.GetEncoder()}, 
 	frontRightEncoder{frontRight.GetEncoder()}, 
 	backLeftEncoder{backLeft.GetEncoder()}, 
-	backRightEncoder{backRight.GetEncoder()} 
+	backRightEncoder{backRight.GetEncoder()},
+	hub{hubRef}
 {
 	frontLeft.SetInverted(false);
 	frontRight.SetInverted(true);
@@ -32,6 +33,10 @@ Drivetrain::Drivetrain() :
 
 	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
 		.Add("Drive Solenoid", false)
+		.WithSize(2, 2)
+		.WithProperties({
+			{"Color when true", nt::Value::MakeString("Maroon")},
+			{"Color when false", nt::Value::MakeString("Cyan")}})
 		.GetEntry();
 }
 

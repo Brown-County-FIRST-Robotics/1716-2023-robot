@@ -3,6 +3,7 @@
 #include <frc2/command/StartEndCommand.h>
 #include <frc2/command/ParallelDeadlineGroup.h>
 #include <frc2/command/WaitCommand.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -31,16 +32,15 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetBButton(); } ));
 
 	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return -controller2.GetLeftY(); }, 
-		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }));
+		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }, [this] { return controller2.GetXButton(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
 	// autonomousChooser.AddOption("Back Up", &frc2::ParallelDeadlineGroup(frc2::WaitCommand(2.0_s),
 	// 	frc2::StartEndCommand([this] {drivetrain.Drive(-.2, 0, 0);}, [this] {drivetrain.Drive(0, 0, 0);}, {&drivetrain})));
-	// autonomousChooser.AddOption("Nothing", &frc2::InstantCommand());
+	autonomousChooser.AddOption("Nothing", &nothing);
 
-	frc::Shuffleboard::GetTab("Drive")
-		.Add("Autonomous Routine", &autonomousChooser);
+	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -124,3 +124,5 @@ void RobotContainer::UpdateControllerLogging() {
 	ls->SetBoolean(controller.GetLeftStickButton());
 	rs->SetBoolean(controller.GetRightStickButton());
 }
+
+bool Nothing::IsFinished() { return true; }

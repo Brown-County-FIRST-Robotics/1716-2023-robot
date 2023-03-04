@@ -7,10 +7,16 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/BooleanTopic.h>
+#include <frc/PneumaticHub.h>
 
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveBackThenBalance.h"
+
+class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
+public:
+	bool IsFinished() override;
+};
 
 class RobotContainer {
 public:
@@ -22,8 +28,10 @@ private:
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};
 	
-	Drivetrain drivetrain;
-	Arm arm;
+	frc::PneumaticHub hub{SolenoidConst::HUB_ID};
+
+	Drivetrain drivetrain{hub};
+	Arm arm{hub};
 
 	void ConfigureButtonBindings();
 
@@ -36,6 +44,7 @@ private:
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
+	Nothing nothing;
 
 
 	//Controller logging

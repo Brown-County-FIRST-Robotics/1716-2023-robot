@@ -2,13 +2,12 @@
 // #include <units/time.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
-#include <frc/PneumaticHub.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
-	static frc::PneumaticHub HUB{10}; //for making solenoids
 	const int WAIT_TICKS = 3;
-};
+	const int HUB_ID = 10;
+}
 
 namespace DrivetrainConst {
 	const int FRONT_LEFT_ID = 1;
@@ -27,16 +26,16 @@ namespace DrivetrainConst {
 };
 
 namespace PIDConst {
-const double ULTIMATEGAIN = .0067;
+	const double ULTIMATEGAIN = .0067;
 	const double OSCPERIOD = 3.49;
 
-	const double PROPORTIONAL_FACTOR = (ULTIMATEGAIN * .6) * 1.9;
+	const double PROPORTIONAL_FACTOR = (.0067 * .6) * 1.9 * 1.5;
 	const double INTEGRAL_FACTOR = (((ULTIMATEGAIN * 1.2) / OSCPERIOD) * .5);
-	const double DERIVATIVE_FACTOR = ((ULTIMATEGAIN * OSCPERIOD) * 0.075) * 0.8;
+	const double DERIVATIVE_FACTOR = ((ULTIMATEGAIN * OSCPERIOD) * 0.075) * 1.5;
 };
 
 namespace ArmConst
-{ 
+{
 	const int SHOULDER_ID = 50;
 
 	//0 is forward, 1 is reverse
@@ -44,7 +43,7 @@ namespace ArmConst
 	const int ARM_DIRECTION_ID[2] = {4, 5};
 	const int CLAW_ID[2] = {6, 7};
 
-	const double SHOULDER_SPEED = .5;
+	const double SHOULDER_SPEED = .25;
 
 	//Analog ID
 	const int ARM_POTENTIOMETER_ID = 0;
