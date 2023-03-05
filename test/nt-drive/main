@@ -112,7 +112,6 @@ def main():
         signal.signal(signal.SIGINT, originalhandler)
     signal.signal(signal.SIGINT, handler)
 
-    DEATHSTARE.start(cameras)
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
@@ -120,6 +119,12 @@ def main():
         current_action = Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
     elif args.auto_mode == 'DEATHSTAREDEMO':
         current_action = Decision.AddScreenVals(filter, cameras, nt_table, april_executor, 'auto')
+    else:
+        for camera in cameras:
+            camera.shutdown()
+        assert False, f'"{args.auto_mode}" does not have a matching `elif` block'
+
+    DEATHSTARE.start(cameras)
 
     lastframetime = 0
     try:
