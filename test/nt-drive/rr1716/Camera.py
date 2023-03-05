@@ -131,7 +131,7 @@ class Camera:
     def add_rectangle(self, start, end, color, thickness=2):
         logging.debug("camera.add_rectangle")
         self.rectangles = [ start, end, thickness ]
-        #self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
+        self.frame = cv2.rectangle(self.frame, start, end, color, thickness)
 
     def clear_rectangle(self):
         logging.debug("camera.clear_rectangle")

@@ -210,7 +210,7 @@ class GamePiece():
         self.setUpright(False) #don't care if cube is upright
 
     def drawBoundRect(self, frame, color):
-        cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), color, 4, cv2.LINE_AA)
+        return cv2.rectangle(frame, (int(self.imgX - self.w / 2), int(self.imgY - self.h / 2)), (int(self.imgX + self.w / 2), int(self.imgY + self.h / 2)), color, 4, cv2.LINE_AA)
 
     #green if frame
     def drawCone(self, frame):

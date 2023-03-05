@@ -56,6 +56,34 @@ class Detection:
         self.field_y = camera_Y
         return camera_X, camera_Y, thetaCA
 
+def getCoords(img, valid_tags=range(1, 9)):
+    if img is None:
+        return None
+    options = apriltag.DetectorOptions(families='tag16h5',
+                                       border=1,
+                                       nthreads=1,
+                                       quad_decimate=1.0,
+                                       quad_blur=0.0,
+                                       refine_edges=True,
+                                       refine_decode=False,
+                                       refine_pose=True,
+                                       debug=False,
+                                       quad_contours=True)
+    # Create a detector with given options
+    detector = apriltag.Detector(options)
+    # Find the apriltags
+    detection_results = detector.detect(img)
+    detections=[]
+    if len(detection_results) > 0:  # Check if there are any apriltags
+        for detection in detection_results:
+            # Check if apriltag is allowed
+            if detection.tag_id not in valid_tags:
+                continue
+            if detection.hamming != 0:
+                continue
+            detections.append(detection.corners)
+    return detections
+
 
 def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), roll_threshold=20, check_hamming=True):
     """

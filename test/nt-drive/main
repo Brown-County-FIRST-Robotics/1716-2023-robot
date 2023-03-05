@@ -114,7 +114,7 @@ def main():
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
-    current_action=Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
+    current_action=Decision.AddScreenVals(filter, cameras, nt_table, april_executor, 'auto')
 
 
     lastframetime = 0

@@ -1,5 +1,7 @@
 import math
 import logging
+import os
+
 from rr1716 import Vision
 from rr1716 import AprilTags
 from rr1716 import Strategy
@@ -202,6 +204,57 @@ class AutoBalance(Action):
 
     def MakeChild(self):
         return GetDriverCommand(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+
+def convert(inp):
+    return [int(i) for i in inp]
+
+class AddScreenVals(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        col = []
+        if os.path.exists("cube_picked_color"):
+            with open("cube_picked_color", "r") as file:
+                for line in file:
+                    for x in line.split():
+                        col.append(int(x))
+
+        self.cone = Vision.GamePiece()
+        while len(col) < 3:
+            col.append(0)
+
+        lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
+        upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
+
+        for i in range(len(lower)):
+            if lower[i] < 0:
+                lower[i] = 0
+            if lower[i] > 255:
+                lower[i] = 255
+
+            if upper[i] < 0:
+                upper[i] = 0
+            if upper[i] > 255:
+                upper[i] = 255
+
+        self.cone.setLowerColor(np.array(lower, dtype=np.uint8))
+        self.cone.setUpperColor(np.array(upper, dtype=np.uint8))
+
+    def Step(self):
+        april_futures = []
+        for cam in self.cams:
+            april_futures.append(self.april_executor.submit(AprilTags.getCoords, cam.get_gray()))
+        for cam, future in zip(self.cams,april_futures):
+            detections = future.result()
+            for detection in detections:
+                cam.add_rectangle(convert(detection[0]),convert(detection[2]), [0,0,255])
+            self.cone.findCone(cam.frame)
+            print(self.cone.notfound)
+            cam.frame=self.cone.drawBoundRect(cam.frame, [255,0,0])
+            self.cone.findCube(cam.frame)
+            cam.frame = self.cone.drawBoundRect(cam.frame, [0, 255, 0])
+
+    def ShouldEnd(self):
+        return False
 
 
 class GetDriverCommand(Action):
