@@ -16,8 +16,7 @@ class Action:
         self.filter = filter
         self.april_executor = april_executor
 
-
-    def GetFilter(self):
+    def FetchApriltags(self):
         robotLocation = None
         april_futures = []
 
@@ -30,6 +29,8 @@ class Action:
                 break
         if robotLocation is not None:
             self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+
+    def GetFilter(self):
         logging.info(f'filter pos: {self.filter.getCurrentPos(self.nt_interface)}')
         return self.filter.getCurrentPos(self.nt_interface)
 
@@ -37,7 +38,7 @@ class Action:
         pass
 
     def Step(self):
-        pass
+        self.FetchApriltags()
 
     def ShouldEnd(self):
         return True
@@ -54,6 +55,7 @@ class StartFilter(Action):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
 
     def Step(self):
+        # DO NOT ADD super().step() HERE
         robotLocation = None
         for camera in self.cams:
             res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None)  # check for apriltag
@@ -109,6 +111,7 @@ class DriveToLocation(Action):
         self.location = location
 
     def Step(self):
+        super().Step()
         field_x, field_y, field_r = self.GetFilter()
         cx = math.cos(field_r * math.pi / 180)
         cy = math.sin(field_r * math.pi / 180)
@@ -166,6 +169,10 @@ class GetOnStation(Action):
         self.nt_interface.SwitchToTank()
         self.nt_interface.Drive(0, -1, 0)
 
+    def Step(self):
+        # DO NOT ADD super().step() HERE
+        pass
+
     def ShouldEnd(self):
         accel = self.nt_interface.GetAccel()
         return math.atan(accel[0] / accel[2]) * 180 / math.pi < Strategy.accel_angle_threshold
@@ -181,6 +188,10 @@ class AutoBalance(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.nt_interface.StartAutoBalance()
+
+    def Step(self):
+        # DO NOT ADD super().step() HERE
+        pass
 
     def ShouldEnd(self):
         return self.nt_interface.IsTeleop() and self.referrer=='auto'
