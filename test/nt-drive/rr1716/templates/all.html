@@ -29,7 +29,7 @@ Pick Camera {{ num }}
 
 async function getApriltag(){
     let apriltag_output=fetch('/apriltags');
-    document.getElementById('apriltag').innerText=await apriltag_output.text();
+    document.getElementById('apriltag').innerHTML=await apriltag_output.text();
 }
 setInterval(getApriltag, 200);
 

@@ -7,8 +7,8 @@
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">	
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+
 
 
     <title>Camera View</title>
@@ -65,5 +65,15 @@
 </div>
 
 <button onclick="window.location.href='/picker'">Color Picker</button>
-</body>
+<p id="apriltag"></p>
+<script>
+
+async function getApriltag(){
+    let apriltag_output=await fetch('/apriltags');
+    let april_data=apriltag_output.text();
+    document.getElementById('apriltag').innerHTML=await april_data;
+}
+setInterval(getApriltag, 200);
+</script>
+    </body>
 </html>
