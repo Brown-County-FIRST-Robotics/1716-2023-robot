@@ -121,7 +121,7 @@ def main():
     elif args.auto_mode == 'DEATHSTAREDEMO':
         current_action = Decision.AddScreenVals(filter, cameras, nt_table, april_executor, 'auto')
     elif args.auto_mode == 'DRIVETOAPRILTAG':
-        current_action = Decision.DriveToLocation(filter, cameras, nt_table, april_executor, (684,-294,0))
+        current_action = Decision.StartFilter(filter, cameras, nt_table, april_executor, 'DRIVETOAPRILTAG')
     else:
         for camera in cameras:
             camera.shutdown()

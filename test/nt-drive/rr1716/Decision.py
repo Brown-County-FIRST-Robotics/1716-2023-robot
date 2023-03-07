@@ -72,7 +72,10 @@ class StartFilter(Action):
         return None not in self.filter.lastApril  # check if lastApril has a None, meaning it has not seen an apriltag
 
     def MakeChild(self):
-        return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
+        if self.referrer=='auto':
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
+        elif self.referrer=='DRIVETOAPRILTAG':
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,-294,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
