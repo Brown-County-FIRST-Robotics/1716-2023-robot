@@ -3,12 +3,13 @@
 import logging
 from flask import Flask, render_template, Response, redirect, request
 from threading import Thread
-import rr1716
+from rr1716 import AprilTags
 import cv2
 import numpy as np
 import rr1716
 
 __COLOR_PICK_RANGE__ = 20
+
 
 app = Flask(__name__)
 
@@ -133,6 +134,19 @@ def pick_cube():
     file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
     file.close()
     return redirect("/preview")
+
+@app.route("/apriltags")
+def get_apriltags():
+    res=None
+    for cam in app.Cameras:
+        res=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        if res is not None and res!=[]:
+            break
+    if res:
+        x,y,r=res[0].calcFieldPos()
+        return Response(f'<h3>Field position: x:{x}, y:{y}, r:{r}</h3>', mimetype='text')
+    return Response('<h3>No apriltags Found</h3>', mimetype='text')
+
 
 def start(camera):
     logging.debug("DEATHSTARE.start")

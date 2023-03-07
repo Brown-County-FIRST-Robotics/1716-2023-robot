@@ -64,5 +64,15 @@
 </div>
 
 <button onclick="window.location.href='/picker'">Color Picker</button>
-</body>
+<p id="apriltag"></p>
+<script>
+
+async function getApriltag(){
+    let apriltag_output=await fetch('/apriltags');
+    let april_data=apriltag_output.text();
+    document.getElementById('apriltag').innerHTML=await april_data;
+}
+setInterval(getApriltag, 200);
+</script>
+    </body>
 </html>

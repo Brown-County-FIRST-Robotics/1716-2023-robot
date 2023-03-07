@@ -3,7 +3,7 @@
 import logging
 from networktables import NetworkTables
 
-IP = "10.17.16.2"
+IP = '10.17.16.2'
 
 
 class NetworkTablesWrapper:
@@ -13,12 +13,13 @@ class NetworkTablesWrapper:
         self.pigeon_table = NetworkTables.getTable('1716Pigeon')
         self.game_table = NetworkTables.getTable('1716GameInfo')
         self.encoder_table = NetworkTables.getTable('1716Encoder')
+        self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
-        self.drive_table.putNumber("x", x)
-        self.drive_table.putNumber("y", y)
-        self.drive_table.putNumber("rotation", r)
+        self.drive_table.putNumber('x', x)
+        self.drive_table.putNumber('y', y)
+        self.drive_table.putNumber('rotation', r)
 
     def SwitchToTank(self):
         logging.debug(f'NetworkTablesWrapper.SwitchToTank()')
@@ -147,8 +148,22 @@ class NetworkTablesWrapper:
         logging.debug(f'NetworkTablesWrapper.ResetEncoderVals')
         self.encoder_table.putBoolean('resetEncoder', True)
 
+    def GetPlacement(self):
+        logging.debug(f'NetworkTablesWrapper.GetPlacement')
+        pos = self.dashboard_table.getNumberArray('placePos',[-1,-1])
+        if pos==[-1,-1]:
+            return None
+        return pos
 
-if __name__ == "__main__":
+    def GetPickup(self):
+        logging.debug(f'NetworkTablesWrapper.GetPickup')
+        pos=self.dashboard_table.getNumber('pickupPos',-1)
+        if pos==-1:
+            return None
+        return pos
+
+
+if __name__ == '__main__':
     # TEST CODE
 
     # We're a module, never run anything here
