@@ -53,6 +53,12 @@ def index():
     """Video streaming home page."""
     return render_template('sidecam.html')
 
+@app.route('/calibrate')
+def calibrate():
+    logging.debug("DEATHSTARE.calibrate")
+    """Video streaming home page."""
+    return render_template('calibrate.html')
+
 #Color picker
 # This function gets called by the /video_feed route below
 def gen_frames_picker(camera):  # generate frame by frame from camera
