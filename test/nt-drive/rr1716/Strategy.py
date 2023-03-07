@@ -1,5 +1,5 @@
-xy_p_factor = -0.002  # TODO: change
-r_p_factor = 0.001  # TODO: change
+xy_pid_factor = (0.0005, 0.001, 0)  # TODO: change
+r_pid_factor = (0.0001,0,0)  # TODO: change
 
 r_error_threshold = 5  # TODO: change
 

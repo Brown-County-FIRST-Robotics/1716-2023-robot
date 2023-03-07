@@ -7,6 +7,7 @@ from rr1716 import AprilTags
 from rr1716 import Strategy
 import cv2
 import numpy as np
+import simple_pid
 # from rr1716 import Filter
 
 
@@ -111,6 +112,9 @@ class DriveToLocation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
+        self.x_pid=simple_pid.PID(*Strategy.xy_pid_factor)
+        self.y_pid = simple_pid.PID(*Strategy.xy_pid_factor)
+        self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
 
     def Step(self):
         super().Step()
@@ -124,9 +128,11 @@ class DriveToLocation(Action):
         offset_x = field_x - self.location[0]
         offset_y = field_y - self.location[1]
         offset_r = field_r - self.location[2]
+        move_x=offset_x * cx + offset_y * cy
+        move_y=offset_x * ax + offset_y * ay
+        move_r=offset_r
 
-        self.nt_interface.Drive(-Strategy.xy_p_factor * (offset_x * cx + offset_y * cy),
-                               -Strategy.xy_p_factor * (offset_x * ax + offset_y * ay), Strategy.r_p_factor * offset_r)
+        self.nt_interface.Drive(self.x_pid(move_x),self.y_pid(move_y),self.r_pid(move_r))
 
     def ShouldEnd(self):
         field_x, field_y, field_r = self.GetFilter()

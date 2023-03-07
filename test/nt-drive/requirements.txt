@@ -10,3 +10,4 @@ opencv-python==4.7.0.68
 pynetworktables==2021.0.0
 Werkzeug==2.2.2
 zipp==3.12.0
+simple_pid==1.0.1
