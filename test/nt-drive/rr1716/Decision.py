@@ -303,8 +303,8 @@ class DriveToCone(Action):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         
         col = []
-        if os.path.exists("cube_picked_color"):
-            file = open("cube_picked_color", "r") 
+        if os.path.exists("cone_picked_color"):
+            file = open("cone_picked_color", "r") 
             for line in file:
                 for x in line.split():
                     col.append(int(x)) 
@@ -314,8 +314,8 @@ class DriveToCone(Action):
         while len(col) < 3:
             col.append(0)
         
-        lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
-        upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
+        lower = [col[0] - 50, col[1] - 50, col[2] - 50]
+        upper = [col[0] + 50, col[1] + 50, col[2] + 50]
     
         for i in range(len(lower)):
             if lower[i] < 0:
@@ -335,12 +335,12 @@ class DriveToCone(Action):
         self.cone.findCone(self.cams[0].frame)
         
         # cone is to the left, turn left
-        if self.cone.x < -20:
+        if self.cone.x < -40:
             print("turn left")
             self.nt_interface.Drive(0, 0, -0.5)
             return
         # cone is to the right, turn right
-        elif self.cone.x > 20:
+        elif self.cone.x > 40:
             print("turn right")
             self.nt_interface.Drive(0, 0, 0.5)
             return
