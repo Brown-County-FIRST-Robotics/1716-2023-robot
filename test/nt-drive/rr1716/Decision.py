@@ -265,7 +265,6 @@ class AddScreenVals(Action):
     def ShouldEnd(self):
         return False
 
-
 class GetDriverCommand(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
