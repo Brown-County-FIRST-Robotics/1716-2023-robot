@@ -8,7 +8,7 @@ from rr1716 import Strategy
 import cv2
 import numpy as np
 import simple_pid
-# from rr1716 import Filter
+# from rr1716 import StateEstimator
 
 
 class Action:
@@ -34,8 +34,8 @@ class Action:
             self.filter.updateWithApriltag(robotLocation, self.nt_interface)
 
     def GetFilter(self):
-        logging.info(f'filter pos: {self.filter.getCurrentPos(self.nt_interface)}')
-        return self.filter.getCurrentPos(self.nt_interface)
+        logging.info(f'filter pos: {self.filter.current}')
+        return self.filter.current
 
     def GetGameObjects(self):
         pass
@@ -115,8 +115,7 @@ class DriveToLocation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
-        self.x_pid=simple_pid.PID(*Strategy.xy_pid_factor)
-        self.y_pid = simple_pid.PID(*Strategy.xy_pid_factor)
+        self.xy_pid = simple_pid.PID(*Strategy.xy_pid_factor)
         self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
 
     def Step(self):
