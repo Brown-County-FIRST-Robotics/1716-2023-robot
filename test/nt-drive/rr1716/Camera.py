@@ -66,11 +66,12 @@ class Camera:
     def _thread(self):
         while not self._stopping:
             success, frame = self.camera.read()
-            frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
             if success and frame is not None:
+                frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
                 self.frame = frame
                 self.frame_count = self.frame_count + 1
             else:
+                logging.error("camera frame cap failed %s", self.device)
                 self.frame=None
             self.hsv = None
             self.gray = None
