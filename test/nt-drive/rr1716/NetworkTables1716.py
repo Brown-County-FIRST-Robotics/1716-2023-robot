@@ -14,6 +14,8 @@ class NetworkTablesWrapper:
         self.game_table = NetworkTables.getTable('1716GameInfo')
         self.encoder_table = NetworkTables.getTable('1716Encoder')
         self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
+        self.motor_table = NetworkTables.getTable("1716Motors")
+
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
@@ -161,6 +163,8 @@ class NetworkTablesWrapper:
         if pos==-1:
             return None
         return pos
+    def GetMotors(self):
+        return self.motor_table.getNumber('x',0),self.motor_table.getNumber('y',0),self.motor_table.getNumber('r',0)
 
 
 if __name__ == '__main__':
