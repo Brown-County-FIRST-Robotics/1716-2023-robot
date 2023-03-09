@@ -66,6 +66,9 @@ class StateEstimator:
     def current(self):
         self.updateToNow()
         return dataclasses.replace(self._current)
+    @property
+    def currentTuple(self):
+        return (self.current.x, self.current.y, self.current.theta)
 
     def updateToNow(self): # Update the x,y,r values, according to vx,vy,vr
         newTime = self.now()

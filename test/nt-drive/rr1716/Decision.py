@@ -31,17 +31,18 @@ class Action:
                 robotLocation=detections[0]
                 break
         if robotLocation is not None:
-            self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+            self.filter.updateWithApriltag(robotLocation)
 
     def GetFilter(self):
-        logging.info(f'filter pos: {self.filter.current}')
-        return self.filter.current
+        logging.info(f'filter pos: {self.filter.currentTuple}')
+        return self.filter.currentTuple
 
     def GetGameObjects(self):
         pass
 
     def Step(self):
         self.FetchApriltags()
+        self.filter.updateWithCommandedVelocity(self.nt_interface.GetMotors())
 
     def ShouldEnd(self):
         return True
@@ -66,16 +67,16 @@ class StartFilter(Action):
                 robotLocation = res[0]  # TODO: change?
                 break
         if robotLocation is not None:
-            self.filter.updateWithApriltag(robotLocation, self.nt_interface)
+            self.filter.updateWithApriltag(robotLocation)
 
     def ShouldEnd(self):
-        return None not in self.filter.lastApril  # check if lastApril has a None, meaning it has not seen an apriltag
+        return self.filter._lastApril is not None  # check if lastApril has a None, meaning it has not seen an apriltag
 
     def MakeChild(self):
         if self.referrer=='auto':
             return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
         elif self.referrer=='DRIVETOAPRILTAG':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,-294,0), self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,0,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
@@ -120,7 +121,7 @@ class DriveToLocation(Action):
 
     def Step(self):
         super().Step()
-        field_x, field_y, field_r = self.GetFilter()
+        field_x, field_y, field_r = self.filter.currentTuple
         cx = math.cos(field_r * math.pi / 180)
         cy = math.sin(field_r * math.pi / 180)
 
@@ -134,10 +135,10 @@ class DriveToLocation(Action):
         move_y=offset_x * ax + offset_y * ay
         move_r=offset_r
 
-        self.nt_interface.Drive(self.x_pid(move_x),self.y_pid(move_y),self.r_pid(move_r))
+        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(move_r))
 
     def ShouldEnd(self):
-        field_x, field_y, field_r = self.GetFilter()
+        field_x, field_y, field_r = self.filter.currentTuple
         error = math.sqrt((field_x - self.location[0]) ** 2 + (
                     field_y - self.location[1]) ** 2)
         return error < Strategy.drive_error_threshold and math.fabs(field_r - self.location[2]) < Strategy.r_error_threshold
