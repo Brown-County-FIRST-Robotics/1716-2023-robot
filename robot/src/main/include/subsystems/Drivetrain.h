@@ -73,6 +73,7 @@ private:
 	std::shared_ptr<nt::NetworkTable> driveTable;
 	std::shared_ptr<nt::NetworkTable> encoderTable;
 	std::shared_ptr<nt::NetworkTable> pigeonTable;
+	std::shared_ptr<nt::NetworkTable> motorTable;
 
 	nt::FloatPublisher flEncoder;
 	nt::FloatPublisher blEncoder;

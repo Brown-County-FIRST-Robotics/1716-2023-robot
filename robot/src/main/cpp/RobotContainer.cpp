@@ -68,12 +68,12 @@ void RobotContainer::ConfigureButtonBindings() {
 	 	.Until([this] { return controller.GetBackButtonPressed(); }));
 	 	//Auto balancing
 
-	// controller.Y().OnTrue(RasPiDrive(&drivetrain)
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			RasPiDrive(&drivetrain)
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetBackButton(); }));
+	 controller.Y().OnTrue(RasPiDrive(&drivetrain)
+	 	.FinallyDo(
+	 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
+	 			RasPiDrive(&drivetrain)
+	 			.Until([this] { return controller.GetPOV() == 180; })); })
+	 	.Until([this] { return controller.GetBackButton(); }));
 	// 	//RasPi control
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely

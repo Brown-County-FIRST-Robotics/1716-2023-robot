@@ -20,6 +20,8 @@ Drivetrain::Drivetrain() :
 	encoderTable = networkTableInst.GetTable("1716Encoder");	
 	pigeonTable = networkTableInst.GetTable("1716Pigeon");
 
+	motorTable = networkTableInst.GetTable("1716Motors");
+
 	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
 	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
 	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
@@ -58,7 +60,10 @@ void Drivetrain::Periodic() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
+	motorTable->PutNumber("x",-x);
+	motorTable->PutNumber("y",y);
+	motorTable->PutNumber("r",z);
+	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse || true) {
 		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
 	}
 	else { //don't strafe in traction mode
