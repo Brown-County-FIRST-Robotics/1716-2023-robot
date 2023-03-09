@@ -13,8 +13,6 @@ import glob
 
 
 # ChAruco board variables
-CHARUCOBOARD_ROWCOUNT = 7
-CHARUCOBOARD_COLCOUNT = 5 
 ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
 
 # Create constants to be passed into OpenCV and Aruco methods
@@ -25,10 +23,20 @@ ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
 #        markerLength=0.014,
 #        dictionary=ARUCO_DICT)
 
-CHARUCO_BOARD = aruco.CharucoBoard((5,7), 0.029, 0.014, ARUCO_DICT, None)
+
+paper_size = (20,30) #inches
+min_square_size = 2 #inches
+num_squares = [(s-2)//min_square_size for s in paper_size] #leave a border row of one inch around edge
+square_size=[(paper_size[i]-2)/num_squares[i] for i in range(2)] #inches
+size = min(square_size)
+
+ppi=11 * 10 #found by hand to be minimum (11) for the 20,30.  you should try other values to not have the blur
+
+CHARUCO_BOARD = aruco.CharucoBoard(num_squares, size, size*.6, ARUCO_DICT, None)
+#print(CHARUCO_BOARD.getChessboardCorners())
 
 if 'generate' in sys.argv[1:]:
-    imboard=CHARUCO_BOARD.generateImage((2000, 2000))
+    imboard=CHARUCO_BOARD.generateImage((ppi*(num_squares[0]+2), ppi*(num_squares[1]+2)), None, ppi)
     cv2.imwrite("chessboard.tiff", imboard)
     print('chessboard.tiff written')
     sys.exit()
