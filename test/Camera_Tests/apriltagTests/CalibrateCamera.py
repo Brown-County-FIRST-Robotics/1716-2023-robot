@@ -1,12 +1,10 @@
+#!/usr/bin/env python
+
+
 #mostly coppied from https://github.com/kyle-bersani/opencv-examples/blob/master/CalibrationByCharucoBoard/CalibrateCamera.py
 #with a little from https://mecaruco2.readthedocs.io/en/latest/notebooks_rst/Aruco/sandbox/ludovic/aruco_calibration_rotation.html
 
-
-
-# System information:
-# - Linux Mint 18.1 Cinnamon 64-bit
-# - Python 2.7 with OpenCV 3.2.0
-
+import sys
 import numpy
 import cv2
 from cv2 import aruco
@@ -17,20 +15,20 @@ import glob
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
 CHARUCOBOARD_COLCOUNT = 5 
-ARUCO_DICT = aruco.Dictionary_get(aruco.DICT_5X5_1000)
+ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
 
 # Create constants to be passed into OpenCV and Aruco methods
-CHARUCO_BOARD = aruco.CharucoBoard_create(
-        squaresX=CHARUCOBOARD_COLCOUNT,
-        squaresY=CHARUCOBOARD_ROWCOUNT,
-        squareLength=0.04,
-        markerLength=0.02,
-        dictionary=ARUCO_DICT)
+#CHARUCO_BOARD = aruco.CharucoBoard(1,
+#        squaresX=CHARUCOBOARD_COLCOUNT,
+#        squaresY=CHARUCOBOARD_ROWCOUNT,
+#        squareLength=0.029,
+#        markerLength=0.014,
+#        dictionary=ARUCO_DICT)
 
+CHARUCO_BOARD = aruco.CharucoBoard((5,7), 0.029, 0.014, ARUCO_DICT, None)
 
-import sys
 if 'generate' in sys.argv[1:]:
-    imboard=CHARUCO_BOARD.draw((2000, 2000))
+    imboard=CHARUCO_BOARD.generateImage((2000, 2000))
     cv2.imwrite("chessboard.tiff", imboard)
     print('chessboard.tiff written')
     sys.exit()
@@ -46,8 +44,13 @@ camnum = int(sys.argv[1].strip())
 if str(camnum) == sys.argv[1].strip():
     pass
 cam = cv2.VideoCapture(camnum)
-cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+#cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+#cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 video_size = (cam.get(cv2.CAP_PROP_FRAME_WIDTH), cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 as_int = tuple(int(x) for x in video_size)
 assert as_int == video_size
@@ -73,14 +76,6 @@ while True:
 
     cv2.imshow("test", dispimg)
 
-    k = cv2.waitKey(1)
-    if k%256 == 27:
-        # ESC pressed
-        print("Escape hit, breaking loop...")
-        break
-
-
-    print('captured frame')
     # Grayscale the image
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     image_size = gray.shape[::-1]
@@ -115,21 +110,22 @@ while True:
         #Add these corners and ids to our calibration arrays
         corners_all.append(charuco_corners)
         ids_all.append(charuco_ids)
-        pass
+        img_counter += 1
     else:
         cv2.putText(img, 'Charuco not found', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (20,20,255), 2, cv2.LINE_AA)
 
     cv2.putText(img, 'press space to continue', (50,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2, cv2.LINE_AA)
 
     cv2.imshow("test", img)
-    k = cv2.waitKey(0)
+    k = cv2.waitKey(1)
     if k % 256 == 27:
         # ESC pressed
         print("Escape hit, breaking loop...")
         break
 
 
-    img_counter += 1
+
+    print("Captured image %d" % img_counter)
 
 cam.release()
 
@@ -153,11 +149,6 @@ calibration, cameraMatrix, distCoeffs, rvecs, tvecs = aruco.calibrateCameraCharu
         cameraMatrix=None,
         distCoeffs=None)
 
-
 # Print matrix and distortion coefficient to the console
-out = {}
-out["calibrationResolution"] = image_size
-out["cameraMatrix"] = cameraMatrix
-out["cameraDistortion"] = distCoeffs
+out = [cameraMatrix.tolist(), distCoeffs.tolist()]
 print(out)
-
