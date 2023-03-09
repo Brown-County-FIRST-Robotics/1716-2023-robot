@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import logging
-from flask import Flask, render_template, Response, redirect, request
+from flask import Flask, render_template, Response, redirect, request, jsonify
 from threading import Thread
 from rr1716 import AprilTags
 import cv2
@@ -52,6 +52,16 @@ def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
     return render_template('sidecam.html')
+
+@app.route('/state')
+def state():
+    logging.debug("DEATHSTARE.state")
+    return render_template('state.html')
+
+@app.route('/stateest')
+def stateest():
+    logging.debug("DEATHSTARE.stateest")
+    return jsonify(0,0,0)
 
 #Color picker
 # This function gets called by the /video_feed route below

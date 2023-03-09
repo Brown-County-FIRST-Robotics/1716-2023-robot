@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">	
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+
+    <title>State Estimator View</title>
+</head>
+<body>
+<canvas id="myCanvas" width="100%" height="100%"></canvas>
+<script>
+
+
+function redraw(){
+
+let aspect = Math.min(window.innerWidth / img.width, window.innerHeight / img.height);
+
+canvas.width  = img.width * aspect;
+canvas.height = img.height * aspect;
+ctx.drawImage(img, 0, 0,canvas.width,canvas.height);
+}
+
+
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+var img = new Image();
+img.src = '/static/field.png';
+img.onload = (event) => {redraw();}
+addEventListener("resize", (event) => {redraw();});
+
+
+function scale(d) {//CM TO pix
+return d * canvas.width/((54*12+1)*2.54);
+}
+
+
+
+//https://stackoverflow.com/a/17126036/933173
+function drawRotatedRect(ctx, x,y,width,height,degrees, color){
+
+        // first save the untranslated/unrotated context
+        ctx.save();
+
+        ctx.beginPath();
+        // move the rotation point to the center of the rect
+        ctx.translate( x+width/2, y+height/2 );
+        // rotate the rect
+        ctx.rotate(degrees*Math.PI/180);
+
+        // draw the rect on the transformed context
+        // Note: after transforming [0,0] is visually [x,y]
+        //       so the rect needs to be offset accordingly when drawn
+        ctx.rect( -width/2, -height/2, width,height);
+
+        ctx.fillStyle=color;
+        ctx.fill();
+
+        // restore the context to its untranslated/unrotated state
+        ctx.restore();
+
+    }
+
+
+//https://gist.github.com/jwir3/d797037d2e1bf78a9b04838d73436197
+function drawArrowhead(context, from, to, radius) {
+	var x_center = to.x;
+	var y_center = to.y;
+
+	var angle;
+	var x;
+	var y;
+
+	context.beginPath();
+
+	angle = Math.atan2(to.y - from.y, to.x - from.x)
+	x = radius * Math.cos(angle) + x_center;
+	y = radius * Math.sin(angle) + y_center;
+
+	context.moveTo(x, y);
+
+	angle += (1.0/3.0) * (2 * Math.PI)
+	x = radius * Math.cos(angle) + x_center;
+	y = radius * Math.sin(angle) + y_center;
+
+	context.lineTo(x, y);
+
+	angle += (1.0/3.0) * (2 * Math.PI)
+	x = radius *Math.cos(angle) + x_center;
+	y = radius *Math.sin(angle) + y_center;
+
+	context.lineTo(x, y);
+
+	context.closePath();
+
+	context.fill();
+}
+
+
+function drawRobot(x, y, r){
+drawRotatedRect(ctx, x,y,scale(35*2.54),scale(24*2.54),r, "green");
+ctx.fillStyle="red";
+drawArrowhead(ctx, {'x':x, 'y':y}, {'x':x+scale(30)*Math.cos(r*Math.PI/180),
+'y':y+scale(30)*Math.cos(r*Math.PI/180)}, 3);
+}
+
+async function getState(){
+const r = await fetch('/stateest');
+const state = await r.json();
+console.log(state);
+drawRobot(100,100,0);
+}
+setInterval(getState, 200);
+
+</script>
+    </body>
+</html>
