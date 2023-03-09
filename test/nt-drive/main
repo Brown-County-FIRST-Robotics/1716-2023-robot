@@ -127,7 +127,7 @@ def main():
             camera.shutdown()
         assert False, f'"{args.auto_mode}" does not have a matching `elif` block'
 
-    DEATHSTARE.start(cameras)
+    DEATHSTARE.start(cameras, filter)
 
     lastframetime = 0
     try:

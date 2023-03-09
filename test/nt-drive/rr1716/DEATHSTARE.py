@@ -7,6 +7,7 @@ from rr1716 import AprilTags
 import cv2
 import numpy as np
 import rr1716
+import dataclasses
 
 __COLOR_PICK_RANGE__ = 20
 
@@ -61,7 +62,7 @@ def state():
 @app.route('/stateest')
 def stateest():
     logging.debug("DEATHSTARE.stateest")
-    return jsonify(0,0,0)
+    return jsonify(dataclasses.asdict(app.filter.current))
 
 #Color picker
 # This function gets called by the /video_feed route below
@@ -158,11 +159,12 @@ def get_apriltags():
     return Response('<h3>No apriltags Found</h3>', mimetype='text')
 
 
-def start(camera):
+def start(camera, filter):
     logging.debug("DEATHSTARE.start")
     app.Cameras = camera
     thread = Thread(target=app.run, kwargs={'host':"0.0.0.0"})
     thread.start()
+    app.filter=filter
 
 if __name__ == '__main__':
     pass
