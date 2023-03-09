@@ -42,7 +42,7 @@ class Action:
 
     def Step(self):
         self.FetchApriltags()
-        self.filter.updateWithCommandedVelocity(self.nt_interface.GetMotors())
+        self.filter.updateWithCommandedVelocity(*self.nt_interface.GetMotors())
 
     def ShouldEnd(self):
         return True
