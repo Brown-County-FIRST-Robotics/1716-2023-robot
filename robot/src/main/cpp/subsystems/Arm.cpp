@@ -3,8 +3,8 @@
 #include "subsystems/Arm.h"
 #include <math.h>
 
-Arm::Arm() {
-	// shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef} {
+	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
 	// shoulder.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
 }
@@ -31,7 +31,7 @@ void Arm::Periodic() {
 // }
 
 void Arm::SetShoulder(double speed) {
-	// shoulder.Set(speed);
+	shoulder.Set(speed * ArmConst::SHOULDER_SPEED);
 }
 
 void Arm::ToggleArmDirection() {
@@ -90,4 +90,28 @@ frc::DoubleSolenoid::Value Arm::GetArmActive() {
 
 double Arm::GetArmAngle() {
 	return armPotentiometer.Get();
+}
+
+void Arm::ToggleClaw() {
+	if (clawPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
+		claw.Set(frc::DoubleSolenoid::Value::kForward);
+		clawPos = frc::DoubleSolenoid::Value::kForward;
+	}
+	else { //if not reverse, set to reverse
+		claw.Set(frc::DoubleSolenoid::Value::kReverse);
+		clawPos = frc::DoubleSolenoid::Value::kReverse;
+	}
+	
+	clawTicks = SolenoidConst::WAIT_TICKS;
+}
+
+void Arm::SetClaw(frc::DoubleSolenoid::Value value) {
+	claw.Set(value);
+	clawPos = value;
+	
+	clawTicks = SolenoidConst::WAIT_TICKS;
+}
+
+frc::DoubleSolenoid::Value Arm::GetClaw() {
+	return clawPos;
 }

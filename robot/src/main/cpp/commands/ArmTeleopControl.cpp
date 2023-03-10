@@ -3,8 +3,8 @@
 #include <utility>
 
 ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoulderAxis, 
-	std::function<bool()> armUpButton, std::function<bool()> armDownButton) :
-	shoulder(std::move(shoulderAxis)), armUp(std::move(armUpButton)), armDown(std::move(armDownButton))
+	std::function<bool()> armUpButton, std::function<bool()> armDownButton, std::function<bool()> clawButton) : arm(subsystem),
+	shoulder(std::move(shoulderAxis)), armUp(std::move(armUpButton)), armDown(std::move(armDownButton)), claw(std::move(clawButton))
 {
 	AddRequirements(subsystem);
 }
@@ -25,6 +25,13 @@ void ArmTeleopControl::Execute() {
 		armUpPressed = false;
 		armDownPressed = false;
 	}
+
+	if (!clawPressed && claw()) {
+		arm->ToggleClaw();
+		clawPressed = true;
+	}
+	else if (!claw())
+		clawPressed = false;
 
 	arm->SetShoulder(shoulder() * ArmConst::SHOULDER_SPEED);
 }

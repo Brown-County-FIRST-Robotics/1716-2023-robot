@@ -10,7 +10,8 @@ public:
 	explicit ArmTeleopControl(Arm* subsystem, 
 		std::function<double()> shoulderAxis, 
 		std::function<bool()> armUpButton, 
-		std::function<bool()> armDownButton);
+		std::function<bool()> armDownButton,
+		std::function<bool()> clawButton);
 
 	void Execute() override;
 	
@@ -22,7 +23,9 @@ private:
 	std::function<double()> shoulder;
 	std::function<bool()> armUp;
 	std::function<bool()> armDown;
+	std::function<bool()> claw;
 
 	bool armUpPressed = false;
 	bool armDownPressed = false;
+	bool clawPressed = false;
 };

@@ -1,10 +1,11 @@
 #include "subsystems/Drivetrain.h"
 
-Drivetrain::Drivetrain() :
+Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	frontLeftEncoder{frontLeft.GetEncoder()}, 
 	frontRightEncoder{frontRight.GetEncoder()}, 
 	backLeftEncoder{backLeft.GetEncoder()}, 
-	backRightEncoder{backRight.GetEncoder()} 
+	backRightEncoder{backRight.GetEncoder()},
+	hub{hubRef}
 {
 	frontLeft.SetInverted(false);
 	frontRight.SetInverted(true);
@@ -34,6 +35,10 @@ Drivetrain::Drivetrain() :
 
 	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
 		.Add("Drive Solenoid", false)
+		.WithSize(2, 2)
+		.WithProperties({
+			{"Color when true", nt::Value::MakeString("Maroon")},
+			{"Color when false", nt::Value::MakeString("Cyan")}})
 		.GetEntry();
 }
 
@@ -60,14 +65,15 @@ void Drivetrain::Periodic() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	motorTable->PutNumber("x",-x);
-	motorTable->PutNumber("y",y);
-	motorTable->PutNumber("r",z);
-	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse || true) {
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+	motorTable->PutNumber("x", x); //Ttdo: update this to be consistent with the rest of the system
+	motorTable->PutNumber("y", y);
+	motorTable->PutNumber("r", z);
+
+	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
 	}
 }
 
