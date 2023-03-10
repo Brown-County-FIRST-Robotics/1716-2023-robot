@@ -244,8 +244,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
     #lower = [col[0] * 0.5, col[1] * 0.5, col[2] * 0.1]
     #upper = [col[0] * 1.4, col[1] * 1.4, col[2] * 4.0]
   
-    lower = [col[0] - 50, col[1] - 50, col[2] - 50]
-    upper = [col[0] + 50, col[1] + 50, col[2] + 50]
+    lower = [col[0] - 30, col[1] - 30, col[2] - 30]
+    upper = [col[0] + 30, col[1] + 30, col[2] + 30]
 
     for i in range(len(lower)):
         if lower[i] < 0:

@@ -335,26 +335,28 @@ class DriveToCone(Action):
         self.cone.findCone(self.cams[0].frame)
         
         # cone is to the left, turn left
-        if self.cone.x < -40:
+        if self.cone.x < -80:
             print("turn left")
-            self.nt_interface.Drive(0, 0, -0.5)
+            self.nt_interface.Drive(0, 0, -0.1)
             return
         # cone is to the right, turn right
-        elif self.cone.x > 40:
+        elif self.cone.x > 80:
             print("turn right")
-            self.nt_interface.Drive(0, 0, 0.5)
+            self.nt_interface.Drive(0, 0, 0.1)
             return
 
         # too far away, drive towards it
-        if self.cone.w < 100 and self.cone.h < 200:
+        if self.cone.w < 600:
             print("drive forward")
-            self.nt_interface.Drive(-1, 0, 0)
+            self.nt_interface.Drive(0.1, 0, 0)
             return
         # too close, drive back
+        """
         elif self.cone.w > 200 and self.cone.h > 400:  
             print("drive backward")
             self.nt_interface.Drive(1, 0, 0)
             return
+        """
 
         # perfect, do nothing!
 

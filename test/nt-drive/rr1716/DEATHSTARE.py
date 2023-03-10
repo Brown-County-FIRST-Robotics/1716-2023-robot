@@ -105,7 +105,7 @@ def preview_image():
 @app.route("/pick")
 def pick():
     app.Cameras[0].get_frame()
-    col = rr1716.Vision.averageColor(app.Cameras[0].get_frame(), __COLOR_PICK_RANGE__)
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_color(), __COLOR_PICK_RANGE__)
     print("color: ", col) 
     #write to file
     file = open("picked_color", "w")
