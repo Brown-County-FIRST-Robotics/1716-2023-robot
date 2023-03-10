@@ -21,6 +21,8 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	encoderTable = networkTableInst.GetTable("1716Encoder");	
 	pigeonTable = networkTableInst.GetTable("1716Pigeon");
 
+	motorTable = networkTableInst.GetTable("1716Motors");
+
 	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
 	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
 	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
@@ -63,6 +65,10 @@ void Drivetrain::Periodic() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
+	motorTable->PutNumber("x", x); //Ttdo: update this to be consistent with the rest of the system
+	motorTable->PutNumber("y", y);
+	motorTable->PutNumber("r", z);
+
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
 		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
 	}
