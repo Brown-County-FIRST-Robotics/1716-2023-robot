@@ -64,10 +64,10 @@ void Drivetrain::Periodic() {
 
 void Drivetrain::Drive(double x, double y, double z) {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
 	}
 }
 

@@ -39,6 +39,7 @@ RobotContainer::RobotContainer() {
 	// autonomousChooser.AddOption("Back Up", &frc2::ParallelDeadlineGroup(frc2::WaitCommand(2.0_s),
 	// 	frc2::StartEndCommand([this] {drivetrain.Drive(-.2, 0, 0);}, [this] {drivetrain.Drive(0, 0, 0);}, {&drivetrain})));
 	autonomousChooser.AddOption("Nothing", &nothing);
+	autonomousChooser.AddOption("Back Up", &backUp);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
@@ -48,33 +49,13 @@ void RobotContainer::ConfigureButtonBindings() {
 		//toggle solenoid
 
 	//Drive modes
-	// frc2::Trigger([this] { return controller.GetPOV() == 270; }).OnTrue(TeleopDrive(&drivetrain, 
-	// 	[this] { return -controller.GetLeftY(); }, 
-	// 	[this] { return controller.GetLeftX(); }, 
-	// 	[this] { return controller.GetRightX(); },
-	// 	[this] { return controller.GetBButton(); } )
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			TeleopDrive(&drivetrain, 
-	// 			[this] { return -controller.GetLeftY(); }, 
-	// 			[this] { return controller.GetLeftX(); }, 
-	// 			[this] { return controller.GetRightX(); },
-	// 			[this] { return controller.GetBButton(); } )
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetPOV() == 180; }));
-	// 	//Backwards driving
-
 	controller.X().OnTrue(AutoBalance(&drivetrain)
 	 	.Until([this] { return controller.GetBackButtonPressed(); }));
 	 	//Auto balancing
 
-	// controller.Y().OnTrue(RasPiDrive(&drivetrain)
-	// 	.FinallyDo(
-	// 		[this](bool interrupted) { drivetrain.SetDefaultCommand(
-	// 			RasPiDrive(&drivetrain)
-	// 			.Until([this] { return controller.GetPOV() == 180; })); })
-	// 	.Until([this] { return controller.GetBackButton(); }));
-	// 	//RasPi control
+	controller.Y().OnTrue(RasPiDrive(&drivetrain)
+		.Until([this] { return controller.GetBackButton() || controller.GetYButton(); }));
+		//RasPi control
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
 		.OnTrue(AutoBalance(&drivetrain)
@@ -126,3 +107,14 @@ void RobotContainer::UpdateControllerLogging() {
 }
 
 bool Nothing::IsFinished() { return true; }
+
+BackUp::BackUp(Drivetrain* subsystem)
+{
+	AddCommands(
+		frc2::ParallelDeadlineGroup(
+			frc2::WaitCommand(2_s),
+			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(-0.3, 0, 0);}, 
+				[subsystem] { subsystem->Drive(0, 0, 0); }) //command that backs up
+		)
+	);
+}

@@ -43,7 +43,7 @@ namespace ArmConst
 	const int ARM_DIRECTION_ID[2] = {4, 5};
 	const int CLAW_ID[2] = {6, 7};
 
-	const double SHOULDER_SPEED = .25;
+	const double SHOULDER_SPEED = .65;
 
 	//Analog ID
 	const int ARM_POTENTIOMETER_ID = 0;

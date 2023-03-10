@@ -18,6 +18,11 @@ public:
 	bool IsFinished() override;
 };
 
+class BackUp : public frc2::CommandHelper<frc2::SequentialCommandGroup, BackUp> {
+public:
+	explicit BackUp(Drivetrain* drive);
+};
+
 class RobotContainer {
 public:
 	RobotContainer();
@@ -45,6 +50,7 @@ private:
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
 	Nothing nothing;
+	BackUp backUp{&drivetrain};
 
 
 	//Controller logging
