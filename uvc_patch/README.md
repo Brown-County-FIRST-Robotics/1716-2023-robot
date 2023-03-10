@@ -1,7 +1,6 @@
 # Multiple USB Cameras On A Raspberry Pi
 (Or other PC like device with a single USB controller chip)
 
-_Note:  this is a pre-release of this info until I can get back to the PI tomorrow and verify the build instructions_
 
 ## Why is this an issue
 Most cheap UVC cameras only offer streaming over _isochronous_ USB, as opposed to bulk transfer.  That means that any bandwidth they plan to consume must be reserved, and the total reservations on the USB controller must come in under 80% of the 480Mbps offered by USB2.  With uncompressed frames it's likely that you can't reserve enough bandwidth to use even 2 cameras on a single controller, and the PI 4 and most other single board computers surveyed only has one USB2 controller.
@@ -23,7 +22,9 @@ We found a patch (source below) for an older version of the kernel to hack the u
 
 Patching a Linux kernel module involves getting the source code, modifying it, and building it, and installing it.  The patch included in this repo has been modified from the original to work with the newer kernel on our PI
 
-A downloadable version will be here one I get to the PI tomorrow.
+A downloadable binary version we built on our pi with kernel 5.15.84-v8+ is
+[here](uvcvideo.ko). You can download it and skip to "remove the original driver and load our new
+replacement" in the instructions below.
 
 ## Follow these steps to build your own patched driver
 ```bash
@@ -32,22 +33,25 @@ A downloadable version will be here one I get to the PI tomorrow.
 #This sequence was patched together from my command history after the fact.  If you find a flaw, open a github issue so we can fix the instructions
 
 #get packages needed to build kernel
-sudo apt-get install git bc bison flex libssl-dev
+sudo apt install git bc bison flex libssl-dev
 #get python 2 for rpi-source to run
-sudo python2
+sudo apt install python2
 
-#pri-source is included here, but was originally fetched with
+#rpi-source is included here, but was originally fetched with
 #wget https://raw.githubusercontent.com/RPi-Distro/rpi-source/ceee03b5fb9cee65dd933f4784bb455cfa872a76/rpi-source
 #that version (included here) is patched to work with the new raspberry pi 64 bit kernels
 
 #get the kernel source
 python2 rpi-source  -q --tag-update
 python2 rpi-source --architecture 1
-cd linux
+#rpi-source seems to put the source in your home directory regardless of
+#where you ran it.  yay.
+cd ~/linux
 
 #patch it to allow a new bandwidth_cap parameter
 #this patch is from https://www.spinics.net/lists/linux-media/msg175596.html
 #but has been modified to work with hte kernel log changes present in newer kernels
+#download it from (here)[uvc_bw_patch].
 patch -p1 < ../uvc_bw_patch 
 
 #build just the module you want
@@ -74,9 +78,8 @@ cd  /usr/lib/modules/5.15.84-v8+/kernel/drivers/media/usb/uvc
 
 sudo mv uvcvideo.ko.xz uvcvideo.ko.xz.bak
 
-#modify this to where you built the driver
+#modify this path to where you built the driver
 sudo cp /home/robotics/linux/drivers/media/usb/uvc/uvcvideo.ko .
-
 sudo depmod
 
 #now make the bandwidth cap permanent

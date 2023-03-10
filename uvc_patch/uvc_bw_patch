@@ -1,14 +1,14 @@
---- a/drivers/media/usb/uvc/uvc_driver.c
-+++ b/drivers/media/usb/uvc/uvc_driver.c
-@@ -33,6 +33,7 @@ unsigned int uvc_no_drop_param;
+--- linux/drivers/media/usb/uvc/uvc_driver.c	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvc_driver.c	2023-02-05 14:39:31.608117954 +0000
+@@ -34,6 +34,7 @@
  static unsigned int uvc_quirks_param = -1;
- unsigned int uvc_trace_param;
+ unsigned int uvc_dbg_param;
  unsigned int uvc_timeout_param = UVC_CTRL_STREAMING_TIMEOUT;
 +unsigned int uvc_bandwidth_cap_param;
  
  /* ------------------------------------------------------------------------
   * Video formats
-@@ -2389,6 +2390,8 @@ module_param_named(trace, uvc_trace_param, uint, S_IRUGO|S_IWUSR);
+@@ -2634,6 +2635,8 @@
  MODULE_PARM_DESC(trace, "Trace level bitmask");
  module_param_named(timeout, uvc_timeout_param, uint, S_IRUGO|S_IWUSR);
  MODULE_PARM_DESC(timeout, "Streaming control requests timeout");
@@ -17,18 +17,16 @@
  
  /* ------------------------------------------------------------------------
   * Driver initialization and cleanup
-diff --git a/drivers/media/usb/uvc/uvc_video.c b/drivers/media/usb/uvc/uvc_video.c
-index a65d5353a441..74a0dc0614cf 100644
---- a/drivers/media/usb/uvc/uvc_video.c
-+++ b/drivers/media/usb/uvc/uvc_video.c
-@@ -196,6 +196,14 @@ static void uvc_fixup_video_ctrl(struct uvc_streaming *stream,
+--- linux/drivers/media/usb/uvc/uvc_video.c	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvc_video.c	2023-02-06 15:05:30.119277544 +0000
+@@ -231,6 +231,14 @@
  
  		ctrl->dwMaxPayloadTransferSize = bandwidth;
  	}
 +
 +	if (uvc_bandwidth_cap_param &&
 +	    ctrl->dwMaxPayloadTransferSize > uvc_bandwidth_cap_param) {
-+		uvc_trace(UVC_TRACE_VIDEO,
++		uvc_dbg(stream->dev, VIDEO,
 +			"Bandwidth capped from %u to %u B/frame.\n",
 +			ctrl->dwMaxPayloadTransferSize, uvc_bandwidth_cap_param);
 +		ctrl->dwMaxPayloadTransferSize = uvc_bandwidth_cap_param;
@@ -36,16 +34,13 @@ index a65d5353a441..74a0dc0614cf 100644
  }
  
  static size_t uvc_video_ctrl_size(struct uvc_streaming *stream)
-diff --git a/drivers/media/usb/uvc/uvcvideo.h b/drivers/media/usb/uvc/uvcvideo.h
-index 6ab972c643e3..c7d9220c9a7a 100644
---- a/drivers/media/usb/uvc/uvcvideo.h
-+++ b/drivers/media/usb/uvc/uvcvideo.h
-@@ -718,6 +718,7 @@ extern unsigned int uvc_no_drop_param;
- extern unsigned int uvc_trace_param;
+--- linux/drivers/media/usb/uvc/uvcvideo.h	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvcvideo.h	2023-02-05 14:39:31.616117981 +0000
+@@ -754,6 +754,7 @@
+ extern unsigned int uvc_dbg_param;
  extern unsigned int uvc_timeout_param;
  extern unsigned int uvc_hw_timestamps_param;
 +extern unsigned int uvc_bandwidth_cap_param;
  
- #define uvc_trace(flag, msg...) \
- 	do { \
--- 
+ #define uvc_dbg(_dev, flag, fmt, ...)					\
+ do {									\
