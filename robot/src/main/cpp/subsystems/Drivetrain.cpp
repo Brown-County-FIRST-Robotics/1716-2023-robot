@@ -1,10 +1,11 @@
 #include "subsystems/Drivetrain.h"
 
-Drivetrain::Drivetrain() :
+Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	frontLeftEncoder{frontLeft.GetEncoder()}, 
 	frontRightEncoder{frontRight.GetEncoder()}, 
 	backLeftEncoder{backLeft.GetEncoder()}, 
-	backRightEncoder{backRight.GetEncoder()} 
+	backRightEncoder{backRight.GetEncoder()},
+	hub{hubRef}
 {
 	frontLeft.SetInverted(false);
 	frontRight.SetInverted(true);
@@ -29,6 +30,14 @@ Drivetrain::Drivetrain() :
 	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
 	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
 	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
+
+	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
+		.Add("Drive Solenoid", false)
+		.WithSize(2, 2)
+		.WithProperties({
+			{"Color when true", nt::Value::MakeString("Maroon")},
+			{"Color when false", nt::Value::MakeString("Cyan")}})
+		.GetEntry();
 }
 
 void Drivetrain::Periodic() {
@@ -55,10 +64,10 @@ void Drivetrain::Periodic() {
 
 void Drivetrain::Drive(double x, double y, double z) {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
 	}
 }
 
@@ -113,10 +122,12 @@ int16_t Drivetrain::GetZ() {
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
 		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoidIndicator->SetBoolean(true);
 		solenoidPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
 		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoidIndicator->SetBoolean(false);
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
@@ -125,6 +136,11 @@ void Drivetrain::ToggleSolenoid() {
 
 void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
 	solenoid.Set(position);
+	if (position == frc::DoubleSolenoid::Value::kForward)
+		solenoidIndicator->SetBoolean(true);
+	else
+		solenoidIndicator->SetBoolean(false);
+
 	solenoidPos = position;
 	
 	waitTicksNeeded = SolenoidConst::WAIT_TICKS;
