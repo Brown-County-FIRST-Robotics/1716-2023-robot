@@ -335,18 +335,18 @@ class DriveToCone(Action):
         self.cone.findCone(self.cams[0].frame)
         
         # cone is to the left, turn left
-        if self.cone.x < -80:
+        if self.cone.x < -20 - self.cone.w / 2:
             print("turn left")
             self.nt_interface.Drive(0, 0, -0.1)
             return
         # cone is to the right, turn right
-        elif self.cone.x > 80:
+        elif self.cone.x > 20 + self.cone.w / 2:
             print("turn right")
             self.nt_interface.Drive(0, 0, 0.1)
             return
 
         # too far away, drive towards it
-        if self.cone.w < 600:
+        if self.cone.w < 500 and self.cone.h < 400:
             print("drive forward")
             self.nt_interface.Drive(0.1, 0, 0)
             return
@@ -359,6 +359,8 @@ class DriveToCone(Action):
         """
 
         # perfect, do nothing!
+        if (self.cone.w >= 500 or self.cone.h >= 400) and self.cone.x >= -20 - self.cone.w / 2 and self.cone.x <= 20 + self.cone.w / 2:
+            self.nt_interface.Drive(0, 0, 0)
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
