@@ -6,6 +6,12 @@ import math
 
 IP = '10.17.16.2'
 
+def clamp(v,r):
+    if v==0:
+        return 0
+    if math.fabs(v)>math.fabs(r):
+        return math.fabs(r)*math.fabs(v)/v
+    return v
 
 class NetworkTablesWrapper:
     def __init__(self):
@@ -20,9 +26,9 @@ class NetworkTablesWrapper:
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
-        self.drive_table.putNumber('x', y)
-        self.drive_table.putNumber('y', x)
-        self.drive_table.putNumber('rotation', r)
+        self.drive_table.putNumber('x', clamp(y,0.2))
+        self.drive_table.putNumber('y', clamp(x,0.2))
+        self.drive_table.putNumber('rotation', clamp(r,0.15))
 
     def SwitchToTank(self):
         logging.debug(f'NetworkTablesWrapper.SwitchToTank()')
