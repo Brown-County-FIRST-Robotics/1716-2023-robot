@@ -133,8 +133,8 @@ class DriveToLocation(Action):
         fxfromry = math.cos((theta + 90) * math.pi / 180)#0 1
         fyfromry = math.sin((theta + 90) * math.pi / 180)#1 0
 
-        move_x = field_x * fxfromrx + field_y * fxfromry
-        move_y = field_x * fyfromrx + field_y * fyfromry
+        move_y = field_x * fxfromrx + field_y * fxfromry
+        move_x = field_x * fyfromrx + field_y * fyfromry
 
         self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(field_r - self.location[2]))
 
