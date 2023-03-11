@@ -76,7 +76,7 @@ class StartFilter(Action):
         if self.referrer=='auto':
             return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
         elif self.referrer=='DRIVETOAPRILTAG':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (632,41,0), self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (600,-400,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
@@ -153,6 +153,7 @@ class DriveToLocation(Action):
     def MakeChild(self):
         if self.referrer == 'auto':
             return AwaitSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+        assert 0
 
 
 class AwaitSetHeight(Action):

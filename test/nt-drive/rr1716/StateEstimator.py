@@ -76,7 +76,7 @@ class StateEstimator:
         self._current.x = x
         self._current.y = y
 
-
+# The inputs to this are in robot coordinates, not field
     def updateWithCommandedVelocity(self, vx, vy, omega):
         # robot 0 theta means pointed up on field (to long wall) and +vy is forward.
         self.updateToNow()
@@ -90,8 +90,8 @@ class StateEstimator:
         fxfromry = math.cos((theta + 90) * math.pi / 180)#0 1
         fyfromry = math.sin((theta + 90) * math.pi / 180)#1 0
 
-        fx = vx * fxfromrx + vy * fxfromry
-        fy = vx * fyfromrx + vy * fyfromry
+        fy = vx * fxfromrx + vy * fxfromry
+        fx = vx * fyfromrx + vy * fyfromry
 
 
         self._current.omega = omega

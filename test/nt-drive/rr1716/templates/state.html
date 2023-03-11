@@ -97,9 +97,9 @@ function drawRobot(state){
 
     function robot_arrow(fromx, fromy, tox, toy) {
         d1 = Math.sqrt(fromx**2+fromy**2);
-        a1 = Math.atan2(fromy, fromx);
+        a1 = state.theta * Math.PI/180 + Math.atan2(fromy, fromx);
         d2 = Math.sqrt(tox**2+toy**2);
-        a2 = Math.atan2(toy, tox);
+        a2 = state.theta * Math.PI/180 + Math.atan2(toy, tox);
         canvas_arrow(ctx, toxpix(state.x+d1*Math.cos(a1)), toypix(state.y+d1*Math.sin(a1)),
             toxpix(state.x+d2*Math.cos(a2)), toypix(state.y+d2*Math.sin(a2)));
     }

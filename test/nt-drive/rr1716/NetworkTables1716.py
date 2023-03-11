@@ -176,7 +176,7 @@ class NetworkTablesWrapper:
     def GetMotors(self):
         vx=240*self.motor_table.getNumber('x',0)
         vy=240*self.motor_table.getNumber('y',0)
-        omega = 300*self.motor_table.getNumber('r',0)
+        omega = 160*self.motor_table.getNumber('r',0)
         return vx, vy, omega
 
 if __name__ == '__main__':
