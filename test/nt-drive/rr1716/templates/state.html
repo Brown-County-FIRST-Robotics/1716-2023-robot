@@ -45,7 +45,7 @@ function toxpix(x) {//CM TO pix
 return scale(x + FIELDW/2);
 }
 function toypix(y) {//CM TO pix
-return scale(y + FIELDH/2);
+return scale(FIELDH/2 - y);
 }
 
 
@@ -94,11 +94,11 @@ context.stroke();
 
 
 function drawRobot(x, y, r){
-drawRotatedRect(ctx, toxpix(x-3*2.54-40*2.54/2), toypix(y-3*2.54-31*2.54/2), scale(40*2.54), scale(31*2.54),r, "blue");
-drawRotatedRect(ctx, toxpix(x       -40*2.54/2), toypix(y       -31*2.54/2), scale(34*2.54), scale(25*2.54),r, "silver");
+//drawRotatedRect(ctx, toxpix(x-3*2.54-40*2.54/2), toypix(y-3*2.54-31*2.54/2), scale(40*2.54), scale(31*2.54),-r, "blue");
+//drawRotatedRect(ctx, toxpix(x       -40*2.54/2), toypix(y       -31*2.54/2), scale(34*2.54), scale(25*2.54),-r, "silver");
 ctx.fillStyle="red";
-canvas_arrow(ctx, toxpix(x-3*2.54-40*2.54/2), toypix(y-3*2.54-31*2.54/2),
-toxpix(x-3*2.54-40*2.54/2+30), toypix(y-3*2.54-31*2.54/2+30));
+canvas_arrow(ctx, toxpix(x), toypix(y),
+toxpix(x+30*Math.cos(r*Math.PI/180)), toypix(y+30*Math.sin(r*Math.PI/180)));
 //drawArrowhead(ctx, {'x':x, 'y':y}, {'x':x+scale(300)*Math.cos(r*Math.PI/180), 'y':y+scale(300)*Math.cos(r*Math.PI/180)}, 3);
 }
 
