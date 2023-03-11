@@ -37,13 +37,13 @@ namespace PIDConst {
 namespace ArmConst
 {
 	const int SHOULDER_ID = 50;
+	const int ELBOW_ID = 51;
 
 	//0 is forward, 1 is reverse
-	const int ARM_BRAKE_ID[2] = {2, 3};
-	const int ARM_DIRECTION_ID[2] = {4, 5};
 	const int CLAW_ID[2] = {6, 7};
 
-	const double SHOULDER_SPEED = .65;
+	const double SHOULDER_SPEED = 1;
+	const double ELBOW_SPEED = .25;
 
 	//Analog ID
 	const int ARM_POTENTIOMETER_ID = 0;

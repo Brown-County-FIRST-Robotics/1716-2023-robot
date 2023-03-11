@@ -31,8 +31,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetRightX(); },
 		[this] { return controller.GetBButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return -controller2.GetLeftY(); }, 
-		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }, [this] { return controller2.GetXButton(); }));
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetRightY(); }, 
+		[this] { return controller2.GetLeftY(); }, [this] { return controller2.GetXButton(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
