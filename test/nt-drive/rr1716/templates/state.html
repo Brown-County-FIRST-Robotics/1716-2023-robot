@@ -75,7 +75,6 @@ function drawRotatedRect(ctx, x,y,width,height,degrees, color){
 
     }
 
-canvas_arrow(ctx, 10, 30, 200, 150);
 
 
 function canvas_arrow(context, fromx, fromy, tox, toy) {
@@ -93,12 +92,31 @@ context.stroke();
 }
 
 
-function drawRobot(x, y, r){
-//drawRotatedRect(ctx, toxpix(x-3*2.54-40*2.54/2), toypix(y-3*2.54-31*2.54/2), scale(40*2.54), scale(31*2.54),-r, "blue");
-//drawRotatedRect(ctx, toxpix(x       -40*2.54/2), toypix(y       -31*2.54/2), scale(34*2.54), scale(25*2.54),-r, "silver");
+
+function drawRobot(state){
+
+    function robot_arrow(fromx, fromy, tox, toy) {
+        d1 = Math.sqrt(fromx**2+fromy**2);
+        a1 = Math.atan2(fromy, fromx);
+        d2 = Math.sqrt(tox**2+toy**2);
+        a2 = Math.atan2(toy, tox);
+        canvas_arrow(ctx, toxpix(state.x+d1*Math.cos(a1)), toypix(state.y+d1*Math.sin(a1)),
+            toxpix(state.x+d2*Math.cos(a2)), toypix(state.y+d2*Math.sin(a2)));
+    }
+
+
+    drawRotatedRect(ctx, toxpix(state.x-40*2.54/2), toypix(state.y+31*2.54/2), scale(40*2.54), scale(31*2.54),-state.theta, "blue");
+    drawRotatedRect(ctx, toxpix(state.x       -34*2.54/2), toypix(state.y       +25*2.54/2), scale(34*2.54), scale(25*2.54),-state.theta, "silver");
 ctx.fillStyle="red";
-canvas_arrow(ctx, toxpix(x), toypix(y),
-toxpix(x+30*Math.cos(r*Math.PI/180)), toypix(y+30*Math.sin(r*Math.PI/180)));
+    robot_arrow(30,0,40,0);
+//    robot_arrow(0,0,state.vx,state.vy);
+    ctx.save();
+    ctx.lineWidth = 5;
+    canvas_arrow(ctx, toxpix(state.x), toypix(state.y),
+        toxpix(state.x+state.vx), toypix(state.y+state.vy));
+    ctx.restore();
+//    canvas_arrow(ctx, toxpix(x), toypix(y),
+//        toxpix(x+30*Math.cos(r*Math.PI/180)), toypix(y+30*Math.sin(r*Math.PI/180)));
 //drawArrowhead(ctx, {'x':x, 'y':y}, {'x':x+scale(300)*Math.cos(r*Math.PI/180), 'y':y+scale(300)*Math.cos(r*Math.PI/180)}, 3);
 }
 
@@ -107,7 +125,7 @@ const r = await fetch('/stateest');
 const state = await r.json();
 console.log(state);
 ctx.drawImage(img, 0, 0,canvas.width,canvas.height);
-drawRobot(state.x,state.y,state.theta);
+drawRobot(state);
 }
 setInterval(getState, 200);
 
