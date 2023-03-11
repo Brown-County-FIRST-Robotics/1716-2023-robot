@@ -50,11 +50,9 @@ class Detection:
         thetaCA = camera_theta - math.atan(self.left_right / self.distance) * 180 / math.pi
         camera_Y = pos[1] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.sin(thetaCA * math.pi / 180))
         camera_X = pos[0] - (math.sqrt(self.left_right ** 2 + self.distance ** 2) * math.cos(thetaCA * math.pi / 180))
-        thetaCA=thetaCA-360
-        self.field_yaw = thetaCA
         self.field_x = camera_X
         self.field_y = camera_Y
-        return camera_X, camera_Y, thetaCA
+        return camera_X, camera_Y, camera_theta
 
 def getCoords(img, valid_tags=range(1, 9)):
     if img is None:
@@ -145,7 +143,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             assert good, 'something went wrong with solvePnP'
 
             # Map rotation_vector
-            pitch, yaw, roll = [-float(i) for i in rotation_vector[0] * 180 / math.pi]
+            pitch, yaw, roll = [float(i) for i in rotation_vector[0] * 180 / math.pi]
 
             left_right = translation_vector[0][0] * 2.54
             up_down = -translation_vector[0][1] * 2.54
