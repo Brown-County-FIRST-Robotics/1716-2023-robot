@@ -126,17 +126,19 @@ class DriveToLocation(Action):
         field_x-=self.location[0]
         field_y-=self.location[1]
         logging.info(f'Moves:{field_x} {field_y} {field_r}')
-        theta  = field_r
-        fxfromrx = math.cos(theta * math.pi / 180)#1 0
-        fyfromrx = math.sin(theta * math.pi / 180)#0 -1
+        theta  = field_r-self.location[2]
+        if theta>180:
+            theta-=360
+        fxfromrx = math.cos(field_r * math.pi / 180)#1 0
+        fyfromrx = math.sin(field_r * math.pi / 180)#0 -1
 
-        fxfromry = math.cos((theta + 90) * math.pi / 180)#0 1
-        fyfromry = math.sin((theta + 90) * math.pi / 180)#1 0
+        fxfromry = math.cos((field_r + 90) * math.pi / 180)#0 1
+        fyfromry = math.sin((field_r + 90) * math.pi / 180)#1 0
 
         move_y = field_x * fxfromrx + field_y * fxfromry
         move_x = field_x * fyfromrx + field_y * fyfromry
 
-        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(field_r - self.location[2]))
+        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(theta))
 
     def ShouldEnd(self):
         state=self.filter.current
