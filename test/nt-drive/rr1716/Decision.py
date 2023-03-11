@@ -76,7 +76,7 @@ class StartFilter(Action):
         if self.referrer=='auto':
             return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
         elif self.referrer=='DRIVETOAPRILTAG':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,0,0), self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (632,41,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
@@ -123,7 +123,10 @@ class DriveToLocation(Action):
         super().Step()
         state = self.filter.current
         field_x, field_y, field_r = state.x, state.y, state.theta
-        theta  = self._current.theta
+        field_x-=self.location[0]
+        field_y-=self.location[1]
+        logging.info(f'Moves:{field_x} {field_y} {field_r}')
+        theta  = field_r
         fxfromrx = math.cos(theta * math.pi / 180)#1 0
         fyfromrx = math.sin(theta * math.pi / 180)#0 -1
 
@@ -133,9 +136,10 @@ class DriveToLocation(Action):
         move_x = field_x * fxfromrx + field_y * fxfromry
         move_y = field_x * fyfromrx + field_y * fyfromry
 
-        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(field_r - self.location[2]))
+        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(field_r - self.location[2]))
 
     def ShouldEnd(self):
+        state=self.filter.current
         field_x, field_y, field_r = state.x, state.y, state.theta
         error = math.sqrt((field_x - self.location[0]) ** 2 + (
                     field_y - self.location[1]) ** 2)

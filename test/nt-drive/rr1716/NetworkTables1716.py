@@ -20,8 +20,8 @@ class NetworkTablesWrapper:
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
-        self.drive_table.putNumber('x', x)
-        self.drive_table.putNumber('y', y)
+        self.drive_table.putNumber('x', y)
+        self.drive_table.putNumber('y', x)
         self.drive_table.putNumber('rotation', r)
 
     def SwitchToTank(self):
