@@ -164,20 +164,14 @@ class NetworkTablesWrapper:
         if pos==-1:
             return None
         return pos
-    def GetMotors(self, field_r):
-        cx = math.cos(field_r * math.pi / 180)
-        cy = math.sin(field_r * math.pi / 180)
 
-        ax = math.cos((field_r + 90) * math.pi / 180)
-        ay = math.sin((field_r + 90) * math.pi / 180)
 
-        move_x=240*self.motor_table.getNumber('x',0)
-        move_y=240*self.motor_table.getNumber('y',0)
-
-        fx = move_x * cx + move_y * cy
-        fy = move_x * ax + move_y * ay
-        fr = 300*self.motor_table.getNumber('r',0)
-        return fx,fy,fr
+     #robot 0 theta means pointed up on field (to long wall) and +vy is forward.
+    def GetMotors(self):
+        vx=240*self.motor_table.getNumber('x',0)
+        vy=240*self.motor_table.getNumber('y',0)
+        omega = 300*self.motor_table.getNumber('r',0)
+        return vx, vy, omega
 
 if __name__ == '__main__':
     # TEST CODE

@@ -86,14 +86,23 @@ class StateEstimator:
 
 
     def updateWithCommandedVelocity(self, vx, vy, omega):
+        # robot 0 theta means pointed up on field (to long wall) and +vy is forward.
         self.updateToNow()
-        self._current.omega = omega
-        self._current.vx = vx
-        self._current.vy = vy
+#th0 y->y
+#th270 y->x
 
-    def updateWithEncoders(self):
-#        asdf do pos and vel update
-        fl, bl, fr, br = [i * 4 * math.pi for i in ntInterface.GetEncoderVals()]  # fl bl fr br
-        y = fl + fr + bl + br
-        x = fl + br - bl - fr
-        r = fr + br - fl - bl
+        theta  = self._current.theta
+        fxfromrx = math.cos(theta * math.pi / 180)#1 0
+        fyfromrx = math.sin(theta * math.pi / 180)#0 -1
+
+        fxfromry = math.cos((theta + 90) * math.pi / 180)#0 1
+        fyfromry = math.sin((theta + 90) * math.pi / 180)#1 0
+
+        fx = vx * fxfromrx + vy * fxfromry
+        fy = vx * fyfromrx + vy * fyfromry
+
+
+        self._current.omega = omega
+        self._current.vx = fx
+        self._current.vy = fy
+
