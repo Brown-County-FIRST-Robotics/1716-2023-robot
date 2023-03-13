@@ -48,3 +48,12 @@ namespace ArmConst
 	//Analog ID
 	const int ARM_POTENTIOMETER_ID = 0;
 };
+
+
+namespace LedConst
+{
+	const int RED_PIN=0; // TODO: add real values
+	const int GREEN_PIN=0; // TODO: add real values
+	const int BLUE_PIN=0; // TODO: add real values
+
+};
