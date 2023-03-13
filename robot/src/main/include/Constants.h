@@ -2,6 +2,8 @@
 // #include <units/time.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
+#include <map>
+#include <string>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -55,5 +57,10 @@ namespace LedConst
 	const int RED_PIN=0; // TODO: add real values
 	const int GREEN_PIN=0; // TODO: add real values
 	const int BLUE_PIN=0; // TODO: add real values
+	std::map<std::string, std::vector<int>> COLORS{
+		{"red",{255,0,0}},
+		{"green",{0,255,0}},
+		{"blue",{0,0,255}}
+	}; //TODO: add more colors
 
 };
