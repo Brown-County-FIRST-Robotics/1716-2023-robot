@@ -76,7 +76,7 @@ class StartFilter(Action):
         if self.referrer=='auto':
             return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
         elif self.referrer=='DRIVETOAPRILTAG':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,0,0), self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (600,-400,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
@@ -121,24 +121,28 @@ class DriveToLocation(Action):
 
     def Step(self):
         super().Step()
-        field_x, field_y, field_r = self.filter.currentTuple
-        cx = math.cos(field_r * math.pi / 180)
-        cy = math.sin(field_r * math.pi / 180)
+        state = self.filter.current
+        field_x, field_y, field_r = state.x, state.y, state.theta
+        field_x-=self.location[0]
+        field_y-=self.location[1]
+        logging.info(f'Moves:{field_x} {field_y} {field_r}')
+        theta  = field_r-self.location[2]
+        if theta>180:
+            theta-=360
+        fxfromrx = math.cos(field_r * math.pi / 180)#1 0
+        fyfromrx = math.sin(field_r * math.pi / 180)#0 -1
 
-        ax = math.cos((field_r + 90) * math.pi / 180)
-        ay = math.sin((field_r + 90) * math.pi / 180)
+        fxfromry = math.cos((field_r + 90) * math.pi / 180)#0 1
+        fyfromry = math.sin((field_r + 90) * math.pi / 180)#1 0
 
-        offset_x = field_x - self.location[0]
-        offset_y = field_y - self.location[1]
-        offset_r = field_r - self.location[2]
-        move_x=offset_x * cx + offset_y * cy
-        move_y=offset_x * ax + offset_y * ay
-        move_r=offset_r
+        move_y = field_x * fxfromrx + field_y * fxfromry
+        move_x = field_x * fyfromrx + field_y * fyfromry
 
-        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(move_r))
+        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(theta))
 
     def ShouldEnd(self):
-        field_x, field_y, field_r = self.filter.currentTuple
+        state=self.filter.current
+        field_x, field_y, field_r = state.x, state.y, state.theta
         error = math.sqrt((field_x - self.location[0]) ** 2 + (
                     field_y - self.location[1]) ** 2)
         return error < Strategy.drive_error_threshold and math.fabs(field_r - self.location[2]) < Strategy.r_error_threshold
@@ -149,6 +153,7 @@ class DriveToLocation(Action):
     def MakeChild(self):
         if self.referrer == 'auto':
             return AwaitSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+        assert 0
 
 
 class AwaitSetHeight(Action):

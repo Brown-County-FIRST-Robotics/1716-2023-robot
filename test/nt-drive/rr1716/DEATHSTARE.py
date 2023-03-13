@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import logging
-from flask import Flask, render_template, Response, redirect, request
+from flask import Flask, render_template, Response, redirect, request, jsonify
 from threading import Thread
 from rr1716 import AprilTags
 import cv2
 import numpy as np
 import rr1716
+import dataclasses
 
 __COLOR_PICK_RANGE__ = 20
 
@@ -52,6 +53,16 @@ def index():
     logging.debug("DEATHSTARE.index")
     """Video streaming home page."""
     return render_template('sidecam.html')
+
+@app.route('/state')
+def state():
+    logging.debug("DEATHSTARE.state")
+    return render_template('state.html')
+
+@app.route('/stateest')
+def stateest():
+    logging.debug("DEATHSTARE.stateest")
+    return jsonify(dataclasses.asdict(app.filter.current))
 
 #Color picker
 # This function gets called by the /video_feed route below
@@ -147,12 +158,25 @@ def get_apriltags():
         return Response(f'<h3>Field position: x:{x}, y:{y}, r:{r}</h3>', mimetype='text')
     return Response('<h3>No apriltags Found</h3>', mimetype='text')
 
+@app.route("/apriltags2")
+def get_apriltags2():
+    res=[]
+    for cam in app.Cameras:
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        for det in dets:
+          print(det)
+          x,y,r=det.calcFieldPos()
+          out = (det.tagID, det.distance, det.left_right, det.yaw, x, y, r, det.RMSError)
+          res.append(out)
+    return jsonify(res)
 
-def start(camera):
+
+def start(camera, filter):
     logging.debug("DEATHSTARE.start")
     app.Cameras = camera
     thread = Thread(target=app.run, kwargs={'host':"0.0.0.0"})
     thread.start()
+    app.filter=filter
 
 if __name__ == '__main__':
     pass

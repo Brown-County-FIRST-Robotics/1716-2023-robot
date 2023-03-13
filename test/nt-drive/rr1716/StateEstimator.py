@@ -18,11 +18,6 @@ class State:
     time: float
 
 
-def toPos(fl, fr, bl, br):
-    y = fl + fr + bl + br
-    x = fl + br - bl - fr
-    r = fr + br - fl - bl
-    return x, y, r
 
 
 class StateEstimator:
@@ -66,9 +61,6 @@ class StateEstimator:
     def current(self):
         self.updateToNow()
         return dataclasses.replace(self._current)
-    @property
-    def currentTuple(self):
-        return (self.current.x, self.current.y, self.current.theta)
 
     def updateToNow(self): # Update the x,y,r values, according to vx,vy,vr
         newTime = self.now()
@@ -84,16 +76,25 @@ class StateEstimator:
         self._current.x = x
         self._current.y = y
 
-
+# The inputs to this are in robot coordinates, not field
     def updateWithCommandedVelocity(self, vx, vy, omega):
+        # robot 0 theta means pointed up on field (to long wall) and +vy is forward.
         self.updateToNow()
-        self._current.omega = omega
-        self._current.vx = vx
-        self._current.vy = vy
+#th0 y->y
+#th270 y->x
 
-    def updateWithEncoders(self):
-#        asdf do pos and vel update
-        fl, bl, fr, br = [i * 4 * math.pi for i in ntInterface.GetEncoderVals()]  # fl bl fr br
-        y = fl + fr + bl + br
-        x = fl + br - bl - fr
-        r = fr + br - fl - bl
+        theta  = self._current.theta
+        fxfromrx = math.cos(theta * math.pi / 180)#1 0
+        fyfromrx = math.sin(theta * math.pi / 180)#0 -1
+
+        fxfromry = math.cos((theta + 90) * math.pi / 180)#0 1
+        fyfromry = math.sin((theta + 90) * math.pi / 180)#1 0
+
+        fy = vx * fxfromrx + vy * fxfromry
+        fx = vx * fyfromrx + vy * fyfromry
+
+
+        self._current.omega = omega
+        self._current.vx = fx
+        self._current.vy = fy
+

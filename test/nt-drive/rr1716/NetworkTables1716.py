@@ -2,9 +2,16 @@
 
 import logging
 from networktables import NetworkTables
+import math
 
 IP = '10.17.16.2'
 
+def clamp(v,r):
+    if v==0:
+        return 0
+    if math.fabs(v)>math.fabs(r):
+        return math.fabs(r)*math.fabs(v)/v
+    return v
 
 class NetworkTablesWrapper:
     def __init__(self):
@@ -19,9 +26,9 @@ class NetworkTablesWrapper:
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
-        self.drive_table.putNumber('x', x)
-        self.drive_table.putNumber('y', y)
-        self.drive_table.putNumber('rotation', r)
+        self.drive_table.putNumber('x', clamp(y,0.2))
+        self.drive_table.putNumber('y', clamp(x,0.2))
+        self.drive_table.putNumber('rotation', clamp(r,0.15))
 
     def SwitchToTank(self):
         logging.debug(f'NetworkTablesWrapper.SwitchToTank()')
@@ -163,9 +170,14 @@ class NetworkTablesWrapper:
         if pos==-1:
             return None
         return pos
-    def GetMotors(self):
-        return self.motor_table.getNumber('x',0),self.motor_table.getNumber('y',0),self.motor_table.getNumber('r',0)
 
+
+     #robot 0 theta means pointed up on field (to long wall) and +vy is forward.
+    def GetMotors(self):
+        vx=240*self.motor_table.getNumber('x',0)
+        vy=240*self.motor_table.getNumber('y',0)
+        omega = 160*self.motor_table.getNumber('r',0)
+        return vx, vy, omega
 
 if __name__ == '__main__':
     # TEST CODE
