@@ -114,7 +114,7 @@ def main():
     signal.signal(signal.SIGINT, handler)
 
     nt_table = NetworkTables1716.NetworkTablesWrapper()
-    filter=Filter.Filter()
+    filter=StateEstimator.StateEstimator()
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
  
     

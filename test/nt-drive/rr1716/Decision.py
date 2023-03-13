@@ -356,16 +356,16 @@ class DriveToGamepeice(Action):
         # cone is to the left, turn left
         if self.gamepeice.x < -5 - self.gamepeice.w / 2:
             print("turn left")
-            r = -0.15
+            r = -0.05
         # cone is to the right, turn right
         elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
             print("turn right")
-            r = 0.15
+            r = 0.05
 
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            x = 0.4 
+            y = 0.4 
 
         self.nt_interface.Drive(x, y, r)
 
