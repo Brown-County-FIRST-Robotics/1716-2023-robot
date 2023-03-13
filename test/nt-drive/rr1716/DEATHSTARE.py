@@ -158,6 +158,18 @@ def get_apriltags():
         return Response(f'<h3>Field position: x:{x}, y:{y}, r:{r}</h3>', mimetype='text')
     return Response('<h3>No apriltags Found</h3>', mimetype='text')
 
+@app.route("/apriltags2")
+def get_apriltags2():
+    res=[]
+    for cam in app.Cameras:
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        for det in dets:
+          print(det)
+          x,y,r=det.calcFieldPos()
+          out = (det.tagID, det.distance, det.left_right, det.yaw, x, y, r, det.RMSError)
+          res.append(out)
+    return jsonify(res)
+
 
 def start(camera, filter):
     logging.debug("DEATHSTARE.start")

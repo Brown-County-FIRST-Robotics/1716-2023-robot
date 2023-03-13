@@ -98,7 +98,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
     """
     # Check if image is grayscale
     if img is None:
-        return None
+        return []
     assert len(img.shape) == 2, 'Image must be grayscale'
 
     # AprilTag detector options
@@ -154,11 +154,8 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
                 logging.info(f'discarded a value (roll:{roll})')
                 continue
             logging.info(f'april pos: yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
-            detections.append(Detection(yaw, left_right, distance, rms,
-                                        detection.tag_id))
+            detections.append(Detection(yaw, left_right[0], distance[0], rms[0][0], detection.tag_id))
             logging.info(f'field pos:yaw:{detections[-1].calcFieldPos()}')
-    if len(detections)==0:
-        return None
     return detections
 
 
