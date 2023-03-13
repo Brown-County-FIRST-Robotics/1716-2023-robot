@@ -338,7 +338,7 @@ class DriveToGamepeice(Action):
 
     def Step(self):
         x = y = r = 0
-        self.gamepeice.findCone(self.cams[0].frame) #find the cone
+        self.gamepeice.findObject(self.cams[0].frame) #find the cone
        
         # perfect, do nothing!
         if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
