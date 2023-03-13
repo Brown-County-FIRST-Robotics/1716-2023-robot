@@ -25,7 +25,7 @@ RobotContainer::RobotContainer() {
 
 	ConfigureButtonBindings();
 	
-	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, 
+	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, &led, 
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },

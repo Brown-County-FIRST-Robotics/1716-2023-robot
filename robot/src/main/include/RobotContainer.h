@@ -12,6 +12,7 @@
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveBackThenBalance.h"
+#include "subsystems/Led.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
 public:
@@ -36,6 +37,7 @@ private:
 	frc::PneumaticHub hub{SolenoidConst::HUB_ID};
 
 	Drivetrain drivetrain{hub};
+	Led led;
 	Arm arm{hub};
 
 	void ConfigureButtonBindings();
