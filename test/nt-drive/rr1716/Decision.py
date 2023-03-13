@@ -8,8 +8,8 @@ from rr1716 import Strategy
 import cv2
 import numpy as np
 import simple_pid
+# from rr1716 import Filter
 # from rr1716 import StateEstimator
-
 
 class Action:
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -270,7 +270,6 @@ class AddScreenVals(Action):
     def ShouldEnd(self):
         return False
 
-
 class GetDriverCommand(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
@@ -304,77 +303,74 @@ def doCurrentAction(action):
         return action.MakeChild()
     return None
 
+class DriveToGamepeice(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer, col_range_h=50, col_range_s=50, col_range_v=50, target_w=300, target_h=200, color_file_path="cone_picked_color"):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        
+        col = []
+        if os.path.exists(color_file_path):
+            file = open(color_file_path, "r") 
+            for line in file:
+                for x in line.split():
+                    col.append(int(x)) 
+            file.close()
+        else:
+            print("Error: file does not exist: " + color_file_path)
+
+        self.gamepeice = Vision.GamePiece()
+        while len(col) < 3:
+            col.append(0)
+        
+        lower = [col[0] - col_range_h, col[1] - col_range_s, col[2] - col_range_v]
+        upper = [col[0] + col_range_h, col[1] + col_range_s, col[2] + col_range_v]
+    
+        for i in range(len(lower)):
+            if lower[i] < 0:
+                lower[i] = 0
+            if lower[i] > 255:
+                lower[i] = 255
+
+            if upper[i] < 0:
+                upper[i] = 0
+            if upper[i] > 255:
+                upper[i] = 255
+
+        self.gamepeice.setLowerColor(np.array(lower, dtype=np.uint8))
+        self.gamepeice.setUpperColor(np.array(upper, dtype=np.uint8))
+
+        self.target_w = target_w
+        self.target_h = target_h
+
+    def Step(self):
+        x = y = r = 0
+        self.gamepeice.findObject(self.cams[0].frame) #find the cone
+       
+        # perfect, do nothing!
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
+            self.nt_interface.Drive(0, 0, 0)
+            return
+
+        logging.debug("Decision: w: " + str(self.gamepeice.w))
+        logging.debug("Decision: x, y: " + str(self.gamepeice.x) + ", " + str(self.gamepeice.y))
+
+        # cone is to the left, turn left
+        if self.gamepeice.x < -5 - self.gamepeice.w / 2:
+            print("turn left")
+            r = -0.15
+        # cone is to the right, turn right
+        elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
+            print("turn right")
+            r = 0.15
+
+        # too far away, drive towards it
+        if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
+            print("drive forward")
+            x = 0.4 
+
+        self.nt_interface.Drive(x, y, r)
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
-    import NetworkTables1716
-    import cv2
-    import numpy as np
-
-    gameobjects = [
-        Vision.GamePiece(),
-        Vision.GamePiece(),
-        Vision.GamePiece(),
-        Vision.GamePiece()
-    ]
-
-    gameobjects[0].x = -30
-    gameobjects[0].y = 0
-
-    gameobjects[1].notfound = True
-    gameobjects[2].notfound = True
-    gameobjects[3].notfound = True
-
-    nttable = NetworkTables1716.NetworkTablesWrapper()
-    cam = cv2.VideoCapture("/dev/video2")
-
-    ret, frame = cam.read()
-    avgColor = Vision.averageColor(frame, 20)
-
-    low = [ avgColor[0] * 0.3, avgColor[1] * 0.7, avgColor[2] * 0.7 ]
-    high = [ avgColor[0] * 3.3, avgColor[1] * 1.3, avgColor[2] * 1.3 ]
-    gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
-    gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
-
-    while True:
-        ret, frame = cam.read()
-        
-        gameobjects[0].findCone(frame)
-        gameobjects[0].drawBoundRect(frame, [0,255,0])
-
-        print(int(gameobjects[0].x), int(gameobjects[0].y))
-
-        scaledup = cv2.resize(frame, (int(frame.shape[1] * 1.6), int(frame.shape[0] * 1.6)),
-                              interpolation=cv2.INTER_AREA)
-        cv2.imshow("frame", scaledup)
-
-        decisionMade = decision(DecisionArg(gameobjects, False, 120))
-        print("rotation speed:", decisionMade.driveRotation, "speed:", decisionMade.driveSpeed) 
-        nttable.Drive(decisionMade.driveSpeed, 0.0, decisionMade.driveRotation)
-
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
-            break
-        elif key == ord('1'):
-            avgColor = Vision.averageColor(frame, 100) 
-            low = [ avgColor[0] * 0.3, avgColor[1] * 0.5, avgColor[2] * 0.5 ]
-            high = [ avgColor[0] * 2.0, avgColor[1] * 2.0, avgColor[2] * 2.0 ]
-            
-            for i in range(3):
-                if low[i] < 0:
-                    low[i] = 0
-                elif low[i] > 255:
-                    low[i] = 255
-
-                if high[i] < 0:
-                    high[i] = 0
-                elif high[i] > 255:
-                    high[i] = 255
-            
-            print(low, high, avgColor)
-            gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
-            gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
-
     pass
 # initialize module here
 else:

@@ -43,7 +43,7 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
         self.camera.set(cv2.CAP_PROP_BRIGHTNESS, 0)
-        self.camera.set(cv2.CAP_PROP_CONTRAST, 32)
+        self.camera.set(cv2.CAP_PROP_CONTRAST, 0)
         self.camera.set(cv2.CAP_PROP_SATURATION, 128)
         self.camera.set(cv2.CAP_PROP_HUE, 0)
         self.camera.set(cv2.CAP_PROP_AUTO_WB, 1)
