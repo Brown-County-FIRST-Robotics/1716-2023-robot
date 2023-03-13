@@ -19,10 +19,10 @@ void ArmTeleopControl::Execute() {
 		clawPressed = false;
 
 	arm->SetShoulder(-shoulder());
-	arm->SetElbow(-elbow());
+	// arm->SetElbow(-elbow());
 }
 
 void ArmTeleopControl::End(bool interrupted) {
 	arm->SetShoulder(0);
-	arm->SetElbow(0);
+	// arm->SetElbow(0);
 }

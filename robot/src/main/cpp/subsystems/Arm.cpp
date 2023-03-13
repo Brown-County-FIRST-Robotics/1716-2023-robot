@@ -1,12 +1,23 @@
-#define _USE_MATH_DEFINES
-
 #include "subsystems/Arm.h"
-#include <math.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 
-Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef} {
+Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDController()}, elbowEncoder{elbow.GetEncoder()} {
 	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-	// elbow.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, false);
-	// elbow.EnableSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, false);
+	elbowEncoder.SetPosition(0);
+	elbow.SetInverted(true);
+
+	elbowPid.SetP(P);
+    elbowPid.SetI(I);
+    elbowPid.SetD(D);
+    elbowPid.SetIZone(0);
+    elbowPid.SetFF(0);
+    elbowPid.SetOutputRange(-MAX_OUTPUT, MAX_OUTPUT);
+
+	frc::SmartDashboard::PutNumber("P", P);
+	frc::SmartDashboard::PutNumber("I", I);
+	frc::SmartDashboard::PutNumber("D", D);
+	frc::SmartDashboard::PutNumber("Max Output", MAX_OUTPUT);
+	frc::SmartDashboard::PutNumber("Position", elbowPositionGoal);
 }
 
 void Arm::Periodic() {
@@ -14,6 +25,19 @@ void Arm::Periodic() {
 		claw.Set(frc::DoubleSolenoid::Value::kOff);
 	else if (clawTicks > -1)
 		clawTicks--;
+
+	double p = frc::SmartDashboard::GetNumber("P", 0);
+	double i = frc::SmartDashboard::GetNumber("I", 0);
+	double d = frc::SmartDashboard::GetNumber("D", 0);
+	double max = frc::SmartDashboard::GetNumber("Max Output", 0);
+	double pos = frc::SmartDashboard::GetNumber("Position", 0);
+
+	if((p != P)) { elbowPid.SetP(p); P = p; }
+    if((i != I)) { elbowPid.SetI(i); I = i; }
+    if((d != D)) { elbowPid.SetD(d); D = d; }
+    if((max != MAX_OUTPUT)) { elbowPid.SetOutputRange(-max, max); MAX_OUTPUT = max; }
+    if((pos != elbowPositionGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kPosition); elbowPositionGoal = pos; }
+	frc::SmartDashboard::PutNumber("Output", elbow.GetAppliedOutput());
 }
 
 // void Arm::SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position) {
@@ -24,8 +48,13 @@ void Arm::SetShoulder(double speed) {
 	shoulder.Set(-speed * ArmConst::SHOULDER_SPEED);
 }
 
-void Arm::SetElbow(double speed) {
-	elbow.Set(-speed * ArmConst::ELBOW_SPEED);
+void Arm::SetElbowGoal(double position) {
+	// elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kPosition);
+	elbowPositionGoal = position;
+}
+
+double Arm::GetElbowGoal() {
+	return elbowPositionGoal;
 }
 
 void Arm::ToggleClaw() {

@@ -25,7 +25,7 @@ namespace DrivetrainConst {
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };
 
-namespace PIDConst {
+namespace AutolevelConst {
 	const double ULTIMATEGAIN = .0067;
 	const double OSCPERIOD = 3.49;
 
@@ -43,8 +43,12 @@ namespace ArmConst
 	const int CLAW_ID[2] = {6, 7};
 
 	const double SHOULDER_SPEED = 1;
-	const double ELBOW_SPEED = .25;
 
 	//Analog ID
 	const int ARM_POTENTIOMETER_ID = 0;
+
+	const double P = .000001;
+	const double I = 0;
+	const double D = 0;
+	const double MAX_OUTPUT = .15;
 };

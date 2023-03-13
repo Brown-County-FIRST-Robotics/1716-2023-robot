@@ -3,7 +3,7 @@
 
 AutoBalance::AutoBalance(Drivetrain* drive) 
 	//https://docs.wpilib.org/en/stable/docs/software/commandbased/pid-subsystems-commands.html#creating-a-pidcommand
-	: CommandHelper{frc2::PIDController{PIDConst::PROPORTIONAL_FACTOR, PIDConst::INTEGRAL_FACTOR, PIDConst::DERIVATIVE_FACTOR}, 
+	: CommandHelper{frc2::PIDController{AutolevelConst::PROPORTIONAL_FACTOR, AutolevelConst::INTEGRAL_FACTOR, AutolevelConst::DERIVATIVE_FACTOR}, 
 	[drive] { return drive->GetRoll(); }, //Input
 	0, //Goal
 	[drive](double output) { drive->Drive(output, 0, 0); }, //Output
