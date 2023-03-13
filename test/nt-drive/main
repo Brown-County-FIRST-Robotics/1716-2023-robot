@@ -8,7 +8,7 @@ from rr1716 import DEATHSTARE
 from rr1716 import AprilTags
 from rr1716 import Decision
 from rr1716 import NetworkTables1716
-from rr1716 import Filter
+from rr1716 import StateEstimator
 from rr1716 import Positions
 from concurrent.futures import ThreadPoolExecutor
 import time
@@ -115,7 +115,6 @@ def main():
 
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=Filter.Filter()
-    
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
  
     current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocone', 30, 255, 255, 300, 200, "cube_picked_color")
@@ -135,7 +134,7 @@ def main():
         assert False, f'"{args.auto_mode}" does not have a matching `elif` block'
     """
 
-    DEATHSTARE.start(cameras)
+    DEATHSTARE.start(cameras, filter)
 
     lastframetime = 0
     try:
