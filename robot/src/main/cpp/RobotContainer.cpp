@@ -45,7 +45,11 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	 // TODO: add real mecanum and tank solenoid values
+	controller.A().OnTrue(frc2::InstantCommand([this] {
+		drivetrain.ToggleSolenoid();
+		led.SetColor(drivetrain.GetSolenoid()==frc::DoubleSolenoid::Value::kForward?LedConst::MECANUM_COLOR:LedConst::TANK_COLOR);}, 
+	{&drivetrain, &led}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes

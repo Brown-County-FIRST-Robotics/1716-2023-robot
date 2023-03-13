@@ -4,10 +4,11 @@
 #include <frc2/command/CommandHelper.h>
 
 #include "subsystems/Drivetrain.h"
+#include "subsystems/Led.h"
 
 class TeleopDrive : public frc2::CommandHelper<frc2::CommandBase, TeleopDrive> {
 public:
-	explicit TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
+	explicit TeleopDrive(Drivetrain* subsystem, Led* ledSubsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake);
 
 	void Execute() override;
 	
@@ -15,6 +16,7 @@ public:
 
 private:
 	Drivetrain* drivetrain;
+	Led* led;
 	std::function<double()> x;
 	std::function<double()> y;
 	std::function<double()> z;

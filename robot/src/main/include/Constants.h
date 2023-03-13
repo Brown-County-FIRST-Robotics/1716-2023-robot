@@ -62,5 +62,8 @@ namespace LedConst
 		{"green",{0,255,0}},
 		{"blue",{0,0,255}}
 	}; //TODO: add more colors
+	std::string BRAKE_COLOR="red";
+	std::string MECANUM_COLOR="blue";
+	std::string TANK_COLOR="green";
 
 };

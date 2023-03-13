@@ -2,8 +2,8 @@
 
 #include <utility>
 
-TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))
+TeleopDrive::TeleopDrive(Drivetrain* subsystem, Led* led, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 
+	: drivetrain(subsystem), led(led), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))
 {
 	AddRequirements(subsystem);
 }
@@ -28,9 +28,11 @@ void TeleopDrive::End(bool interrupted) {
 void TeleopDrive::UpdateBrake(bool brake) {
 	if (brake) {
 		drivetrain->ActivateBreakMode(true);
+		led->SetColor(LedConst::BRAKE_COLOR);
 	}
 	else {
 		drivetrain->ActivateBreakMode(false);
+		led->SetColor(drivetrain->GetSolenoid()==frc::DoubleSolenoid::Value::kForward?LedConst::MECANUM_COLOR:LedConst::TANK_COLOR); // TODO: add real mecanum and tank solenoid values
 	}
 }
 
