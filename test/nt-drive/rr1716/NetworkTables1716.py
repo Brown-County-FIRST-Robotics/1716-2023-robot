@@ -6,12 +6,14 @@ import math
 
 IP = '10.17.16.2'
 
-def clamp(v,r):
-    if v==0:
+
+def clamp(v, r):
+    if v == 0:
         return 0
-    if math.fabs(v)>math.fabs(r):
+    if math.fabs(v) > math.fabs(r):
         return math.fabs(r)*math.fabs(v)/v
     return v
+
 
 class NetworkTablesWrapper:
     def __init__(self):
@@ -22,7 +24,6 @@ class NetworkTablesWrapper:
         self.encoder_table = NetworkTables.getTable('1716Encoder')
         self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
         self.motor_table = NetworkTables.getTable("1716Motors")
-
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
@@ -134,7 +135,7 @@ class NetworkTablesWrapper:
 
     def GetMatchTime(self):  # TODO:add tests
         logging.debug(f'NetworkTablesWrapper.GetMatchTime()')
-        match_time = self.pigeon_table.getNumber('matchTime', -1)
+        match_time = self.game_table.getNumber('matchTime', -1)
         if match_time == -1:
             print('No match_time value')
             return None
@@ -171,13 +172,13 @@ class NetworkTablesWrapper:
             return None
         return pos
 
-
-     #robot 0 theta means pointed up on field (to long wall) and +vy is forward.
+    # robot 0 theta means pointed up on field (to long wall) and +vy is forward.
     def GetMotors(self):
         vx=240*self.motor_table.getNumber('x',0)
         vy=240*self.motor_table.getNumber('y',0)
         omega = 160*self.motor_table.getNumber('r',0)
         return vx, vy, omega
+
 
 if __name__ == '__main__':
     # TEST CODE
