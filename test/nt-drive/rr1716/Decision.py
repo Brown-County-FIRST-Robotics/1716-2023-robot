@@ -298,8 +298,8 @@ def doCurrentAction(action):
         return action.MakeChild()
     return None
 
-class DriveToCone(Action):
-    def __init__(self, filter, cams, nt_interface, april_executor, referrer, color_file_path="cone_picked_color"):
+class DriveToGamepeice(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer, col_range_h=50, col_range_s=50, col_range_v=50, target_w=300, target_h=200, color_file_path="cone_picked_color"):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         
         col = []
@@ -311,14 +311,13 @@ class DriveToCone(Action):
             file.close()
         else:
             print("Error: file does not exist: " + color_file_path)
-            sys.exit(-1)
 
-        self.cone = Vision.GamePiece()
+        self.gamepeice = Vision.GamePiece()
         while len(col) < 3:
             col.append(0)
         
-        lower = [col[0] - 50, col[1] - 50, col[2] - 50]
-        upper = [col[0] + 50, col[1] + 50, col[2] + 50]
+        lower = [col[0] - col_range_h, col[1] - col_range_s, col[2] - col_range_v]
+        upper = [col[0] + col_range_h, col[1] + col_range_s, col[2] + col_range_v]
     
         for i in range(len(lower)):
             if lower[i] < 0:
@@ -331,129 +330,37 @@ class DriveToCone(Action):
             if upper[i] > 255:
                 upper[i] = 255
 
-        self.cone.setLowerColor(np.array(lower, dtype=np.uint8))
-        self.cone.setUpperColor(np.array(upper, dtype=np.uint8))
+        self.gamepeice.setLowerColor(np.array(lower, dtype=np.uint8))
+        self.gamepeice.setUpperColor(np.array(upper, dtype=np.uint8))
+
+        self.target_w = target_w
+        self.target_h = target_h
 
     def Step(self):
         x = y = r = 0
-        self.cone.findCone(self.cams[0].frame)
-
-        CONE_TARGET_W = 300
-        CONE_TARGET_H = 200
+        self.gamepeice.findCone(self.cams[0].frame) #find the cone
        
         # perfect, do nothing!
-        if (self.cone.w >= CONE_TARGET_W or self.cone.h >= CONE_TARGET_H) and self.cone.x >= -5 - self.cone.w / 2 and self.cone.x <= 5 + self.cone.w / 2:
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
             self.nt_interface.Drive(0, 0, 0)
             return
 
-        logging.debug("Decision: cone w: " + str(self.cone.w))
-        logging.debug("Decision: cone x, y: " + str(self.cone.x) + ", " + str(self.cone.y))
+        logging.debug("Decision: w: " + str(self.gamepeice.w))
+        logging.debug("Decision: x, y: " + str(self.gamepeice.x) + ", " + str(self.gamepeice.y))
 
         # cone is to the left, turn left
-        if self.cone.x < -5 - self.cone.w / 2:
+        if self.gamepeice.x < -5 - self.gamepeice.w / 2:
             print("turn left")
             r = -0.15
-            #self.nt_interface.Drive(0, 0, -0.2)
         # cone is to the right, turn right
-        elif self.cone.x > 5 + self.cone.w / 2:
+        elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
             print("turn right")
             r = 0.15
-            #self.nt_interface.Drive(0, 0, 0.2)
 
         # too far away, drive towards it
-        if self.cone.w < CONE_TARGET_W and self.cone.h < CONE_TARGET_H:
+        if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            x = 0.4
-        # too close, drive back
-        """
-        elif self.cone.w > 200 and self.cone.h > 400:  
-            print("drive backward")
-            self.nt_interface.Drive(1, 0, 0)
-            return
-        """
-
-        self.nt_interface.Drive(x, y, r)
-
-class DriveToCube(Action):
-    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
-        super().__init__(filter, cams, nt_interface, april_executor, referrer)
-        
-        col = []
-        if os.path.exists("cube_picked_color"):
-            file = open("cube_picked_color", "r") 
-            for line in file:
-                for x in line.split():
-                    col.append(int(x)) 
-            file.close()
-
-        self.cube = Vision.GamePiece()
-        while len(col) < 3:
-            col.append(0)
-        
-        lower = [col[0] - 30, 0, 0]
-        upper = [col[0] + 30, 255, 255]
-    
-        for i in range(len(lower)):
-            if lower[i] < 0:
-                lower[i] = 0
-            if lower[i] > 255:
-                lower[i] = 255
-
-            if upper[i] < 0:
-                upper[i] = 0
-            if upper[i] > 255:
-                upper[i] = 255
-
-        self.cube.setLowerColor(np.array(lower, dtype=np.uint8))
-        self.cube.setUpperColor(np.array(upper, dtype=np.uint8))
-        self.currentFrame = 0
-
-    def Step(self):
-        x = y = r = 0
-        CUBE_TARGET_W = 300
-        CUBE_TARGET_H = 300
-
-        if self.cams[0].frame_count == self.currentFrame:
-            return 
-        self.currentFrame = self.cams[0].frame_count
-
-        self.cube.findCube(self.cams[0].get_frame()) 
-        
-        logging.debug("Decision: cube w: " + str(self.cube.w))
-        logging.debug("Decision: cube x, y: " + str(self.cube.x) + ", " + str(self.cube.y))
-        if self.cube.w < 40:
-            logging.debug("Decision: threw out cube")
-            return
-    
-        # perfect, do nothing!
-        if (self.cube.w >= CUBE_TARGET_W or self.cube.h >= CUBE_TARGET_H) and self.cube.x >= -25 - self.cube.w / 2 and self.cube.x <= 25 + self.cube.w / 2: 
-            logging.debug("At cube") 
-            self.nt_interface.Drive(0, 0, 0)
-            return 
-
-        # cube is to the left, turn left
-        if self.cube.x < -5 - self.cube.w / 2:
-            print("turn left")
-            r = -0.2
-            #self.nt_interface.Drive(0, 0, -0.15)
-            #return
-        # cube is to the right, turn right
-        elif self.cube.x > 5 + self.cube.w / 2:
-            print("turn right")
-            r = 0.2
-            #self.nt_interface.Drive(0, 0, 0.15)
-            #return
-
-        # too far away, drive towards it
-        if self.cube.w < CUBE_TARGET_W and self.cube.h < CUBE_TARGET_H:
-            print("drive forward")
-            x = 0.8 - 0.6 * self.cube.w / CUBE_TARGET_W
-            if x < 0:
-                x = 0
-            #self.nt_interface.Drive(0.8, 0, 0)
-            #return 
-        else:
-            x = 0
+            x = 0.4 
 
         self.nt_interface.Drive(x, y, r)
 

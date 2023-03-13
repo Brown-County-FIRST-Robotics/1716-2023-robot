@@ -118,7 +118,7 @@ def main():
     
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
  
-    current_action = Decision.DriveToCone(filter, cameras, nt_table, april_executor, 'drivetocone')
+    current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocone', 30, 255, 255, 300, 200, "cube_picked_color")
     
     """
     commented out this code for now
