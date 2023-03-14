@@ -10,7 +10,6 @@
 
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
-#include "commands/RasPiDrive.h"
 #include "commands/ArmTeleopControl.h"
 
 using frc::XboxController;
@@ -36,10 +35,9 @@ RobotContainer::RobotContainer() {
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
-	// autonomousChooser.AddOption("Back Up", &frc2::ParallelDeadlineGroup(frc2::WaitCommand(2.0_s),
-	// 	frc2::StartEndCommand([this] {drivetrain.Drive(-.2, 0, 0);}, [this] {drivetrain.Drive(0, 0, 0);}, {&drivetrain})));
-	autonomousChooser.AddOption("Nothing", &nothing);
 	autonomousChooser.AddOption("Back Up", &backUp);
+	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiDrive);
+	autonomousChooser.AddOption("Nothing", &nothing);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
