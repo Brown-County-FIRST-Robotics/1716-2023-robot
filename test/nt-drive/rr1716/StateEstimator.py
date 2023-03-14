@@ -31,16 +31,17 @@ class StateEstimator:
     def updateWithApriltag(self, april: AprilTags.Detection):
         x, y, theta = april.calcFieldPos()
         self.updateToNow()
-        self._current.theta = theta
-        self._current.x = x
-        self._current.y = y
+        weight = 0.5
+        self._current.theta = theta*(1-weight)+self._current.theta*weight
+        self._current.x = x*(1-weight)+self._current.x*weight
+        self._current.y = y*(1-weight)+self._current.y*weight
 
         #try to get some velocity info from multiple quick tag sightings
         if self._lastApril:
             update_weight = .5
             x,y,r,t = self._lastApril
             interval = self._current.time - t
-            if interval < .35 and interval > .1: #should be ok with dump lower limit since fps is capped at 10.  otherwise have to save april tags to look back on
+            if interval < .35 and interval > .1:  # should be ok with dump lower limit since fps is capped at 10.  otherwise have to save april tags to look back on
                 #deal with angle wrapping around
                 dTheta = (r - self._current.theta) %360
                 if dTheta > 180:
