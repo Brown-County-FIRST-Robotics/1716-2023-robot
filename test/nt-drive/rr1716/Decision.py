@@ -377,6 +377,7 @@ class AutoTurn180(Action):
             self.startrotation = 0
 
     def Step(self):
+        logging.info("rotating")
         # just turn until we are at 180 degrees
         self.nt_interface.Drive(0, 0, 0.2)
 
@@ -389,10 +390,14 @@ class AutoTurn180(Action):
             target_rotation -= 360.0
         while target_rotation < 0.0:
             target_rotation += 360.0
-        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 5.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 20.0
+    
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
 
     def MakeChild(self):
-        return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 300, 300, "cube_picked_color")
+        return None
+        #return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 300, 300, "cube_picked_color")
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
