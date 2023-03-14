@@ -177,6 +177,12 @@ class GamePiece():
     def getUpperRight(self):
         return (int(self.imgX + self.getWidth() / 2), int(self.imgY + self.getHeight() / 2))
 
+    def findCone(self, frame):
+        self.findObject(frame)
+
+    def findCube(self, frame):
+        self.findObject(frame)
+
 #Color picker
 # This function gets called by the /video_feed route below
 def gen_preview_picker(camera):  # generate frame by frame from camera
