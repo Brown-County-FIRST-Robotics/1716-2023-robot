@@ -372,13 +372,24 @@ class DriveToGamepeice(Action):
 class AutoTurn180(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.startrotation = self.nt_interface.GetYaw()
+        if self.startrotation == None:
+            self.startrotation = 0
 
     def Step(self):
         # just turn until we are at 180 degrees
         self.nt_interface.Drive(0, 0, 0.2)
 
     def ShouldEnd(self):
-        return math.fabs(self.nt_interface.GetYaw() - 180.0) < 5.0
+        if self.nt_interface.GetYaw() == None:
+            return False
+        target_rotation = self.startrotation + 180.0
+        # put target_rotation in the range 0 to 360
+        while target_rotation >= 360.0:
+            target_rotation -= 360.0
+        while target_rotation < 0.0:
+            target_rotation += 360.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 5.0
 
     def MakeChild(self):
         return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 300, 300, "cube_picked_color")

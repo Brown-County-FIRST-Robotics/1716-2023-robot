@@ -116,6 +116,12 @@ class NetworkTablesWrapper:
         if yaw == -1:
             print('No yaw value')
             return None
+        
+        while yaw < 0.0:
+            yaw += 360.0
+        while yaw >= 360.0:
+            yaw -= 360.0
+
         return yaw
 
     def IsAutonomous(self):  # TODO:add tests
