@@ -365,7 +365,7 @@ class DriveToGamepeice(Action):
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.4 
+            y = 0.4 - 0.3 * self.gamepeice.w / self.target_w * 0.3 
 
         self.nt_interface.Drive(x, y, r)
 
@@ -396,8 +396,8 @@ class AutoTurn180(Action):
         self.nt_interface.Drive(0, 0, 0)
 
     def MakeChild(self):
-        return None
-        #return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 300, 300, "cube_picked_color")
+        logging.info("switch to drive to gamepeice")
+        return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
