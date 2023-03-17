@@ -7,7 +7,7 @@ import threading
 import numpy as np
 
 class Camera:
-    def __init__(self, device, calibration, position):
+    def __init__(self, device, calibration, position, role):
         logging.debug("camera init %s", device)
         self.frame = None
         self.hsv = None
@@ -18,6 +18,7 @@ class Camera:
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
+        self.role=role
 
         self.rectangles = None
         assert self.camera.isOpened()
@@ -39,6 +40,7 @@ class Camera:
             self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
                                                      tuple(processing_resolution), cv2.CV_16SC2)
         else:
+            assert role != 'apriltag' and role != '*', f'For the role to be "{role}", a calibration is required'
             self.camera_matrix=None
 
         self.camera.set(cv2.CAP_PROP_FPS, 10)

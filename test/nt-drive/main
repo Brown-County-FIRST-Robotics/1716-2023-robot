@@ -47,7 +47,7 @@ def main():
             logging.error("camera not connected %s", i['port'])
             sys.exit()
         logging.info('opening camera %s', i['port'])
-        cameras.append(Camera(i['port'],i['calibration'],i['pos']))
+        cameras.append(Camera(i['port'],i['calibration'],i['pos'], i['role']))
 
 # Keep these here as examples for logging
 #    logging.debug("Debug test")

@@ -1,3 +1,4 @@
+#!/bin/python3
 import argparse
 import os
 import glob
@@ -96,6 +97,7 @@ if __name__ == '__main__':
                     else:
                         print('This camera does not need a position')
                         config[-1]['pos'] = None
+                        break
         config_fname = input('Name of config file:')
         assert input(f'This will create a file called "configs/{config_fname}.json", are you sure(y/n):') == 'y', 'Operation canceled'
         with open(f'configs/{config_fname}.json', 'w') as config_file:
