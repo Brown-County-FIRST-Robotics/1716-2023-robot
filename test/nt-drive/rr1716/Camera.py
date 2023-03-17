@@ -22,22 +22,24 @@ class Camera:
         self.rectangles = None
         assert self.camera.isOpened()
         self.pos=position
+        if calibration is not None:
+            video_size = tuple(calibration["calibrationResolution"])
+            self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
+            self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
+            test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
-        video_size = tuple(calibration["calibrationResolution"])
-        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
-        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, video_size[1])
-        test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
+            self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            raw_camera_matrix = np.array(calibration['cameraMatrix'])
+            dist_coefficients = np.array(calibration['cameraDistortion'])
+            processing_resolution = np.array(calibration['processingResolution'])
 
-        raw_camera_matrix = np.array(calibration['cameraMatrix'])
-        dist_coefficients = np.array(calibration['cameraDistortion'])
-        processing_resolution = np.array(calibration['processingResolution'])
-
-        self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, tuple(video_size), 0,tuple(processing_resolution))
-        self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
-                                                 tuple(processing_resolution), cv2.CV_16SC2)
+            self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, tuple(video_size), 0,tuple(processing_resolution))
+            self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
+                                                     tuple(processing_resolution), cv2.CV_16SC2)
+        else:
+            self.camera_matrix=None
 
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
@@ -67,7 +69,8 @@ class Camera:
         while not self._stopping:
             success, frame = self.camera.read()
             if success and frame is not None:
-                frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
+                if self.camera_matrix is not None:
+                    frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
                 self.frame = frame
                 self.frame_count = self.frame_count + 1
             else:
