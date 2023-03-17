@@ -28,7 +28,7 @@ def main():
     parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
     parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="WARNING", help="Check the commits for correctness")
     parser.add_argument('--config', '-k', action="store", dest="config_file", default="configs/webcam.json", help='the config file to use')
-    parser.add_argument('--auto', '-a', action="store", dest="auto_mode", choices=['PLACEANDBALANCE', 'DEATHSTAREDEMO', 'DRIVETOAPRILTAG', 'DRIVETOGAMEPIECE'], default="DRIVETOGAMEPIECE", help="The Action to start")
+    parser.add_argument('--auto', '-a', action="store", dest="auto_mode", choices=['PLACEANDBALANCE', 'DEATHSTAREDEMO', 'DRIVETOAPRILTAG', 'DRIVETOGAMEPIECE', 'AUTO'], default="DRIVETOGAMEPIECE", help="The Action to start")
 
     args = parser.parse_args()
 
@@ -82,6 +82,8 @@ def main():
         current_action = Decision.DriveDumb(filter, cameras, nt_table, april_executor,0, 'DRIVETOAPRILTAG')
     elif args.auto_mode == 'DRIVETOGAMEPIECE':        
         current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocone', 30, 255, 255, 300, 200, "cube_picked_color")
+    elif args.auto_mode == 'AUTO':
+        current_action = Decision.AutoTurn180(filter, cameras, nt_table, april_executor, 'auto')
     else:
         for camera in cameras:
             camera.shutdown()

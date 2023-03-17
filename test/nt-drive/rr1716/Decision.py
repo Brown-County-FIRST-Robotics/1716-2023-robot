@@ -398,9 +398,57 @@ class DriveToGamepeice(Action):
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.4 
+            y = 0.4 - 0.3 * self.gamepeice.w / self.target_w * 0.3 
 
         self.nt_interface.Drive(x, y, r)
+
+    def ShouldEnd(self):
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
+            return True
+        return False
+
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+        
+    def MakeChild(self):
+        if self.referrer == "auto":
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogampeice")
+        return None
+
+class AutoTurn180(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.startrotation = self.nt_interface.GetYaw()
+        if self.startrotation == None:
+            self.startrotation = 0
+
+    def Step(self):
+        logging.info("rotating")
+        # just turn until we are at 180 degrees
+        self.nt_interface.Drive(0, 0, 0.2)
+
+    def ShouldEnd(self):
+        if self.nt_interface.GetYaw() == None:
+            return False
+        target_rotation = self.startrotation + 180.0
+        # put target_rotation in the range 0 to 360
+        while target_rotation >= 360.0:
+            target_rotation -= 360.0
+        while target_rotation < 0.0:
+            target_rotation += 360.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 20.0
+    
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+
+    def MakeChild(self):
+        if self.referrer == "auto":
+            logging.info("switch to drive to gamepeice")
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
+        elif self.referrer = "drivetogampeice":  
+            logging.info("switch to drive to april tag")
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
+        return None 
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
