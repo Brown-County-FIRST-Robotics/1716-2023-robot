@@ -9,6 +9,7 @@ from rr1716 import AprilTags
 from rr1716 import Decision
 from rr1716 import NetworkTables1716
 from rr1716 import StateEstimator
+import configs
 from rr1716 import Positions
 from concurrent.futures import ThreadPoolExecutor
 import time
@@ -38,8 +39,7 @@ def main():
 
     # use getattr to turn loglevel into integer
 
-    with open(args.config_file, 'r') as f:
-        config=json.loads(f.read())
+    config=configs.loadConfig(args.config_file)
     cameras = []
 
     for i in config:

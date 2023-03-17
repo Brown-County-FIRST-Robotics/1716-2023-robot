@@ -3,6 +3,26 @@ import os
 import glob
 import json
 
+
+def loadConfig(config_file):
+    with open(config_file, 'r') as f:
+        raw_config=json.loads(f.read())
+        config=[]
+        for i in raw_config:
+            config.append({})
+            config[-1]['pos']=i['pos']
+
+            config[-1]['port']=i['port']
+            with open(i['config'],'r') as cam_file:
+                cam_config=json.loads(cam_file.read())
+                config[-1]['role'] = cam_config['role']
+                if cam_config['calibration'] is not None:
+                    config[-1]['calibration']=cam_config['calibration']
+                else:
+                    config[-1]['calibration']=None
+    return config
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
