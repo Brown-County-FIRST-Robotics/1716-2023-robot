@@ -27,7 +27,7 @@ void TeleopDrive::Execute() {
 			true);
 
 	UpdateBrake(doBrake());
-	UpdateHeadless(headlessButton());
+	UpdateHeadless();
 }
 
 void TeleopDrive::End(bool interrupted) {
@@ -43,17 +43,13 @@ void TeleopDrive::UpdateBrake(bool brake) {
 	}
 }
 
-void TeleopDrive::UpdateHeadless(bool headless) {
+void TeleopDrive::UpdateHeadless() {
 	if (headlessButton() && !headlessPressed) { //if pressed for the first time
-		if (!headless)
-			headless = true;
-		if (headless)
-			headless = false;
-	}
-	
-	if (headlessButton())
+		int i = 1;
+		headless = !headless;
 		headlessPressed = true;
-	else
+	}
+	else if (!headlessButton() && headlessPressed)
 		headlessPressed = false;
 }
 

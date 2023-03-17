@@ -84,7 +84,7 @@ void Drivetrain::Periodic() {
 }
 
 void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented
-	motorTable->PutNumber("x", x); //Ttdo: update this to be consistent with the rest of the system
+	motorTable->PutNumber("x", x); //Todo: update this to be consistent with the rest of the system
 	motorTable->PutNumber("y", y);
 	motorTable->PutNumber("r", z);
 

@@ -16,7 +16,7 @@ public:
 
 private:
 	void UpdateBrake(bool brake);
-	void UpdateHeadless(bool headless);
+	void UpdateHeadless();
 
 	Drivetrain* drivetrain;
 	std::function<double()> x;
