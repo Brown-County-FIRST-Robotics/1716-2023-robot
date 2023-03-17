@@ -1,5 +1,1 @@
-[
-{"port": "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.1:1.0-video-index0", "config": "configs/cameras/cam1.json", "pos": [0, 0, 0, 0]},
-{"port": "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.2:1.0-video-index0", "config": "configs/cameras/cam2.json", "pos": [0, 0, 0, 0]},
-{"port": "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0-video-index0", "config": "configs/cameras/cam3.json", "pos": [0, 0, 0, 0]}
-]
+[{"port": "/dev/video0", "config": "configs/cameras/cam5.json", "pos": [0, 0, 0]}]
