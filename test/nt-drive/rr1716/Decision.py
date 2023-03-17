@@ -18,12 +18,19 @@ class Action:
         self.cams = cams
         self.filter = filter
         self.april_executor = april_executor
+        self.april_cams=[]
+        self.conecube_cams=[]
+        for i in self.cams:
+            if i.role == 'apriltag' or i.role == '*':
+                self.april_cams.append(i)
+            if i.role == 'conecube' or i.role == '*':
+                self.conecube_cams.append(i)
 
     def FetchApriltags(self):
         robotLocation = None
         april_futures = []
 
-        for cam in self.cams:
+        for cam in self.april_cams:
             april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.get_gray(), cam.camera_matrix, None))
         for future in april_futures:
             detections = future.result()
@@ -61,7 +68,7 @@ class StartFilter(Action):
     def Step(self):
         # DO NOT ADD super().step() HERE
         robotLocation = None
-        for camera in self.cams:
+        for camera in self.april_cams:
             res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None)  # check for apriltag
             if res is not None and res != []:  # TODO: change?
                 robotLocation = res[0]  # TODO: change?
@@ -176,7 +183,7 @@ class DriveDumb(Action):
         self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
 
     def Step(self):
-        cam=self.cams[0]
+        cam=self.april_cams[0]
         dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
         if len(dets)==0:
             return
@@ -369,7 +376,7 @@ class DriveToGamepeice(Action):
 
     def Step(self):
         x = y = r = 0
-        self.gamepeice.findObject(self.cams[0].frame) #find the cone
+        self.gamepeice.findObject(self.conecube_cams[0].frame) #find the cone
        
         # perfect, do nothing!
         if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
