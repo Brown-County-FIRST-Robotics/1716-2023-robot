@@ -14,38 +14,34 @@ public:
 
 	void Periodic() override;
 
-	// void SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position);
 	void SetShoulder(double speed);
 
-	void ToggleArmDirection();
-	void SetArmDirection(frc::DoubleSolenoid::Value value);
-	frc::DoubleSolenoid::Value GetArmDirection();
+	void SetElbowGoal(double position);
+	double GetElbowGoal();
 
-	void ToggleArmActive();
-	void SetArmActive(bool active);
-	frc::DoubleSolenoid::Value GetArmActive();
-
-	double GetArmAngle();
+	// double GetArmAngle();
 
 	void ToggleClaw();
 	void SetClaw(frc::DoubleSolenoid::Value value);
 	frc::DoubleSolenoid::Value GetClaw();
 
 private:
-	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushed};
+
+	rev::CANSparkMax elbow{ArmConst::ELBOW_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+	rev::SparkMaxPIDController elbowPid;
+	rev::SparkMaxRelativeEncoder elbowEncoder;
+	double elbowPositionGoal = 0;
 
 	frc::PneumaticHub& hub;
-	frc::DoubleSolenoid armBrake = hub.MakeDoubleSolenoid(ArmConst::ARM_BRAKE_ID[0], ArmConst::ARM_BRAKE_ID[1]);
-	frc::DoubleSolenoid armDirection = hub.MakeDoubleSolenoid(ArmConst::ARM_DIRECTION_ID[0], ArmConst::ARM_DIRECTION_ID[1]);
 	frc::DoubleSolenoid claw = hub.MakeDoubleSolenoid(ArmConst::CLAW_ID[0], ArmConst::CLAW_ID[1]);
-
-	int directionTicks = -1;
-	int brakeTicks = -1;
 	int clawTicks = -1;
-
-	frc::DoubleSolenoid::Value directionPos = frc::DoubleSolenoid::Value::kReverse;
-	frc::DoubleSolenoid::Value brakePos = frc::DoubleSolenoid::Value::kReverse;
 	frc::DoubleSolenoid::Value clawPos = frc::DoubleSolenoid::Value::kReverse;
 
-	frc::AnalogPotentiometer armPotentiometer{ArmConst::ARM_POTENTIOMETER_ID};
+	// frc::AnalogPotentiometer armPotentiometer{ArmConst::ARM_POTENTIOMETER_ID};
+
+	double P = 0.1;
+	double I = 0;
+	double D = 0;
+	double MAX_OUTPUT = 0.4;
 };

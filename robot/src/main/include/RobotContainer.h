@@ -12,6 +12,7 @@
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveBackThenBalance.h"
+#include "commands/RasPiDrive.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
 public:
@@ -51,6 +52,7 @@ private:
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
 	Nothing nothing;
 	BackUp backUp{&drivetrain};
+	RasPiDrive rasPiDrive{&drivetrain};
 
 
 	//Controller logging

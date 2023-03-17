@@ -10,7 +10,6 @@
 
 #include "commands/TeleopDrive.h"
 #include "commands/AutoBalance.h"
-#include "commands/RasPiDrive.h"
 #include "commands/ArmTeleopControl.h"
 
 using frc::XboxController;
@@ -29,32 +28,32 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetBButton(); } ));
+		[this] { return controller.GetLeftTriggerAxis() > 0.2; },
+		[this] { return controller.GetAButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return -controller2.GetLeftY(); }, 
-		[this] { return controller2.GetYButton(); }, [this] { return controller2.GetAButton(); }, [this] { return controller2.GetXButton(); }));
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetRightY(); }, 
+		[this] { return controller2.GetLeftY(); }, [this] { return controller2.GetXButton(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
-	// autonomousChooser.AddOption("Back Up", &frc2::ParallelDeadlineGroup(frc2::WaitCommand(2.0_s),
-	// 	frc2::StartEndCommand([this] {drivetrain.Drive(-.2, 0, 0);}, [this] {drivetrain.Drive(0, 0, 0);}, {&drivetrain})));
-	autonomousChooser.AddOption("Nothing", &nothing);
 	autonomousChooser.AddOption("Back Up", &backUp);
+	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiDrive);
+	autonomousChooser.AddOption("Nothing", &nothing);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetRightTriggerAxis() > .2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
-	controller.X().OnTrue(AutoBalance(&drivetrain)
+	controller.B().OnTrue(AutoBalance(&drivetrain)
 	 	.Until([this] { return controller.GetBackButtonPressed(); }));
 	 	//Auto balancing
 
-	controller.Y().OnTrue(RasPiDrive(&drivetrain)
-		.Until([this] { return controller.GetBackButton() || controller.GetYButton(); }));
+	controller.X().OnTrue(RasPiDrive(&drivetrain)
+		.Until([this] { return controller.GetBackButton(); }));
 		//RasPi control
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
