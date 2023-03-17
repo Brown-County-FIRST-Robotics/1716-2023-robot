@@ -15,6 +15,8 @@ def clamp(v, r):
     return v
 
 
+
+
 class NetworkTablesWrapper:
     def __init__(self):
         logging.debug('NetworkTablesWrapper.init')
