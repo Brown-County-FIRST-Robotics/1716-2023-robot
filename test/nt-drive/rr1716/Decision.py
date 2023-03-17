@@ -402,6 +402,19 @@ class DriveToGamepeice(Action):
 
         self.nt_interface.Drive(x, y, r)
 
+    def ShouldEnd(self):
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
+            return True
+        return False
+
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+        
+    def MakeChild(self):
+        if self.referrer == "auto":
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogampeice")
+        return None
+
 class AutoTurn180(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
@@ -429,8 +442,13 @@ class AutoTurn180(Action):
         self.nt_interface.Drive(0, 0, 0)
 
     def MakeChild(self):
-        logging.info("switch to drive to gamepeice")
-        return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
+        if self.referrer == "auto":
+            logging.info("switch to drive to gamepeice")
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
+        elif self.referrer = "drivetogampeice":  
+            logging.info("switch to drive to april tag")
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
+        return None 
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
