@@ -28,7 +28,7 @@ public:
 	* @param y: left/right
 	* @param z: rotation
 	*/
-	void Drive(double x, double y, double z);
+	void Drive(double x, double y, double z, bool headless = false);
 
 	void Periodic() override;
 
@@ -87,4 +87,6 @@ private:
 	nt::FloatPublisher yaw;
 	nt::FloatPublisher xAccel;
 	nt::FloatPublisher yAccel;
+
+	nt::GenericEntry* resetPigeonPos;
 };
