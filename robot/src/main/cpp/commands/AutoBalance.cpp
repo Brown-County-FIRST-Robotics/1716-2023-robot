@@ -6,7 +6,7 @@ AutoBalance::AutoBalance(Drivetrain* drive)
 	: CommandHelper{frc2::PIDController{AutolevelConst::PROPORTIONAL_FACTOR, AutolevelConst::INTEGRAL_FACTOR, AutolevelConst::DERIVATIVE_FACTOR}, 
 	[drive] { return drive->GetRoll(); }, //Input
 	0, //Goal
-	[drive](double output) { drive->Drive(output, 0, 0); }, //Output
+	[drive](double output) { drive->Drive(-output, 0, 0); }, //Output
 	{drive}}, //Requirements
 	drivetrain(drive)
 {

@@ -28,7 +28,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetBButton(); } ));
+		[this] { return controller.GetLeftTriggerAxis() > 0.2; },
+		[this] { return controller.GetAButton(); } ));
 
 	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetRightY(); }, 
 		[this] { return controller2.GetLeftY(); }, [this] { return controller2.GetXButton(); }));
@@ -43,16 +44,16 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	controller.A().OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetRightTriggerAxis() > .2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
-	controller.X().OnTrue(AutoBalance(&drivetrain)
+	controller.B().OnTrue(AutoBalance(&drivetrain)
 	 	.Until([this] { return controller.GetBackButtonPressed(); }));
 	 	//Auto balancing
 
-	controller.Y().OnTrue(RasPiDrive(&drivetrain)
-		.Until([this] { return controller.GetBackButton() || controller.GetYButton(); }));
+	controller.X().OnTrue(RasPiDrive(&drivetrain)
+		.Until([this] { return controller.GetBackButton(); }));
 		//RasPi control
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
