@@ -412,7 +412,7 @@ class DriveToGamepeice(Action):
         
     def MakeChild(self):
         if self.referrer == "auto":
-            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogampeice")
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogamepeice")
         return None
 
 class AutoTurn180(Action):
@@ -445,7 +445,7 @@ class AutoTurn180(Action):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
             return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
-        elif self.referrer = "drivetogampeice":  
+        elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
         return None 
