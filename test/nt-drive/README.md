@@ -1,5 +1,18 @@
 # This the netowrk tables driving readme!
 
+# <strong>DO NOT EVER CHANGE A CONFIG FILE</strong>
+Just make your own
+
+## Config Files
+The config files are now seperated into camera files and config files. The camera file stores the camera's calibration and role, while the config file contains the port, camera file, and position on the robot. 
+
+### Making config files
+```shell
+# to make a camera config
+./configs.py --make_camera
+# to make a config
+./configs.py --make_config
+```
 
 These are the modules
 
