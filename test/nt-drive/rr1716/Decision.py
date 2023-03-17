@@ -109,7 +109,7 @@ class AsyncSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, 0, 0], self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, -293, 0], self.referrer)
 
 
 class DriveToLocation(Action):
@@ -167,6 +167,32 @@ class AwaitSetHeight(Action):
         if self.referrer == 'auto':
             return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
 
+
+class DriveDumb(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.location = location
+        self.xy_pid = simple_pid.PID(*Strategy.xy_pid_factor)
+        self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
+
+    def Step(self):
+        cam=self.cams[0]
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        if len(dets)==0:
+            return
+        det=dets[0]
+
+        offset_y = float(det.distance-100)
+        offset_x = float(det.left_right)
+        offset_r = float(det.yaw)
+
+        self.nt_interface.Drive(offset_x*0.01,
+                               offset_y*0.01, offset_r*0.0025)
+        #self.nt_interface.Drive(1,0,0)
+
+
+    def ShouldEnd(self):
+        return False
 
 class Drop(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
