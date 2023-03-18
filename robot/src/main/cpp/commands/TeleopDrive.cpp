@@ -2,8 +2,9 @@
 
 #include <utility>
 
-TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))
+TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
+	std::function<bool()> brake, std::function<bool()> headlessToggle) 
+	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake)), headlessButton(std::move(headlessToggle))
 {
 	AddRequirements(subsystem);
 }
@@ -13,12 +14,20 @@ void TeleopDrive::Execute() {
 	ySquare = y() * fabs(y());
 	zSquare = z() * fabs(z());
 
-	drivetrain->Drive(
-		CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
-		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
-		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
+	if (!headless)
+		drivetrain->Drive(
+			-CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
+			CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
+			CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
+	else
+		drivetrain->Drive(
+			-CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
+			CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
+			CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)),
+			true);
 
 	UpdateBrake(doBrake());
+	UpdateHeadless();
 }
 
 void TeleopDrive::End(bool interrupted) {
@@ -32,6 +41,16 @@ void TeleopDrive::UpdateBrake(bool brake) {
 	else {
 		drivetrain->ActivateBreakMode(false);
 	}
+}
+
+void TeleopDrive::UpdateHeadless() {
+	if (headlessButton() && !headlessPressed) { //if pressed for the first time
+		int i = 1;
+		headless = !headless;
+		headlessPressed = true;
+	}
+	else if (!headlessButton() && headlessPressed)
+		headlessPressed = false;
 }
 
 double TeleopDrive::CloserToZero(double value1, double value2) {
