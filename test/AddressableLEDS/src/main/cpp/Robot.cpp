@@ -5,6 +5,7 @@
 #include "Robot.h"
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 void Robot::RobotInit() {
   // Default to a length of 60, start empty output
@@ -17,8 +18,8 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   // Fill the buffer with a rainbow
   //static int sleep = 220;
-  chaser();
-  std::this_thread::sleep_for(std::chrono::milliseconds(220));
+  knightRider();
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   //sleep+= -20;
 
@@ -44,7 +45,7 @@ void Robot::Rainbow() {
 
 void Robot::chaser(){
   static int i = 0;
-  static int size = 24;
+  int size = 24;
 
   Robot::allOff();
   m_ledBuffer[i].SetRGB(255,0,0);
@@ -59,8 +60,23 @@ void Robot::chaser(){
 
 void Robot::knightRider(){
   static int i = 0;
-
-  Robot::allOn(0,0,0);
+  static bool goingOut = true;
+  if (goingOut){
+    i++;
+    if(i == (kLength - 1)){
+      goingOut = false;
+    }
+  } else {
+    i--;
+    if (i == 0){
+      goingOut = true;
+    }
+  }
+  //Robot::allOn(175,45,45);
+  Robot::allOff();
+  m_ledBuffer[i].SetRGB(255,0,0);
+  m_ledBuffer[(i+1)].SetRGB(255,0,0);
+  m_ledBuffer[(i+2)].SetRGB(255,0,0);
 }
 
 void Robot::allOn(int R, int G, int B){
