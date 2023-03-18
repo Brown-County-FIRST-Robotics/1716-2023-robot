@@ -186,13 +186,22 @@ class DriveDumb(Action):
         if len(dets)==0:
             self.nt_interface.Drive(0,0,0)
             return
-        det=dets[0]
+        dets=[det.calcFieldPos() for det in dets]
+        current_x,current_y,current_r=dets[0]
 
-        offset_y = float(det.distance-100)
-        offset_x = float(det.left_right)
-        offset_r = float(det.yaw)
+        offset_y = current_y-self.location[1]
+        offset_x = current_x-self.location[0]
+        offset_r = current_r-self.location[2]
 
-        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
+        field_x_vector_x = math.cos(current_r * math.pi / 180)
+        field_x_vector_y = math.sin(current_r * math.pi / 180)
+        field_y_vector_x = math.cos((current_r+180) * math.pi / 180)
+        field_y_vector_y = math.sin((current_r+180) * math.pi / 180)
+
+        move_x = offset_x * field_x_vector_x + offset_y * field_x_vector_y
+        move_y = offset_x * field_y_vector_x + offset_y * field_y_vector_y
+
+        self.nt_interface.Drive(move_x*Strategy.xy_p_factor,move_y*Strategy.xy_p_factor,offset_r*Strategy.r_p_factor)
 
     def ShouldEnd(self):
         return False
