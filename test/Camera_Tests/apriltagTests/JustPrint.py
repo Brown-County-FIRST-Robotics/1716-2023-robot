@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # (x,y,z, roll, pitch, yaw)
 '''
 ------ <default position
@@ -28,6 +30,12 @@ if len(sys.argv)!=3:
 
 cam = cv2.VideoCapture()
 cam.open(f'/dev/video{sys.argv[1]}')
+
+#cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+#cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 tag_size = 8/2.54
 
@@ -82,7 +90,7 @@ while True:
 
     if num_detections > 0:
         for i, detection in enumerate(detection_results):
-            if detection.tag_id!=3:
+            if detection.tag_id!=1:
                 continue
             (ptA, ptB, ptC, ptD) = detection.corners
             ptA = convert(ptA)
