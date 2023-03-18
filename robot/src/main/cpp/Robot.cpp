@@ -111,33 +111,11 @@ void Robot::RobotPeriodic() {
 
 	//LEDs:
 	ledUpdateSpeedCounter++;
-	if (ledUpdateSpeedCounter >= LEDConst::UPDATE_SPEED) {
-		int valueChangeSpeed = 6;
-		if (valueIsIncreasing)
-			value += valueChangeSpeed;
-		else
-			value -= valueChangeSpeed;
-
-		if (evenLeds)
-			for (int i = 0; i < LEDConst::LENGTH; i += 2) {
-				SetLed(i, 0, 255, value);
-			}
-		else
-			for (int i = 1; i < LEDConst::LENGTH; i += 2) {
-				SetLed(i, 0, 255, value);
-			}
-
-		ledUpdateSpeedCounter = 0;
-
-		if (value >= 255) {
-			valueIsIncreasing = false;
-		}
-		else if (value <= 0) {
-			valueIsIncreasing = true;
-			evenLeds = !evenLeds;
-		}
+	if (ledUpdateSpeedCounter > LEDConst::UPDATE_SPEED) {
+		KnightRider();
 
 		led.SetData(ledBuffer);
+		ledUpdateSpeedCounter = 0;
 	}
 }
 
@@ -197,4 +175,33 @@ void Robot::SetAllLeds(int h, int s, int v) {
 void Robot::SetLed(int id, int h, int s, int v) {
 	h /= 2;
 	ledBuffer[id].SetHSV(h, s, v);
+}
+
+void Robot::KnightRider() {
+	SetAllLeds(0, 0, 0);
+
+	if (ledGoingOut) {
+		knightRiderIndex++;
+		if (knightRiderIndex >= LEDConst::LENGTH - 1) {
+			ledGoingOut = false;
+		}
+		
+		SetLed(knightRiderIndex, 0, 255, 255);
+		for (int i = 0; i < LEDConst::NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS; i++) {
+			if (knightRiderIndex >= i + 1)
+				SetLed(knightRiderIndex - i, 0, 255, 255 / pow(2, i + 1));
+		}
+	}
+	else {
+		knightRiderIndex--;
+		if (knightRiderIndex <= 0) {
+			ledGoingOut = true;
+		}
+
+		SetLed(knightRiderIndex, 0, 255, 255);
+		for (int i = 0; i < LEDConst::NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS; i++) {
+			if (knightRiderIndex <= LEDConst::LENGTH - (i + 1))
+				SetLed(knightRiderIndex + i, 0, 255, 255 / pow(2, i + 1));
+		}
+	}
 }

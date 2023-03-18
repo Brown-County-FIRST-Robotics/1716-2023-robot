@@ -70,10 +70,11 @@ private:
 	frc::AddressableLED led{LEDConst::ID};
 	std::array<frc::AddressableLED::LEDData, LEDConst::LENGTH> ledBuffer;
 	int ledUpdateSpeedCounter = 0;
+
 	void SetAllLeds(int h, int s, int v);
 	void SetLed(int id, int h, int s, int v);
+	void KnightRider();
 
-	bool evenLeds = false;
-	int value = 0;
-	bool valueIsIncreasing = false;
+	bool ledGoingOut = true;
+	int knightRiderIndex = 0;
 };

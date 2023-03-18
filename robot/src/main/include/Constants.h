@@ -61,7 +61,8 @@ namespace AutonomousConst
 
 namespace LEDConst
 {
-	const int LENGTH = 300; //amount of lights in the string
+	const int LENGTH = 36; //amount of lights in the string
 	const int ID = 9;
-	const int UPDATE_SPEED = 1; 
+	const int UPDATE_SPEED = 2;
+	const int NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS = 10;
 };
