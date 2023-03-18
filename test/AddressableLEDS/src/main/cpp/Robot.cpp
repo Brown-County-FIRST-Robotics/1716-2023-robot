@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.h"
+#include <chrono>
+#include <thread>
 
 void Robot::RobotInit() {
   // Default to a length of 60, start empty output
@@ -14,14 +16,19 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
   // Fill the buffer with a rainbow
+  static int sleep = 220;
   chaser();
-  sleep(1);
+  std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+
+  sleep+= -20;
+
   // Set the LEDs
   m_led.SetData(m_ledBuffer);
 }
 
 void Robot::Rainbow() {
   // For every pixel
+  Robot::allOff();
   for (int i = 0; i < kLength; i++) {
     // Calculate the hue - hue is easier for rainbows because the color
     // shape is a circle so only one value needs to precess
@@ -39,18 +46,56 @@ void Robot::chaser(){
   static int i = 0;
 
   Robot::allOff();
-  m_ledBuffer[i].SetRGB(237,21,21);
-  m_ledBuffer[(i + 2) % kLength].SetRGB(237,21,21);
+  m_ledBuffer[i].SetRGB(255,0,0);
+  m_ledBuffer[(i + 2) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 4) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 6) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 8) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 10) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 12) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 14) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 16) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 18) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 20) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 22) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 24) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 26) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 28) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 30) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 32) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 34) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 36) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 38) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 40) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 42) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 44) % kLength].SetRGB(255,0,0);
+  m_ledBuffer[(i + 46) % kLength].SetRGB(255,0,0);
   i++;
   if(i >= kLength){
     i=0;
   }
 }
 
+void Robot::knightRider(){
+  static int i = 0;
+
+  Robot::allOn(0,0,0);
+}
+
 void Robot::allOn(int R, int G, int B){
   for (int i = 0; i < kLength; i++){
     m_ledBuffer[i].SetRGB(R,G,B);
   }
+}
+
+void Robot::strobe(){
+  static bool isOn = false;
+
+  if (isOn)
+    Robot::allOff();
+  else
+    Robot::allOn(255,0,0);
+  isOn = !isOn;
 }
 
 void Robot::allOff(){
