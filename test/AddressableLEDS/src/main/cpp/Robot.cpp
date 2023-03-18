@@ -16,11 +16,11 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
   // Fill the buffer with a rainbow
-  static int sleep = 220;
+  //static int sleep = 220;
   chaser();
-  std::this_thread::sleep_for(std::chrono::milliseconds(sleep));
+  std::this_thread::sleep_for(std::chrono::milliseconds(220));
 
-  sleep+= -20;
+  //sleep+= -20;
 
   // Set the LEDs
   m_led.SetData(m_ledBuffer);
@@ -44,32 +44,13 @@ void Robot::Rainbow() {
 
 void Robot::chaser(){
   static int i = 0;
+  static int size = 24;
 
   Robot::allOff();
   m_ledBuffer[i].SetRGB(255,0,0);
-  m_ledBuffer[(i + 2) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 4) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 6) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 8) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 10) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 12) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 14) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 16) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 18) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 20) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 22) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 24) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 26) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 28) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 30) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 32) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 34) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 36) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 38) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 40) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 42) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 44) % kLength].SetRGB(255,0,0);
-  m_ledBuffer[(i + 46) % kLength].SetRGB(255,0,0);
+  for(int j = 0; j < (size - 1); j++){
+    m_ledBuffer[(i + (j * 2) % kLength)].SetRGB(255,0,0);
+  }
   i++;
   if(i >= kLength){
     i=0;
