@@ -24,6 +24,11 @@ public:
 	explicit BackUp(Drivetrain* drive);
 };
 
+class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
+public:
+	explicit RasPiAutonomous(Drivetrain* drive);
+};
+
 class RobotContainer {
 public:
 	RobotContainer();
@@ -52,7 +57,7 @@ private:
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
 	Nothing nothing;
 	BackUp backUp{&drivetrain};
-	RasPiDrive rasPiDrive{&drivetrain};
+	RasPiAutonomous rasPiAutonomous{&drivetrain};
 
 
 	//Controller logging

@@ -70,12 +70,7 @@ void Drivetrain::Periodic() {
 	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
 	yAccel.Set(GetY());
 	
-	if ((int)GetYaw() % 360 >= 0) { //make it between 0 and 359
-		yaw.Set((int)GetYaw() % 360);
-	}
-	else {
-		yaw.Set(((int)GetYaw() % 360) + 360);
-	}
+	yaw.Set(GetYaw());
 
 	if (resetPigeonPos->GetBoolean(false)) {
 		pigeon.Reset();
@@ -123,8 +118,13 @@ double Drivetrain::GetPitch() {
 	return pigeon.GetPitch();
 }
 
-double Drivetrain::GetYaw() {
-	return pigeon.GetYaw();
+int Drivetrain::GetYaw() {
+	if ((int)pigeon.GetYaw() % 360 >= 0) { //make it between 0 and 359
+		return (int)pigeon.GetYaw() % 360;
+	}
+	else {
+		return ((int)pigeon.GetYaw() % 360) + 360;
+	}
 }
 
 int16_t Drivetrain::GetX() {

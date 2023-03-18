@@ -37,7 +37,7 @@ RobotContainer::RobotContainer() {
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
 	autonomousChooser.AddOption("Back Up", &backUp);
-	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiDrive);
+	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
@@ -115,5 +115,12 @@ BackUp::BackUp(Drivetrain* subsystem)
 			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(-0.3, 0, 0);}, 
 				[subsystem] { subsystem->Drive(0, 0, 0); }) //command that backs up
 		)
+	);
+}
+
+RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem)
+{
+	AddCommands(
+		RasPiDrive(subsystem, true)
 	);
 }

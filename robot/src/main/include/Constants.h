@@ -52,3 +52,9 @@ namespace ArmConst
 	const double D = 0;
 	const double MAX_OUTPUT = .15;
 };
+
+namespace AutonomousConst
+{
+	const double TIMEOUT_DISTANCE = 30; //distance to drive before giving up
+	const double ROTATION_DISTANCE = 90; //The distance for the robot to rotate before realizing it's behaving properly
+};
