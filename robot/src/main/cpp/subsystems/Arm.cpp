@@ -50,11 +50,19 @@ void Arm::SetShoulder(double speed) {
 
 void Arm::SetElbowGoal(double position) {
 	// elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kPosition);
-	elbowPositionGoal = position;
+	// elbowPositionGoal = position;
 }
 
 double Arm::GetElbowGoal() {
 	return elbowPositionGoal;
+}
+
+double Arm::GetElbowPosition() {
+	return elbowEncoder.GetPosition();
+}
+
+void Arm::SetElbowActive(bool activateElbow) {
+	elbowPid.SetReference(elbowEncoder.GetPosition(), rev::CANSparkMax::ControlType::kPosition); //TEST ENCODER UNITS
 }
 
 void Arm::ToggleClaw() {
