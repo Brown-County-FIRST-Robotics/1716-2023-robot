@@ -2,6 +2,7 @@
 
 #include <frc2/command/CommandScheduler.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
 	//Pickup and placement position selector
@@ -71,6 +72,9 @@ void Robot::RobotInit() {
 	led.SetData(ledBuffer);
 	led.Start();
 	SetAllLeds(0, 0, 0);
+	ledChooser.SetDefaultOption("Knight Rider", 0);
+	ledChooser.AddOption("Wierdness", 1);
+	frc::SmartDashboard::PutData("LED Mode", &ledChooser);
 }
 
 void Robot::RobotPeriodic() {
@@ -112,7 +116,10 @@ void Robot::RobotPeriodic() {
 	//LEDs:
 	ledUpdateSpeedCounter++;
 	if (ledUpdateSpeedCounter > LEDConst::UPDATE_SPEED) {
-		KnightRider();
+		if (ledChooser.GetSelected() == 0)
+			KnightRider();
+		else if (ledChooser.GetSelected() == 1)
+			Weirdness();
 
 		led.SetData(ledBuffer);
 		ledUpdateSpeedCounter = 0;
@@ -165,43 +172,73 @@ int main() {
 }
 #endif
 
-void Robot::SetAllLeds(int h, int s, int v) {
-	h /= 2;
+void Robot::SetAllLeds(int r, int g, int b) {
 	for (int i = 0; i < LEDConst::LENGTH; i++){
-		ledBuffer[i].SetHSV(h, s, v);
+		ledBuffer[i].SetRGB(r, g, b);
 	}
 }
 
-void Robot::SetLed(int id, int h, int s, int v) {
-	h /= 2;
-	ledBuffer[id].SetHSV(h, s, v);
+void Robot::SetLed(int id, int r, int g, int b) {
+	ledBuffer[id].SetRGB(r, g, b);
 }
 
 void Robot::KnightRider() {
 	SetAllLeds(0, 0, 0);
 
-	if (ledGoingOut) {
+	if (knightRiderLedGoingOut) {
 		knightRiderIndex++;
 		if (knightRiderIndex >= LEDConst::LENGTH - 1) {
-			ledGoingOut = false;
+			knightRiderLedGoingOut = false;
 		}
 		
-		SetLed(knightRiderIndex, 0, 255, 255);
+		SetLed(knightRiderIndex, 255, 0, 0);
 		for (int i = 0; i < LEDConst::NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS; i++) {
 			if (knightRiderIndex >= i + 1)
-				SetLed(knightRiderIndex - i, 0, 255, 255 / pow(2, i + 1));
+				SetLed(knightRiderIndex - i, 255 / pow(2, i + 1), 0, 0);
 		}
 	}
 	else {
 		knightRiderIndex--;
 		if (knightRiderIndex <= 0) {
-			ledGoingOut = true;
+			knightRiderLedGoingOut = true;
 		}
 
-		SetLed(knightRiderIndex, 0, 255, 255);
+		SetLed(knightRiderIndex, 255, 0, 0);
 		for (int i = 0; i < LEDConst::NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS; i++) {
 			if (knightRiderIndex <= LEDConst::LENGTH - (i + 1))
-				SetLed(knightRiderIndex + i, 0, 255, 255 / pow(2, i + 1));
+				SetLed(knightRiderIndex + i, 255 / pow(2, i + 1), 0, 0);
 		}
+	}
+}
+
+void Robot::Weirdness() {
+	SetAllLeds(0, 0, 0);
+
+	if (rUp)
+		r += 1;
+	else
+		r -= 1;
+	if (gUp)
+		g += 2;
+	else
+		g -= 2;
+	if (bUp)
+		b += 3;
+	else
+		b -= 3;
+
+	if (r >= 256 || r <= 0) {
+		rUp = !rUp;
+	}
+	if (g >= 256 || g <= 0) {
+		gUp = !gUp;
+	}
+	if (b >= 256 || b <= 0) {
+		bUp = !bUp;
+	}
+
+	for (int i = 0; i < LEDConst::LENGTH / 2; i += 2) {
+		SetLed(i, r, g, b);
+		led.SetData(ledBuffer);
 	}
 }

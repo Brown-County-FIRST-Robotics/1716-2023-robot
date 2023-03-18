@@ -73,8 +73,20 @@ private:
 
 	void SetAllLeds(int h, int s, int v);
 	void SetLed(int id, int h, int s, int v);
+	
 	void KnightRider();
-
-	bool ledGoingOut = true;
+	bool knightRiderLedGoingOut = true;
 	int knightRiderIndex = 0;
+
+	void Weirdness();
+	bool weirdnessValueIsIncreasing = false;
+	int weirdnessBrightness;
+	int r;
+	bool rUp = true;
+	int g;
+	bool gUp = true;
+	int b;
+	bool bUp = true;
+
+	frc::SendableChooser<int> ledChooser;
 };
