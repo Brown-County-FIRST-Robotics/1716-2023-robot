@@ -14,7 +14,7 @@
 #include <networktables/NetworkTableInstance.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/PneumaticHub.h>
-
+#include <frc/ADXRS450_Gyro.h>
 
 #include "Constants.h"
 
@@ -62,6 +62,7 @@ private:
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
+	frc::ADXRS450_Gyro gyro{};
 
 	frc::PneumaticHub& hub;
 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);

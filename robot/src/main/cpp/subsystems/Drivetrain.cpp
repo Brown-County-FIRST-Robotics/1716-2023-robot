@@ -67,7 +67,7 @@ void Drivetrain::Periodic() {
 	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
 	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
 
-	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
+	xAccel.Set(GetX());
 	yAccel.Set(GetY());
 	
 	if ((int)GetYaw() % 360 >= 0) { //make it between 0 and 359
@@ -124,7 +124,7 @@ double Drivetrain::GetPitch() {
 }
 
 double Drivetrain::GetYaw() {
-	return pigeon.GetYaw();
+	return gyro.GetAngle();
 }
 
 int16_t Drivetrain::GetX() {
