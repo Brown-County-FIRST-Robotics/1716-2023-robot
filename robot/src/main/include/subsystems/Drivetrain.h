@@ -12,12 +12,15 @@
 #include <networktables/BooleanTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/PneumaticHub.h>
+
 
 #include "Constants.h"
 
 class Drivetrain : public frc2::SubsystemBase {
 public:
-	Drivetrain();
+	Drivetrain(frc::PneumaticHub& hubRef);
 	
 	/**
 	* Mecanum cartesian style driving for the Drivetrain.
@@ -25,7 +28,7 @@ public:
 	* @param y: left/right
 	* @param z: rotation
 	*/
-	void Drive(double x, double y, double z);
+	void Drive(double x, double y, double z, bool headless = false);
 
 	void Periodic() override;
 
@@ -60,8 +63,10 @@ private:
 
 	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
 
- 	frc::DoubleSolenoid solenoid = SolenoidConst::hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
+	frc::PneumaticHub& hub;
+	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
 	frc::DoubleSolenoid::Value solenoidPos = frc::DoubleSolenoid::Value::kReverse;
+	nt::GenericEntry* solenoidIndicator;
 
 	int waitTicksNeeded = -1;
 
@@ -71,6 +76,7 @@ private:
 	std::shared_ptr<nt::NetworkTable> driveTable;
 	std::shared_ptr<nt::NetworkTable> encoderTable;
 	std::shared_ptr<nt::NetworkTable> pigeonTable;
+	std::shared_ptr<nt::NetworkTable> motorTable;
 
 	nt::FloatPublisher flEncoder;
 	nt::FloatPublisher blEncoder;
@@ -81,4 +87,6 @@ private:
 	nt::FloatPublisher yaw;
 	nt::FloatPublisher xAccel;
 	nt::FloatPublisher yAccel;
+
+	nt::GenericEntry* resetPigeonPos;
 };

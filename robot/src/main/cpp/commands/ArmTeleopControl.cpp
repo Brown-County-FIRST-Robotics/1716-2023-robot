@@ -3,33 +3,26 @@
 #include <utility>
 
 ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoulderAxis, 
-	std::function<bool()> armUpButton, std::function<bool()> armDownButton) :
-	shoulder(std::move(shoulderAxis)), armUp(std::move(armUpButton)), armDown(std::move(armDownButton))
+	std::function<double()> elbowAxis, std::function<bool()> clawButton) : arm(subsystem),
+	shoulder(std::move(shoulderAxis)), elbow(std::move(elbowAxis)), claw(std::move(clawButton))
 {
 	AddRequirements(subsystem);
 }
 
 void ArmTeleopControl::Execute() {
-	if ((!armUpPressed && armUp())) {
-		arm->SetArmDirection(frc::DoubleSolenoid::Value::kForward);
-		arm->SetArmActive(true);
-		armUpPressed = true;
-	}
-	else if ((!armDownPressed && armDown())) {
-		arm->SetArmDirection(frc::DoubleSolenoid::Value::kReverse);
-		arm->SetArmActive(true);
-		armDownPressed = true;
-	}
-	else if ((armUpPressed && !armUp()) || (armDownPressed && !armDown())) {
-		arm->SetArmActive(false);
-		armUpPressed = false;
-		armDownPressed = false;
-	}
 
-	arm->SetShoulder(-shoulder() * ArmConst::SHOULDER_SPEED);
+	if (!clawPressed && claw()) {
+		arm->ToggleClaw();
+		clawPressed = true;
+	}
+	else if (!claw())
+		clawPressed = false;
+
+	arm->SetShoulder(-shoulder());
+	// arm->SetElbow(-elbow());
 }
 
 void ArmTeleopControl::End(bool interrupted) {
-	arm->SetArmActive(false);
 	arm->SetShoulder(0);
+	// arm->SetElbow(0);
 }
