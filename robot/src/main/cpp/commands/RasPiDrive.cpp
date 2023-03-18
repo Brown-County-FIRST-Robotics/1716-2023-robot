@@ -4,7 +4,7 @@
 #include "commands/RasPiDrive.h"
 #include "Constants.h"
 
-RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
+RasPiDrive::RasPiDrive(Drivetrain* drive, Arm* arm) : drivetrain(drive), arm(arm) {
 	AddRequirements(drive);
 
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
@@ -17,10 +17,10 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 
 	armFloor = driveTable->GetBooleanTopic("setArmFloor").GetEntry(false);
 	armPortal = driveTable->GetBooleanTopic("setArmPortal").GetEntry(false);
-	armMedium = driveTable->GetBooleanTopic("setArm").GetEntry(false);
-	armHigh = driveTable->GetBooleanTopic("setArm").GetEntry(false);
-	armLowNode = driveTable->GetBooleanTopic("setArm").GetEntry(false);
-	armHighNode = driveTable->GetBooleanTopic("setArm").GetEntry(false);
+	armMedium = driveTable->GetBooleanTopic("setArmMedium").GetEntry(false);
+	armHigh = driveTable->GetBooleanTopic("setArmHigh").GetEntry(false);
+	armLowNode = driveTable->GetBooleanTopic("setArmLowNode").GetEntry(false);
+	armHighNode = driveTable->GetBooleanTopic("setArmHighNode").GetEntry(false);
 }
 
 void RasPiDrive::Execute() {

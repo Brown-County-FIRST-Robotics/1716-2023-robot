@@ -52,7 +52,7 @@ private:
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
 	Nothing nothing;
 	BackUp backUp{&drivetrain};
-	RasPiDrive rasPiDrive{&drivetrain};
+	RasPiDrive rasPiDrive{&drivetrain, &arm};
 
 
 	//Controller logging

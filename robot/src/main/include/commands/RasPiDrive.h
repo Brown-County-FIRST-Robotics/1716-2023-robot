@@ -9,10 +9,11 @@
 #include <networktables/NetworkTableInstance.h>
 
 #include "subsystems/Drivetrain.h"
+#include "subsystems/Arm.h"
 
 class RasPiDrive : public frc2::CommandHelper<frc2::CommandBase, RasPiDrive> {
 public:
-	explicit RasPiDrive(Drivetrain* drive);
+	explicit RasPiDrive(Drivetrain* drive, Arm* arm);
 	
 	void Execute() override;
 
@@ -20,6 +21,7 @@ public:
 
 private:
 	Drivetrain* drivetrain;
+	Arm* arm;
 
 	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> driveTable;

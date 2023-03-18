@@ -52,7 +52,7 @@ void RobotContainer::ConfigureButtonBindings() {
 	 	.Until([this] { return controller.GetBackButtonPressed(); }));
 	 	//Auto balancing
 
-	controller.X().OnTrue(RasPiDrive(&drivetrain)
+	controller.X().OnTrue(RasPiDrive(&drivetrain, &arm)
 		.Until([this] { return controller.GetBackButton(); }));
 		//RasPi control
 
