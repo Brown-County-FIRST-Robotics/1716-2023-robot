@@ -32,8 +32,33 @@ void RasPiDrive::Execute() {
 	else if (!isTank.Get() && drivetrain->GetSolenoid() == frc::DoubleSolenoid::Value::kForward) {
 		drivetrain->SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
 	}
+
+	if (armFloor.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::FLOOR);
+	} else if (armPortal.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::PORTAL);
+	} else if (armMedium.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::MEDIUM);
+	} else if (armHigh.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::HIGH);
+	} else if (armLowNode.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::LOWNODE);
+	} else if (armHighNode.Get(false)) {
+		arm->SetElbowGoal(ArmHeightConst::HIGHNODE);
+	}
+
+	if (ArmHeightConst::THRESHOLD > abs(arm->GetElbowGoal() - arm->GetElbowPosition())) {
+		arm->SetElbowActive(false);
+		armFloor.Set(false);
+		armPortal.Set(false);
+		armMedium.Set(false);
+		armHigh.Set(false);
+		armLowNode.Set(false);
+		armHighNode.Set(false);
+	}
 }
 
 void RasPiDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
+	arm->SetElbowActive(false);
 }

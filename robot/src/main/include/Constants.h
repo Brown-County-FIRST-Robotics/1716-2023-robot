@@ -52,3 +52,14 @@ namespace ArmConst
 	const double D = 0;
 	const double MAX_OUTPUT = .15;
 };
+
+
+namespace ArmHeightConst{
+	const double FLOOR=0; //TODO: add real values
+	const double PORTAL=0; //TODO: add real value
+	const double MEDIUM=0; //TODO: add real values
+	const double HIGH=0; //TODO: add real values
+	const double LOWNODE=0; //TODO: add real values
+	const double HIGHNODE=0; //TODO: add real values
+	const double THRESHOLD=1; 
+};
