@@ -59,7 +59,6 @@ private:
 	BackUp backUp{&drivetrain};
 	RasPiAutonomous rasPiAutonomous{&drivetrain};
 
-
 	//Controller logging
 	nt::GenericEntry* a;
 	nt::GenericEntry* b;

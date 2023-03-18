@@ -11,6 +11,7 @@
 #include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <frc/AddressableLED.h>
 
 #include "RobotContainer.h"
 
@@ -64,4 +65,15 @@ private:
 
 	int currentPickUp = -1;
 	int currentPlace[2] = {-1, -1};
+
+	//LED Lights:
+	frc::AddressableLED led{LEDConst::ID};
+	std::array<frc::AddressableLED::LEDData, LEDConst::LENGTH> ledBuffer;
+	int ledUpdateSpeedCounter = 0;
+	void SetAllLeds(int h, int s, int v);
+	void SetLed(int id, int h, int s, int v);
+
+	bool evenLeds = false;
+	int value = 0;
+	bool valueIsIncreasing = false;
 };

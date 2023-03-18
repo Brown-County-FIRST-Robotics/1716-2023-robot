@@ -45,7 +45,6 @@ void TeleopDrive::UpdateBrake(bool brake) {
 
 void TeleopDrive::UpdateHeadless() {
 	if (headlessButton() && !headlessPressed) { //if pressed for the first time
-		int i = 1;
 		headless = !headless;
 		headlessPressed = true;
 	}

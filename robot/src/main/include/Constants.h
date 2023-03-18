@@ -58,3 +58,10 @@ namespace AutonomousConst
 	const double TIMEOUT_DISTANCE = 30; //distance to drive before giving up
 	const double ROTATION_DISTANCE = 90; //The distance for the robot to rotate before realizing it's behaving properly
 };
+
+namespace LEDConst
+{
+	const int LENGTH = 300; //amount of lights in the string
+	const int ID = 9;
+	const int UPDATE_SPEED = 1; 
+};

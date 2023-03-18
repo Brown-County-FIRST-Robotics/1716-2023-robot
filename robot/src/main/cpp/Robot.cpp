@@ -65,6 +65,12 @@ void Robot::RobotInit() {
 	//Pickup and place selector
 	pickUpPublisher = dashboardTable->GetIntegerTopic("pickUpPos").Publish();
 	placePublisher = dashboardTable->GetIntegerArrayTopic("placePos").Publish();
+
+	//LED lights:
+	led.SetLength(LEDConst::LENGTH);
+	led.SetData(ledBuffer);
+	led.Start();
+	SetAllLeds(0, 0, 0);
 }
 
 void Robot::RobotPeriodic() {
@@ -101,6 +107,34 @@ void Robot::RobotPeriodic() {
 				placePublisher.Set(placeCoords); //this builds, DO NOT CHANGE
 			}
 		}
+	}
+
+	//LEDs:
+	ledUpdateSpeedCounter++;
+	if (ledUpdateSpeedCounter >= LEDConst::UPDATE_SPEED) {
+		int valueChangeSpeed = 3;
+		if (valueIsIncreasing)
+			value += valueChangeSpeed;
+		else
+			value -= valueChangeSpeed;
+
+		// if (evenLeds)
+			for (int i = 0; i < LEDConst::LENGTH / 2; i += 2) {
+				SetLed(i, 360, 255, value);
+			}
+		// else
+		// 	for (int i = 0; i < LEDConst::LENGTH / 2; i++) {
+		// 		SetLed(i * 2 - 1, 360, 255, value);
+		// 	}
+
+		ledUpdateSpeedCounter = 0;
+
+		if (value >= 100) {
+			valueIsIncreasing = false;
+			// evenLeds = !evenLeds;
+		}
+		else if (value <= 0)
+			valueIsIncreasing = true;
 	}
 }
 
@@ -149,3 +183,17 @@ int main() {
 	return frc::StartRobot<Robot>();
 }
 #endif
+
+void Robot::SetAllLeds(int h, int s, int v) {
+	h /= 2;
+	for (int i = 0; i < LEDConst::LENGTH; i++){
+		ledBuffer[i].SetHSV(h, s, v);
+	}
+	led.SetData(ledBuffer);
+}
+
+void Robot::SetLed(int id, int h, int s, int v) {
+	h /= 2;
+	ledBuffer[id].SetHSV(h, s, v);
+	led.SetData(ledBuffer);
+}
