@@ -28,4 +28,11 @@ private:
 	nt::FloatSubscriber y;
 	nt::FloatSubscriber z;
 	nt::BooleanSubscriber isTank;
+	
+	nt::BooleanEntry armFloor;
+	nt::BooleanEntry armPortal;
+	nt::BooleanEntry armMedium;
+	nt::BooleanEntry armHigh; 
+	nt::BooleanEntry armLowNode;
+	nt::BooleanEntry armHighNode;
 };

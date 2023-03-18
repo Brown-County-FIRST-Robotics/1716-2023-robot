@@ -14,7 +14,13 @@ RasPiDrive::RasPiDrive(Drivetrain* drive) : drivetrain(drive) {
 	y = driveTable->GetFloatTopic("y").Subscribe(0.0, {.pollStorage = 1}); //with a default of 0 and a memory of 1 term
 	z = driveTable->GetFloatTopic("rotation").Subscribe(0.0, {.pollStorage = 1});
 	isTank = driveTable->GetBooleanTopic("isTank").Subscribe(false);
-	
+
+	armFloor = driveTable->GetBooleanTopic("setArmFloor").GetEntry(false);
+	armPortal = driveTable->GetBooleanTopic("setArmPortal").GetEntry(false);
+	armMedium = driveTable->GetBooleanTopic("setArm").GetEntry(false);
+	armHigh = driveTable->GetBooleanTopic("setArm").GetEntry(false);
+	armLowNode = driveTable->GetBooleanTopic("setArm").GetEntry(false);
+	armHighNode = driveTable->GetBooleanTopic("setArm").GetEntry(false);
 }
 
 void RasPiDrive::Execute() {
