@@ -8,6 +8,8 @@ from rr1716 import Strategy
 import cv2
 import numpy as np
 import simple_pid
+
+import time
 # from rr1716 import Filter
 # from rr1716 import StateEstimator
 
@@ -179,12 +181,13 @@ class DriveDumb(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
+        self.xy_pid = simple_pid.PID(*Strategy.xy_pid_factor)
+        self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
 
     def Step(self):
         cam=self.april_cams[0]
         dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
         if len(dets)==0:
-            self.nt_interface.Drive(0,0,0)
             return
         det=dets[0]
 
@@ -192,7 +195,10 @@ class DriveDumb(Action):
         offset_x = float(det.left_right)
         offset_r = float(det.yaw)
 
-        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
+        self.nt_interface.Drive(offset_x*0.01,
+                               offset_y*0.01, offset_r*0.0025)
+        #self.nt_interface.Drive(1,0,0)
+
 
     def ShouldEnd(self):
         return False
@@ -333,9 +339,13 @@ def doCurrentAction(action):
     return None
 
 class DriveToGamepeice(Action):
-    def __init__(self, filter, cams, nt_interface, april_executor, referrer, col_range_h=50, col_range_s=50, col_range_v=50, target_w=300, target_h=200, color_file_path="cone_picked_color"):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer, col_range_h=50, col_range_s=50, col_range_v=50, target_w=300, target_h=200, color_file_path="cone_picked_color", 
+                 minRatio=-1, maxRatio=99999):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
-        
+       
+        self.minRatio = minRatio
+        self.maxRatio = maxRatio
+
         col = []
         if os.path.exists(color_file_path):
             file = open(color_file_path, "r") 
@@ -366,6 +376,8 @@ class DriveToGamepeice(Action):
 
         self.gamepeice.setLowerColor(np.array(lower, dtype=np.uint8))
         self.gamepeice.setUpperColor(np.array(upper, dtype=np.uint8))
+        self.gamepeice.setMinRatio(self.minRatio)
+        self.gamepeice.setMaxRatio(self.maxRatio)
 
         self.target_w = target_w
         self.target_h = target_h
@@ -440,7 +452,7 @@ class AutoTurn180(Action):
     def MakeChild(self):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
-            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 30, 255, 255, 100, 100, "cube_picked_color")
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", 5.0 / 4.0, 5.0 / 3.0)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 

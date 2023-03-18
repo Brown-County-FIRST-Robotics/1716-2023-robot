@@ -41,6 +41,13 @@ class GamePiece():
     lower_color = np.array([ 0, 0, 0 ], np.uint8)
     upper_color = np.array([ 0xFF, 0xFF, 0xFF ], np.uint8)
     notfound = False
+    minRatio = -1.0
+    maxRatio = 9999999.0
+
+    def setMinRatio(self, ratio):
+        self.minRatio = ratio
+    def setMaxRatio(self, ratio):
+        self.maxRatio = ratio
 
     def setLowerColor(self, lower):
         self.lower_color = lower
@@ -127,6 +134,8 @@ class GamePiece():
         for cont in contours:
             x,y,w,h = cv2.boundingRect(cont)
             area = w * h
+            if w / h < self.minRatio or w / h > self.maxRatio:
+                continue
             if area > largestBoundRectArea:
                 largestBoundRectArea = area
                 lx = x
@@ -231,8 +240,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
     while len(col) < 3:
         col.append(0)
 
-    lower = [col[0] - 50, 0.0, 0.0]
-    upper = [col[0] + 50, 255.0, 255.0]
+    lower = [col[0] - 5, col[1] - 100, col[2] - 100]
+    upper = [col[0] + 5, col[1] + 100, col[2] + 100]
 
     for i in range(len(lower)):
         if lower[i] < 0:
@@ -247,6 +256,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
 
     cube.setLowerColor(np.array(lower, dtype=np.uint8))
     cube.setUpperColor(np.array(upper, dtype=np.uint8)) 
+    cube.setMinRatio(3.0 / 5.0)
+    cube.setMaxRatio(5.0 / 3.0)
 
     currentFrame = 0
 

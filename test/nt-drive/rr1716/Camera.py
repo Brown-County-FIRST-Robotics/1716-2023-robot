@@ -53,7 +53,7 @@ class Camera:
         self.camera.set(cv2.CAP_PROP_AUTO_WB, 1)
         self.camera.set(cv2.CAP_PROP_GAMMA, 100)
         self.camera.set(cv2.CAP_PROP_GAIN, 0)
-        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 3200)
+        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 4000)
         self.camera.set(cv2.CAP_PROP_SHARPNESS, 2)
 
         self._stopping = False
