@@ -23,6 +23,7 @@ class Camera:
         self.rectangles = None
         assert self.camera.isOpened()
         self.pos=position
+
         if calibration is not None:
             video_size = tuple(calibration["calibrationResolution"])
             self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, video_size[0])
@@ -30,18 +31,19 @@ class Camera:
             test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
             assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
-            self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-
             raw_camera_matrix = np.array(calibration['cameraMatrix'])
             dist_coefficients = np.array(calibration['cameraDistortion'])
             processing_resolution = np.array(calibration['processingResolution'])
 
             self.camera_matrix, roi = cv2.getOptimalNewCameraMatrix(raw_camera_matrix, dist_coefficients, tuple(video_size), 0,tuple(processing_resolution))
             self.map1, self.map2 = cv2.initUndistortRectifyMap(raw_camera_matrix, dist_coefficients, None, self.camera_matrix,
-                                                     tuple(processing_resolution), cv2.CV_16SC2)
+                                                 tuple(processing_resolution), cv2.CV_16SC2)
         else:
-            assert role != 'apriltag' and role != '*', f'For the role to be "{role}", a calibration is required'
+            self.map1=None
+            self.map2=None
             self.camera_matrix=None
+            assert role != 'apriltag' and role != '*', f'For the role to be "{role}", a calibration is required'
+        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))

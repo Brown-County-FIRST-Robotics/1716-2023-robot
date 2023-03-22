@@ -40,7 +40,8 @@ def main():
     # use getattr to turn loglevel into integer
 
     config=configs.loadConfig(args.config_file)
-    cameras = []
+
+cameras = []
 
     for i in config:
         if not os.path.exists(i['port']):
@@ -110,9 +111,10 @@ def main():
                 cam.startupdate()
             for cam in cameras:
                 cam.wait()
-            res = Decision.doCurrentAction(current_action)
-            if res is not None:
-                current_action = res
+            if args.config_file[:9]!='CALIBRATE':
+                res = Decision.doCurrentAction(current_action)
+                if res is not None:
+                    current_action = res
 
 
     finally:
