@@ -453,6 +453,7 @@ class AutoTurn180(Action):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
             return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", 5.0 / 4.0, 5.0 / 3.0)
+
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
