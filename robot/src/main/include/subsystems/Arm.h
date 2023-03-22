@@ -28,7 +28,7 @@ public:
 	frc::DoubleSolenoid::Value GetClaw();
 
 private:
-	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushed};
+	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 
 	rev::CANSparkMax elbow{ArmConst::ELBOW_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 	rev::SparkMaxPIDController elbowPid;
