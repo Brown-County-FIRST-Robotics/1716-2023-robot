@@ -181,24 +181,26 @@ class DriveDumb(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
-        self.xy_pid = simple_pid.PID(*Strategy.xy_pid_factor)
-        self.r_pid = simple_pid.PID(*Strategy.r_pid_factor)
+
 
     def Step(self):
         cam=self.april_cams[0]
         dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
-        if len(dets)==0:
+
+        det=None
+        for i in dets:
+            if i.tagID==self.location:
+                det=i
+                break
+        if det is None:
+            self.nt_interface.Drive(0,0,0)
             return
-        det=dets[0]
 
         offset_y = float(det.distance-100)
         offset_x = float(det.left_right)
         offset_r = float(det.yaw)
 
-        self.nt_interface.Drive(offset_x*0.01,
-                               offset_y*0.01, offset_r*0.0025)
-        #self.nt_interface.Drive(1,0,0)
-
+        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
 
     def ShouldEnd(self):
         return False
