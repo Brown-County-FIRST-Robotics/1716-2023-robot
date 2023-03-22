@@ -1,10 +1,11 @@
 #include "subsystems/Drivetrain.h"
 
-Drivetrain::Drivetrain() :
+Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	frontLeftEncoder{frontLeft.GetEncoder()}, 
 	frontRightEncoder{frontRight.GetEncoder()}, 
 	backLeftEncoder{backLeft.GetEncoder()}, 
-	backRightEncoder{backRight.GetEncoder()} 
+	backRightEncoder{backRight.GetEncoder()},
+	hub{hubRef}
 {
 	frontLeft.SetInverted(false);
 	frontRight.SetInverted(true);
@@ -20,6 +21,8 @@ Drivetrain::Drivetrain() :
 	encoderTable = networkTableInst.GetTable("1716Encoder");	
 	pigeonTable = networkTableInst.GetTable("1716Pigeon");
 
+	motorTable = networkTableInst.GetTable("1716Motors");
+
 	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
 	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
 	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
@@ -29,6 +32,22 @@ Drivetrain::Drivetrain() :
 	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
 	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
 	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
+
+	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
+		.Add("Drive Solenoid", false)
+		.WithSize(2, 2)
+		.WithProperties({
+			{"Color when true", nt::Value::MakeString("Maroon")},
+			{"Color when false", nt::Value::MakeString("Cyan")}})
+		.GetEntry();
+
+	pigeon.Reset();
+	pigeon.ConfigMountPose(ctre::phoenix::sensors::AxisDirection::PositiveX, ctre::phoenix::sensors::AxisDirection::PositiveZ);
+	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
+		.Add("Reset Pigeon Position", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.WithSize(2, 2)
+		.GetEntry();
 }
 
 void Drivetrain::Periodic() {
@@ -48,17 +67,36 @@ void Drivetrain::Periodic() {
 	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
 	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
 
-	xAccel.Set(GetX());
+	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
 	yAccel.Set(GetY());
-	yaw.Set(GetYaw());
+	
+	if ((int)GetYaw() % 360 >= 0) { //make it between 0 and 359
+		yaw.Set((int)GetYaw() % 360);
+	}
+	else {
+		yaw.Set(((int)GetYaw() % 360) + 360);
+	}
+
+	if (resetPigeonPos->GetBoolean(false)) {
+		pigeon.Reset();
+		resetPigeonPos->SetBoolean(false);
+	}
 }
 
-void Drivetrain::Drive(double x, double y, double z) {
+void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented
+	motorTable->PutNumber("x", x); //Todo: update this to be consistent with the rest of the system
+	motorTable->PutNumber("y", y);
+	motorTable->PutNumber("r", z);
+
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+		if (!headless)
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+		else
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED, 
+				pigeon.GetRotation2d().operator*(-1));
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(-x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
 	}
 }
 
@@ -113,10 +151,12 @@ int16_t Drivetrain::GetZ() {
 void Drivetrain::ToggleSolenoid() {
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) { //if reverse, set to forward
 		solenoid.Set(frc::DoubleSolenoid::Value::kForward);
+		solenoidIndicator->SetBoolean(true);
 		solenoidPos = frc::DoubleSolenoid::Value::kForward;
 	}
 	else { //if not reverse, set to reverse
 		solenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+		solenoidIndicator->SetBoolean(false);
 		solenoidPos = frc::DoubleSolenoid::Value::kReverse;
 	}
 	
@@ -125,6 +165,11 @@ void Drivetrain::ToggleSolenoid() {
 
 void Drivetrain::SetSolenoid(frc::DoubleSolenoid::Value position) {
 	solenoid.Set(position);
+	if (position == frc::DoubleSolenoid::Value::kForward)
+		solenoidIndicator->SetBoolean(true);
+	else
+		solenoidIndicator->SetBoolean(false);
+
 	solenoidPos = position;
 	
 	waitTicksNeeded = SolenoidConst::WAIT_TICKS;

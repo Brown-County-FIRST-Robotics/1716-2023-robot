@@ -1,6 +1,5 @@
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 
