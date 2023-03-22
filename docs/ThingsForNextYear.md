@@ -19,3 +19,7 @@
   - Don't treat another branch like main; just use main
   - potential idea: Have "file owners"; people who must approve any PR with changes to those files
 
+
+## off season
+- Organize bins, and store them better
+- Make better wrench storage
