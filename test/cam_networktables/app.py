@@ -20,14 +20,13 @@ def main():
     
     #Initialize networktables
     NetworkTables.initialize(server="10.17.16.2")
-    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True) 
-    """
-    with cond:
-        print("Waiting")
-        if not notified[0]:
-            cond.wait()
+    #NetworkTables.addConnectionListener(connectionListener, immediateNotify=True) 
+    
+    #with cond:
+    #    print("Waiting")
+    #    if not notified[0]:
+    #        cond.wait()
     print("Connected!")
-    """
 
     #This will be the network table that will store the position of an april tag
     #will store the largest april tag
