@@ -18,6 +18,8 @@ public:
 
 	void SetElbowGoal(double position);
 	double GetElbowGoal();
+	double GetElbowPosition();
+	void SetElbowActive(bool activateElbow);
 
 	// double GetArmAngle();
 

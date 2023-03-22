@@ -16,13 +16,13 @@ def main():
     
     #Initialize networktables
     NetworkTables.initialize(server="10.17.16.2")
-    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True) 
+    #NetworkTables.addConnectionListener(connectionListener, immediateNotify=True) 
 
     #Wait until you connect to network tables
-    with cond:
-        print("Waiting")
-        if not notified[0]:
-            cond.wait()
+    #with cond:
+    #    print("Waiting")
+    #    if not notified[0]:
+    #        cond.wait()
     print("Connected!")
 
     #This will be the network table that will store the position of an april tag

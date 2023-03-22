@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">	
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+
+    <title>Camera View</title>
+</head>
+<body>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+	
+	socket = io();
+	socket.binaryType = "arraybuffer";
+	socket.connect("http://127.0.0.1:5000/sidecam")
+	
+	socket.on("connect", function() {
+			console.log("connected!\n");
+			socket.send("a");
+		})
+	socket.on("message", function(msg) {
+			//document.getElementsByClassName("side")[0].src = msg; 
+			console.log(msg);
+			socket.send("a");	
+		})
+</script>
+-->
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8  offset-lg-2">
+      <h1 class="mt-5">Side Cameras <img src="{{ url_for('static', filename='images/plain-robot.svg') }}" id="logo"></h1>
+    </div>
+  </div> <!-- row -->
+  <div class="row justify-content-center">
+    <div class="col-md-auto" style="z-index:5">
+        <img class="side side1cam pull-right" width="100%" src="{{ url_for('camera_feed', Number = 0) }}">
+    </div>
+  </div>
+  <div class="row no-gutters align-items-center" style="z-index:1">
+    <div class="col">
+        <img class="side side2cam float-right" src="{{ url_for('camera_feed', Number = 1) }}">
+    </div>
+    <div class="col-md-auto">
+        <img class="side img-fluid" id="robot" src="{{ url_for('static', filename='images/robot.jpg') }}">
+    </div>
+    <div class="col">
+        <img class="side side3cam float-left" src="{{ url_for('camera_feed', Number = 2) }}">
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-auto" style="z-index:5">
+        <img class="side side4cam" width="100%" src="{{ url_for('camera_feed', Number = 3) }}">
+    </div>
+  </div> <!-- row -->
+</div>
+
+<button onclick="window.location.href='/picker'">Color Picker</button>
+<p id="apriltag"></p>
+<script>
+
+async function getApriltag(){
+    let apriltag_output=await fetch('/apriltags');
+    let april_data=apriltag_output.text();
+    document.getElementById('apriltag').innerHTML=await april_data;
+}
+setInterval(getApriltag, 200);
+</script>
+    </body>
+</html>
