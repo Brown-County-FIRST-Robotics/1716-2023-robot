@@ -460,6 +460,19 @@ class AutoTurn180(Action):
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
         return None 
 
+class AwaitAutoStart(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+    
+
+    def ShouldEnd(self):
+        return self.nt_interface.IsAutonomous()
+
+    def MakeChild(self):
+        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 
+
+
+
 # TEST CODE GOES HERE
 if __name__ == '__main__':
     pass
