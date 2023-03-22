@@ -95,6 +95,11 @@ def main():
     lastframetime = 0
     try:
         while not stopping:
+            
+            if nt_table.IsTeleop():
+                print("SHUTTING DOWN")
+                sys.exit(0)
+
             #cap at 10 FPS in case this loop isn't the only thing on the pi and we want to not constantly nail the cpu
             newtime = time.time()
             towait = .1-(newtime - lastframetime)
