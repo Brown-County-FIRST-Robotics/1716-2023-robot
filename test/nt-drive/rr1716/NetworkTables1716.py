@@ -2,8 +2,19 @@
 
 import logging
 from networktables import NetworkTables
+import math
 
 IP = '10.17.16.2'
+
+
+def clamp(v, r):
+    if v == 0:
+        return 0
+    if math.fabs(v) > math.fabs(r):
+        return math.fabs(r)*math.fabs(v)/v
+    return v
+
+
 
 
 class NetworkTablesWrapper:
@@ -16,12 +27,11 @@ class NetworkTablesWrapper:
         self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
         self.motor_table = NetworkTables.getTable("1716Motors")
 
-
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
-        self.drive_table.putNumber('x', x)
-        self.drive_table.putNumber('y', y)
-        self.drive_table.putNumber('rotation', r)
+        self.drive_table.putNumber('x', clamp(y,0.2))
+        self.drive_table.putNumber('y', clamp(x,0.2))
+        self.drive_table.putNumber('rotation', clamp(r,0.15))
 
     def SwitchToTank(self):
         logging.debug(f'NetworkTablesWrapper.SwitchToTank()')
@@ -108,6 +118,12 @@ class NetworkTablesWrapper:
         if yaw == -1:
             print('No yaw value')
             return None
+        
+        while yaw < 0.0:
+            yaw += 360.0
+        while yaw >= 360.0:
+            yaw -= 360.0
+
         return yaw
 
     def IsAutonomous(self):  # TODO:add tests
@@ -127,7 +143,7 @@ class NetworkTablesWrapper:
 
     def GetMatchTime(self):  # TODO:add tests
         logging.debug(f'NetworkTablesWrapper.GetMatchTime()')
-        match_time = self.pigeon_table.getNumber('matchTime', -1)
+        match_time = self.game_table.getNumber('matchTime', -1)
         if match_time == -1:
             print('No match_time value')
             return None
@@ -163,8 +179,13 @@ class NetworkTablesWrapper:
         if pos==-1:
             return None
         return pos
+
+    # robot 0 theta means pointed up on field (to long wall) and +vy is forward.
     def GetMotors(self):
-        return self.motor_table.getNumber('x',0),self.motor_table.getNumber('y',0),self.motor_table.getNumber('r',0)
+        vx=240*self.motor_table.getNumber('x',0)
+        vy=240*self.motor_table.getNumber('y',0)
+        omega = 160*self.motor_table.getNumber('r',0)
+        return vx, vy, omega
 
 
 if __name__ == '__main__':

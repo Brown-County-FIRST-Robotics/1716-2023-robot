@@ -7,7 +7,7 @@ import threading
 import numpy as np
 
 class Camera:
-    def __init__(self, device, calibration, position):
+    def __init__(self, device, calibration, position, role):
         logging.debug("camera init %s", device)
         self.frame = None
         self.hsv = None
@@ -18,6 +18,7 @@ class Camera:
         self.last_frame_count = 0
         self.device = device
         self.camera = cv2.VideoCapture(device)
+        self.role=role
 
         self.rectangles = None
         assert self.camera.isOpened()
@@ -30,7 +31,6 @@ class Camera:
             test_video_size = (self.camera.get(cv2.CAP_PROP_FRAME_WIDTH), self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
             assert tuple(test_video_size) == tuple(video_size), 'camera resolution didnt set'
 
-
             raw_camera_matrix = np.array(calibration['cameraMatrix'])
             dist_coefficients = np.array(calibration['cameraDistortion'])
             processing_resolution = np.array(calibration['processingResolution'])
@@ -42,20 +42,20 @@ class Camera:
             self.map1=None
             self.map2=None
             self.camera_matrix=None
-
+            assert role != 'apriltag' and role != '*', f'For the role to be "{role}", a calibration is required'
         self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
         self.camera.set(cv2.CAP_PROP_FPS, 10)
         self.camera.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G'))
 
         self.camera.set(cv2.CAP_PROP_BRIGHTNESS, 0)
-        self.camera.set(cv2.CAP_PROP_CONTRAST, 32)
+        self.camera.set(cv2.CAP_PROP_CONTRAST, 0)
         self.camera.set(cv2.CAP_PROP_SATURATION, 128)
         self.camera.set(cv2.CAP_PROP_HUE, 0)
         self.camera.set(cv2.CAP_PROP_AUTO_WB, 1)
         self.camera.set(cv2.CAP_PROP_GAMMA, 100)
         self.camera.set(cv2.CAP_PROP_GAIN, 0)
-        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 3200)
+        self.camera.set(cv2.CAP_PROP_WB_TEMPERATURE, 4000)
         self.camera.set(cv2.CAP_PROP_SHARPNESS, 2)
 
         self._stopping = False
@@ -73,7 +73,7 @@ class Camera:
         while not self._stopping:
             success, frame = self.camera.read()
             if success and frame is not None:
-                if self.map2 is not None:
+                if self.camera_matrix is not None:
                     frame = cv2.remap(frame, self.map1, self.map2, cv2.INTER_CUBIC)
                 self.frame = frame
                 self.frame_count = self.frame_count + 1

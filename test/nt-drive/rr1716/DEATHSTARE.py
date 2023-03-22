@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import logging
-from flask import Flask, render_template, Response, redirect, request
+from flask import Flask, render_template, Response, redirect, request, jsonify
 from threading import Thread
 from rr1716 import AprilTags
 import cv2
 import numpy as np
 import rr1716
+import dataclasses
 
 __COLOR_PICK_RANGE__ = 20
 
@@ -53,11 +54,23 @@ def index():
     """Video streaming home page."""
     return render_template('sidecam.html')
 
-@app.route('/calibrate')
-def calibrate():
-    logging.debug("DEATHSTARE.calibrate")
-    """Video streaming home page."""
-    return render_template('calibrate.html')
+
+# remove this code for now TODO: add code
+#@app.route('/calibrate')
+#def calibrate():
+#    logging.debug("DEATHSTARE.calibrate")
+#    """Video streaming home page."""
+#    return render_template('calibrate.html')
+
+@app.route('/state')
+def state():
+    logging.debug("DEATHSTARE.state")
+    return render_template('state.html')
+
+@app.route('/stateest')
+def stateest():
+    logging.debug("DEATHSTARE.stateest")
+    return jsonify(dataclasses.asdict(app.filter.current))
 
 #Color picker
 # This function gets called by the /video_feed route below
@@ -111,10 +124,10 @@ def preview_image():
 @app.route("/pick")
 def pick():
     app.Cameras[0].get_frame()
-    col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_color(), __COLOR_PICK_RANGE__)
     print("color: ", col) 
     #write to file
-    file = open("cube_picked_color", "w")
+    file = open("picked_color", "w")
     file.write(str(int(col[0])) + " " + str(int(col[1])) + " " + str(int(col[2])) + " \n")
     file.close()
     return redirect("/preview")
@@ -122,7 +135,7 @@ def pick():
 @app.route("/pick_cone")
 def pick_cone():
     app.Cameras[0].get_frame()
-    col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_frame(), __COLOR_PICK_RANGE__)
     logging.info("cone color: " + str(col)) 
     #write to file
     file = open("cone_picked_color", "w")
@@ -133,7 +146,7 @@ def pick_cone():
 @app.route("/pick_cube")
 def pick_cube():
     app.Cameras[0].get_frame()
-    col = rr1716.Vision.averageColor(app.Cameras[0].get_hsv(), __COLOR_PICK_RANGE__)
+    col = rr1716.Vision.averageColor(app.Cameras[0].get_frame(), __COLOR_PICK_RANGE__)
     logging.info("cube color: " + str(col)) 
     #write to file
     file = open("cube_picked_color", "w")
@@ -153,12 +166,25 @@ def get_apriltags():
         return Response(f'<h3>Field position: x:{x}, y:{y}, r:{r}</h3>', mimetype='text')
     return Response('<h3>No apriltags Found</h3>', mimetype='text')
 
+@app.route("/apriltags2")
+def get_apriltags2():
+    res=[]
+    for cam in app.Cameras:
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        for det in dets:
+          print(det)
+          x,y,r=det.calcFieldPos()
+          out = (det.tagID, det.distance, det.left_right, det.yaw, x, y, r, det.RMSError)
+          res.append(out)
+    return jsonify(res)
 
-def start(camera):
+
+def start(camera, filter):
     logging.debug("DEATHSTARE.start")
     app.Cameras = camera
     thread = Thread(target=app.run, kwargs={'host':"0.0.0.0"})
     thread.start()
+    app.filter=filter
 
 if __name__ == '__main__':
     pass

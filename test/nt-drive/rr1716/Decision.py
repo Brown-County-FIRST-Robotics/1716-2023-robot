@@ -8,8 +8,10 @@ from rr1716 import Strategy
 import cv2
 import numpy as np
 import simple_pid
-# from rr1716 import StateEstimator
 
+import time
+# from rr1716 import Filter
+# from rr1716 import StateEstimator
 
 class Action:
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -18,12 +20,19 @@ class Action:
         self.cams = cams
         self.filter = filter
         self.april_executor = april_executor
+        self.april_cams=[]
+        self.conecube_cams=[]
+        for i in self.cams:
+            if i.role == 'apriltag' or i.role == '*':
+                self.april_cams.append(i)
+            if i.role == 'conecube' or i.role == '*':
+                self.conecube_cams.append(i)
 
     def FetchApriltags(self):
         robotLocation = None
         april_futures = []
 
-        for cam in self.cams:
+        for cam in self.april_cams:
             april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.get_gray(), cam.camera_matrix, None))
         for future in april_futures:
             detections = future.result()
@@ -61,7 +70,7 @@ class StartFilter(Action):
     def Step(self):
         # DO NOT ADD super().step() HERE
         robotLocation = None
-        for camera in self.cams:
+        for camera in self.april_cams:
             res = AprilTags.getPosition(camera.get_gray(), camera.camera_matrix, None)  # check for apriltag
             if res is not None and res != []:  # TODO: change?
                 robotLocation = res[0]  # TODO: change?
@@ -76,7 +85,7 @@ class StartFilter(Action):
         if self.referrer=='auto':
             return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 6)  # IMPORTANT: change
         elif self.referrer=='DRIVETOAPRILTAG':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (682,0,0), self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface, self.april_executor, (600,-400,0), self.referrer)
 
 
 class AsyncSetHeight(Action):
@@ -109,7 +118,7 @@ class AsyncSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, 0, 0], self.referrer)
+            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, -293, 0], self.referrer)
 
 
 class DriveToLocation(Action):
@@ -121,24 +130,28 @@ class DriveToLocation(Action):
 
     def Step(self):
         super().Step()
-        field_x, field_y, field_r = self.filter.currentTuple
-        cx = math.cos(field_r * math.pi / 180)
-        cy = math.sin(field_r * math.pi / 180)
+        state = self.filter.current
+        field_x, field_y, field_r = state.x, state.y, state.theta
+        field_x-=self.location[0]
+        field_y-=self.location[1]
+        logging.info(f'Moves:{field_x} {field_y} {field_r}')
+        theta  = field_r-self.location[2]
+        if theta>180:
+            theta-=360
+        fxfromrx = math.cos(field_r * math.pi / 180)#1 0
+        fyfromrx = math.sin(field_r * math.pi / 180)#0 -1
 
-        ax = math.cos((field_r + 90) * math.pi / 180)
-        ay = math.sin((field_r + 90) * math.pi / 180)
+        fxfromry = math.cos((field_r + 90) * math.pi / 180)#0 1
+        fyfromry = math.sin((field_r + 90) * math.pi / 180)#1 0
 
-        offset_x = field_x - self.location[0]
-        offset_y = field_y - self.location[1]
-        offset_r = field_r - self.location[2]
-        move_x=offset_x * cx + offset_y * cy
-        move_y=offset_x * ax + offset_y * ay
-        move_r=offset_r
+        move_y = field_x * fxfromrx + field_y * fxfromry
+        move_x = field_x * fyfromrx + field_y * fyfromry
 
-        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(move_r))
+        self.nt_interface.Drive(Strategy.xy_pid_factor[0]*(move_x),-Strategy.xy_pid_factor[0]*(move_y),Strategy.r_pid_factor[0]*(theta))
 
     def ShouldEnd(self):
-        field_x, field_y, field_r = self.filter.currentTuple
+        state=self.filter.current
+        field_x, field_y, field_r = state.x, state.y, state.theta
         error = math.sqrt((field_x - self.location[0]) ** 2 + (
                     field_y - self.location[1]) ** 2)
         return error < Strategy.drive_error_threshold and math.fabs(field_r - self.location[2]) < Strategy.r_error_threshold
@@ -149,6 +162,7 @@ class DriveToLocation(Action):
     def MakeChild(self):
         if self.referrer == 'auto':
             return AwaitSetHeight(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+        assert 0
 
 
 class AwaitSetHeight(Action):
@@ -162,6 +176,34 @@ class AwaitSetHeight(Action):
         if self.referrer == 'auto':
             return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
 
+
+class DriveDumb(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.location = location
+
+
+    def Step(self):
+        cam=self.april_cams[0]
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+
+        det=None
+        for i in dets:
+            if i.tagID==self.location:
+                det=i
+                break
+        if det is None:
+            self.nt_interface.Drive(0,0,0)
+            return
+
+        offset_y = float(det.distance-100)
+        offset_x = float(det.left_right)
+        offset_r = float(det.yaw)
+
+        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
+
+    def ShouldEnd(self):
+        return False
 
 class Drop(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -265,7 +307,6 @@ class AddScreenVals(Action):
     def ShouldEnd(self):
         return False
 
-
 class GetDriverCommand(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
@@ -299,77 +340,141 @@ def doCurrentAction(action):
         return action.MakeChild()
     return None
 
+class DriveToGamepeice(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer, col_range_h=50, col_range_s=50, col_range_v=50, target_w=300, target_h=200, color_file_path="cone_picked_color", 
+                 minRatio=-1, maxRatio=99999):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+       
+        self.minRatio = minRatio
+        self.maxRatio = maxRatio
+
+        col = []
+        if os.path.exists(color_file_path):
+            file = open(color_file_path, "r") 
+            for line in file:
+                for x in line.split():
+                    col.append(int(x)) 
+            file.close()
+        else:
+            print("Error: file does not exist: " + color_file_path)
+
+        self.gamepeice = Vision.GamePiece()
+        while len(col) < 3:
+            col.append(0)
+        
+        lower = [col[0] - col_range_h, col[1] - col_range_s, col[2] - col_range_v]
+        upper = [col[0] + col_range_h, col[1] + col_range_s, col[2] + col_range_v]
+    
+        for i in range(len(lower)):
+            if lower[i] < 0:
+                lower[i] = 0
+            if lower[i] > 255:
+                lower[i] = 255
+
+            if upper[i] < 0:
+                upper[i] = 0
+            if upper[i] > 255:
+                upper[i] = 255
+
+        self.gamepeice.setLowerColor(np.array(lower, dtype=np.uint8))
+        self.gamepeice.setUpperColor(np.array(upper, dtype=np.uint8))
+        self.gamepeice.setMinRatio(self.minRatio)
+        self.gamepeice.setMaxRatio(self.maxRatio)
+
+        self.target_w = target_w
+        self.target_h = target_h
+
+    def Step(self):
+        x = y = r = 0
+        self.gamepeice.findObject(self.conecube_cams[0].frame) #find the cone
+       
+        # perfect, do nothing!
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
+            self.nt_interface.Drive(0, 0, 0)
+            return
+
+        logging.debug("Decision: w: " + str(self.gamepeice.w))
+        logging.debug("Decision: x, y: " + str(self.gamepeice.x) + ", " + str(self.gamepeice.y))
+
+        # cone is to the left, turn left
+        if self.gamepeice.x < -5 - self.gamepeice.w / 2:
+            print("turn left")
+            r = -0.05
+        # cone is to the right, turn right
+        elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
+            print("turn right")
+            r = 0.05
+
+        # too far away, drive towards it
+        if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
+            print("drive forward")
+            y = 0.4 - 0.3 * self.gamepeice.w / self.target_w * 0.3 
+
+        self.nt_interface.Drive(x, y, r)
+
+    def ShouldEnd(self):
+        if (self.gamepeice.w >= self.target_w or self.gamepeice.h >= self.target_h) and self.gamepeice.x >= -5 - self.gamepeice.w / 2 and self.gamepeice.x <= 5 + self.gamepeice.w / 2:
+            return True
+        return False
+
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+        
+    def MakeChild(self):
+        if self.referrer == "auto":
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogamepeice")
+        return None
+
+class AutoTurn180(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        self.startrotation = self.nt_interface.GetYaw()
+        if self.startrotation == None:
+            self.startrotation = 0
+
+    def Step(self):
+        logging.info("rotating")
+        # just turn until we are at 180 degrees
+        self.nt_interface.Drive(0, 0, 0.2)
+
+    def ShouldEnd(self):
+        if self.nt_interface.GetYaw() == None:
+            return False
+        target_rotation = self.startrotation + 180.0
+        # put target_rotation in the range 0 to 360
+        while target_rotation >= 360.0:
+            target_rotation -= 360.0
+        while target_rotation < 0.0:
+            target_rotation += 360.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 20.0
+    
+    def End(self):
+        self.nt_interface.Drive(0, 0, 0)
+
+    def MakeChild(self):
+        if self.referrer == "auto":
+            logging.info("switch to drive to gamepeice")
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", 5.0 / 4.0, 5.0 / 3.0)
+        elif self.referrer == "drivetogamepeice":  
+            logging.info("switch to drive to april tag")
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 
+        return None 
+
+class AwaitAutoStart(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+    
+
+    def ShouldEnd(self):
+        return self.nt_interface.IsAutonomous()
+
+    def MakeChild(self):
+        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 
+
+
 
 # TEST CODE GOES HERE
 if __name__ == '__main__':
-    import NetworkTables1716
-    import cv2
-    import numpy as np
-
-    gameobjects = [
-        Vision.GamePiece(),
-        Vision.GamePiece(),
-        Vision.GamePiece(),
-        Vision.GamePiece()
-    ]
-
-    gameobjects[0].x = -30
-    gameobjects[0].y = 0
-
-    gameobjects[1].notfound = True
-    gameobjects[2].notfound = True
-    gameobjects[3].notfound = True
-
-    nttable = NetworkTables1716.NetworkTablesWrapper()
-    cam = cv2.VideoCapture("/dev/video2")
-
-    ret, frame = cam.read()
-    avgColor = Vision.averageColor(frame, 20)
-
-    low = [ avgColor[0] * 0.3, avgColor[1] * 0.7, avgColor[2] * 0.7 ]
-    high = [ avgColor[0] * 3.3, avgColor[1] * 1.3, avgColor[2] * 1.3 ]
-    gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
-    gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
-
-    while True:
-        ret, frame = cam.read()
-        
-        gameobjects[0].findCone(frame)
-        gameobjects[0].drawBoundRect(frame, [0,255,0])
-
-        print(int(gameobjects[0].x), int(gameobjects[0].y))
-
-        scaledup = cv2.resize(frame, (int(frame.shape[1] * 1.6), int(frame.shape[0] * 1.6)),
-                              interpolation=cv2.INTER_AREA)
-        cv2.imshow("frame", scaledup)
-
-        decisionMade = decision(DecisionArg(gameobjects, False, 120))
-        print("rotation speed:", decisionMade.driveRotation, "speed:", decisionMade.driveSpeed) 
-        nttable.Drive(decisionMade.driveSpeed, 0.0, decisionMade.driveRotation)
-
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
-            break
-        elif key == ord('1'):
-            avgColor = Vision.averageColor(frame, 100) 
-            low = [ avgColor[0] * 0.3, avgColor[1] * 0.5, avgColor[2] * 0.5 ]
-            high = [ avgColor[0] * 2.0, avgColor[1] * 2.0, avgColor[2] * 2.0 ]
-            
-            for i in range(3):
-                if low[i] < 0:
-                    low[i] = 0
-                elif low[i] > 255:
-                    low[i] = 255
-
-                if high[i] < 0:
-                    high[i] = 0
-                elif high[i] > 255:
-                    high[i] = 255
-            
-            print(low, high, avgColor)
-            gameobjects[0].setLowerColor(np.array(low, dtype=np.uint8))
-            gameobjects[0].setUpperColor(np.array(high, dtype=np.uint8))
-
     pass
 # initialize module here
 else:
