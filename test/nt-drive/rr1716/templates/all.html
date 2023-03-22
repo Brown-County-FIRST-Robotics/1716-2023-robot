@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/bootstrap.css">
+
+    <title>Live Streaming Demonstration</title>
+</head>
+<body>
+<div class="container">
+Pick Camera {{ num }}
+    <div class="row">
+{%for i in range(0, len)%}
+        <div class="col-sm">
+            <a href="{{ url_for('all') }}?cam={{ i }}&num={{ num }}">
+            <img src="{{ url_for('camera_feed', Number = i) }}" width=100%>
+            </a>
+        </div>
+{%endfor%}
+    </div>
+</div>
+<p id="apriltag"></p>
+<button onclick="window.location.href='/picker'">Color Picker</button>
+<script>
+
+async function getApriltag(){
+    let apriltag_output=fetch('/apriltags');
+    document.getElementById('apriltag').innerHTML=await apriltag_output.text();
+}
+setInterval(getApriltag, 200);
+
+</script>
+</body>
+</html>

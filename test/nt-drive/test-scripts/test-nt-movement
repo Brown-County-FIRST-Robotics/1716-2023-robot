@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+from networktables import NetworkTables
+import time
+
+def main():
+    NetworkTables.initialize("10.17.16.2")
+
+    drive_table = NetworkTables.getTable("1716Drive")
+
+    print("Start")
+    time.sleep(3)
+    print("Forward 0.5")
+    drive_table.putNumber("forward", 0.5)
+    time.sleep(2)
+    print("Forward 0")
+    drive_table.putNumber("forward", 0.0)
+    time.sleep(1)
+    print("Back 0.5")
+    drive_table.putNumber("back", 0.5)
+    time.sleep(2)
+    print("Back 0")
+    drive_table.putNumber("back", 0.0)
+
+if __name__ == "__main__":
+    main()

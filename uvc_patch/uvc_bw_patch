@@ -1,0 +1,46 @@
+--- linux/drivers/media/usb/uvc/uvc_driver.c	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvc_driver.c	2023-02-05 14:39:31.608117954 +0000
+@@ -34,6 +34,7 @@
+ static unsigned int uvc_quirks_param = -1;
+ unsigned int uvc_dbg_param;
+ unsigned int uvc_timeout_param = UVC_CTRL_STREAMING_TIMEOUT;
++unsigned int uvc_bandwidth_cap_param;
+ 
+ /* ------------------------------------------------------------------------
+  * Video formats
+@@ -2634,6 +2635,8 @@
+ MODULE_PARM_DESC(trace, "Trace level bitmask");
+ module_param_named(timeout, uvc_timeout_param, uint, S_IRUGO|S_IWUSR);
+ MODULE_PARM_DESC(timeout, "Streaming control requests timeout");
++module_param_named(bandwidth_cap, uvc_bandwidth_cap_param, uint, S_IRUGO|S_IWUSR);
++MODULE_PARM_DESC(bandwidth_cap, "Maximum bandwidth per device");
+ 
+ /* ------------------------------------------------------------------------
+  * Driver initialization and cleanup
+--- linux/drivers/media/usb/uvc/uvc_video.c	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvc_video.c	2023-02-06 15:05:30.119277544 +0000
+@@ -231,6 +231,14 @@
+ 
+ 		ctrl->dwMaxPayloadTransferSize = bandwidth;
+ 	}
++
++	if (uvc_bandwidth_cap_param &&
++	    ctrl->dwMaxPayloadTransferSize > uvc_bandwidth_cap_param) {
++		uvc_dbg(stream->dev, VIDEO,
++			"Bandwidth capped from %u to %u B/frame.\n",
++			ctrl->dwMaxPayloadTransferSize, uvc_bandwidth_cap_param);
++		ctrl->dwMaxPayloadTransferSize = uvc_bandwidth_cap_param;
++	}
+ }
+ 
+ static size_t uvc_video_ctrl_size(struct uvc_streaming *stream)
+--- linux/drivers/media/usb/uvc/uvcvideo.h	2023-01-05 11:48:06.000000000 +0000
++++ /home/robotics/linux/drivers/media/usb/uvc/uvcvideo.h	2023-02-05 14:39:31.616117981 +0000
+@@ -754,6 +754,7 @@
+ extern unsigned int uvc_dbg_param;
+ extern unsigned int uvc_timeout_param;
+ extern unsigned int uvc_hw_timestamps_param;
++extern unsigned int uvc_bandwidth_cap_param;
+ 
+ #define uvc_dbg(_dev, flag, fmt, ...)					\
+ do {									\
