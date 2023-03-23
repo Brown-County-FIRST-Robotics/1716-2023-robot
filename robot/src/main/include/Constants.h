@@ -42,13 +42,15 @@ namespace ArmConst
 	//0 is forward, 1 is reverse
 	const int CLAW_ID[2] = {6, 7};
 
-	const double SHOULDER_SPEED = 1;
+	const double SHOULDER_SPEED = 0.1;
 
 	//Analog ID
-	const int ARM_POTENTIOMETER_ID = 0;
+	const int SHOULDER_POTENTIOMETER_ID = 0;
 
-	const double P = .000001;
-	const double I = 0;
-	const double D = 0;
-	const double MAX_OUTPUT = .15;
+	const double SHOULDER_P = 0;
+
+	const double ELBOW_P = .000001;
+	const double ELBOW_I = 0;
+	const double ELBOW_D = 0;
+	const double ELBOW_MAX_OUTPUT = .15;
 };

@@ -5,6 +5,7 @@
 #include <rev/CANSparkMax.h>
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PneumaticHub.h>
+#include <frc/controller/PIDController.h>
 
 #include "Constants.h"
 
@@ -14,21 +15,29 @@ public:
 
 	void Periodic() override;
 
-	void SetShoulder(double speed);
+	void SetShoulderGoal(double position);
+	double GetShoulderGoal();
+	double GetShoulderPosition();
+	void SetShoulderActive(bool activate);
 
 	void SetElbowGoal(double position);
 	double GetElbowGoal();
 	double GetElbowPosition();
-	void SetElbowActive(bool activateElbow);
-
-	// double GetArmAngle();
+	void SetElbowActive(bool activate);
 
 	void ToggleClaw();
 	void SetClaw(frc::DoubleSolenoid::Value value);
 	frc::DoubleSolenoid::Value GetClaw();
 
 private:
-	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushed};
+	double Shoulder_P = .2;
+
+
+	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+	frc::AnalogPotentiometer shoulderEncoder{0, -230, 206}; //set up for degrees
+	frc2::PIDController shoulderPid;
+	double shoulderPositionGoal;
+	bool shoulderActive = true;
 
 	rev::CANSparkMax elbow{ArmConst::ELBOW_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 	rev::SparkMaxPIDController elbowPid;
@@ -39,8 +48,6 @@ private:
 	frc::DoubleSolenoid claw = hub.MakeDoubleSolenoid(ArmConst::CLAW_ID[0], ArmConst::CLAW_ID[1]);
 	int clawTicks = -1;
 	frc::DoubleSolenoid::Value clawPos = frc::DoubleSolenoid::Value::kReverse;
-
-	// frc::AnalogPotentiometer armPotentiometer{ArmConst::ARM_POTENTIOMETER_ID};
 
 	double P = 0.1;
 	double I = 0;

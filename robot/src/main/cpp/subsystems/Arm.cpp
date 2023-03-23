@@ -1,8 +1,12 @@
 #include "subsystems/Arm.h"
 #include <frc/SmartDashboard/SmartDashboard.h>
+#include <iostream>
 
-Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDController()}, elbowEncoder{elbow.GetEncoder()} {
+Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDController()}, elbowEncoder{elbow.GetEncoder()},
+	shoulderPid{Shoulder_P, 0, 0} {
 	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+
 	elbowEncoder.SetPosition(0);
 	elbow.SetInverted(true);
 
@@ -18,6 +22,13 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
 	frc::SmartDashboard::PutNumber("D", D);
 	frc::SmartDashboard::PutNumber("Max Output", MAX_OUTPUT);
 	frc::SmartDashboard::PutNumber("Position", elbowPositionGoal);
+
+
+	frc::SmartDashboard::PutNumber("shoulder P", Shoulder_P);
+
+
+	shoulderPositionGoal = shoulderEncoder.Get();
+	frc::SmartDashboard::PutNumber("Shoulder Pos", shoulderPositionGoal);
 }
 
 void Arm::Periodic() {
@@ -38,14 +49,44 @@ void Arm::Periodic() {
     if((max != MAX_OUTPUT)) { elbowPid.SetOutputRange(-max, max); MAX_OUTPUT = max; }
     if((pos != elbowPositionGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kPosition); elbowPositionGoal = pos; }
 	frc::SmartDashboard::PutNumber("Output", elbow.GetAppliedOutput());
+
+
+	frc::SmartDashboard::PutNumber("Shoulder encoder", shoulderEncoder.Get());
+	shoulderPositionGoal = frc::SmartDashboard::GetNumber("Shoulder Pos", shoulderPositionGoal);
+
+
+	double shoulderp = frc::SmartDashboard::GetNumber("P", 0);
+	if((shoulderp != Shoulder_P)) { shoulderPid.SetP(shoulderp); Shoulder_P = shoulderp; }
+
+
+	if (shoulderActive) {
+		double output = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get(), shoulderPositionGoal), -ArmConst::SHOULDER_SPEED, ArmConst::SHOULDER_SPEED);
+		if (output > 0 && shoulderEncoder.Get() > 78) //enforce limits
+			// shoulder.Set(output);
+			std::cout << output;
+		else if (output < 0 && shoulderEncoder.Get() < 130)
+			// shoulder.Set(output);
+			std::cout << output;
+		else
+			// shoulder.Set(0);
+			std::cout << 0;
+	}
 }
 
-// void Arm::SetShoulderLimit(rev::CANSparkMax::SoftLimitDirection direction, double position) {
-// 	elbow.SetSoftLimit(direction, position);
-// }
+void Arm::SetShoulderGoal(double position) {
+	// shoulderPositionGoal = position;
+}
 
-void Arm::SetShoulder(double speed) {
-	shoulder.Set(-speed * ArmConst::SHOULDER_SPEED);
+double Arm::GetShoulderGoal() {
+	return shoulderPositionGoal;
+}
+
+double Arm::GetShoulderPosition() {
+	return shoulderEncoder.Get();
+}
+
+void Arm::SetShoulderActive(bool activate) {
+	shoulderActive = activate;
 }
 
 void Arm::SetElbowGoal(double position) {
