@@ -36,7 +36,7 @@ class Action:
             april_futures.append(self.april_executor.submit(AprilTags.getPosition, cam.get_gray(), cam.camera_matrix, None))
         for future in april_futures:
             detections = future.result()
-            if detections is not None:
+            if detections is not None and detections!=[]:
                 robotLocation=detections[0]
                 break
         if robotLocation is not None:
