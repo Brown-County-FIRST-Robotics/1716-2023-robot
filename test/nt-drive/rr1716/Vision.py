@@ -272,7 +272,7 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
         cone.findObject(frame)
         cube.findObject(frame)  
         
-        cv2.rectangle(frame, cone.getLowerLeft(), cone.getUpperRight(), (0, 255, 0), 2)  
+        #cv2.rectangle(frame, cone.getLowerLeft(), cone.getUpperRight(), (0, 255, 0), 2)  
         cv2.rectangle(frame, cube.getLowerLeft(), cube.getUpperRight(), (255, 0, 0), 2)
         ret, jpeg = cv2.imencode('.jpg', frame)
         data = jpeg.tobytes()

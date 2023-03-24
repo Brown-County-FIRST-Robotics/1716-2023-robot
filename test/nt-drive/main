@@ -41,7 +41,7 @@ def main():
 
     config=configs.loadConfig(args.config_file)
 
-cameras = []
+    cameras = []
 
     for i in config:
         if not os.path.exists(i['port']):

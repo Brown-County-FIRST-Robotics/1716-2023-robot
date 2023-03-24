@@ -56,11 +56,11 @@ def index():
 
 
 # remove this code for now TODO: add code
-#@app.route('/calibrate')
-#def calibrate():
-#    logging.debug("DEATHSTARE.calibrate")
-#    """Video streaming home page."""
-#    return render_template('calibrate.html')
+@app.route('/calibrate')
+def calibrate():
+    logging.debug("DEATHSTARE.calibrate")
+    """Video streaming home page."""
+    return render_template('calibrate.html')
 
 @app.route('/state')
 def state():
