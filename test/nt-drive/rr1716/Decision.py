@@ -401,18 +401,18 @@ class DriveToGamepeice(Action):
         # cone is to the left, turn left
         if self.gamepeice.x < -5 - self.gamepeice.w / 2:
             print("turn left")
-            r = -0.05
+            r = -0.07
         # cone is to the right, turn right
         elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
             print("turn right")
-            r = 0.05
+            r = 0.07
         else:
             r = 0.0
 
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.4 - self.gamepeice.w / self.target_w * 0.4 
+            y = 0.5 - self.gamepeice.w / self.target_w * 0.55 
 
         self.nt_interface.Drive(x, y, r)
 
@@ -424,7 +424,7 @@ class DriveToGamepeice(Action):
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
         logging.info("STOP - AT CUBE")
-        time.sleep(5)
+        time.sleep(2)
         
     def MakeChild(self):
         if self.referrer == "auto":
@@ -437,11 +437,19 @@ class AutoTurn180(Action):
         self.startrotation = self.nt_interface.GetYaw()
         if self.startrotation == None:
             self.startrotation = 0
+        
+        target_rotation = self.startrotation + 180.0
+        # put target_rotation in the range 0 to 360
+        while target_rotation >= 360.0:
+            target_rotation -= 360.0
+        while target_rotation < 0.0:
+            target_rotation += 360.0
+        self.rotationPID = simple_pid.PID(self.startrotation + 0.01, 0, 0,setpoint=target_rotation)
 
     def Step(self):
         logging.info("rotating")
         # just turn until we are at 180 degrees
-        self.nt_interface.Drive(0, 0, 0.2)
+        self.nt_interface.Drive(0, 0, self.rotationPID(self.nt_interface.GetYaw()))
 
     def ShouldEnd(self):
         if self.nt_interface.GetYaw() == None:
@@ -452,7 +460,7 @@ class AutoTurn180(Action):
             target_rotation -= 360.0
         while target_rotation < 0.0:
             target_rotation += 360.0
-        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 20.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 4.0
     
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
