@@ -384,6 +384,8 @@ class DriveToGamepeice(Action):
         self.target_w = target_w
         self.target_h = target_h
 
+        logging.info("Created decision: %d %d" % (target_w, target_h))
+
     def Step(self):
         x = y = r = 0
         self.gamepeice.findObject(self.conecube_cams[0].frame) #find the cone
@@ -404,11 +406,13 @@ class DriveToGamepeice(Action):
         elif self.gamepeice.x > 5 + self.gamepeice.w / 2:
             print("turn right")
             r = 0.05
+        else:
+            r = 0.0
 
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.4 - 0.3 * self.gamepeice.w / self.target_w * 0.3 
+            y = 0.4 - self.gamepeice.w / self.target_w * 0.4 
 
         self.nt_interface.Drive(x, y, r)
 
@@ -419,6 +423,8 @@ class DriveToGamepeice(Action):
 
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
+        logging.info("STOP - AT CUBE")
+        time.sleep(5)
         
     def MakeChild(self):
         if self.referrer == "auto":
@@ -454,7 +460,7 @@ class AutoTurn180(Action):
     def MakeChild(self):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
-            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", 5.0 / 4.0, 5.0 / 3.0)
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=3.0 / 5.0, maxRatio=5.0 / 3.0)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, None, self.referrer) 

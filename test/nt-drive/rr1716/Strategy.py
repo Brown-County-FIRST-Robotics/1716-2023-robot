@@ -7,4 +7,4 @@ drive_error_threshold = 3  # TODO: change
 
 accel_angle_threshold = 10  # TODO: change
 
-TARGET_CUBE_SIZE = 150
+TARGET_CUBE_SIZE = 100

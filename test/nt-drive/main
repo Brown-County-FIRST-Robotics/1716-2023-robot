@@ -84,7 +84,7 @@ def main():
     elif args.auto_mode == 'DRIVETOGAMEPIECE':        
         current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocube', 5, 100, 100, 300, 200, "cube_picked_color")
     elif args.auto_mode == 'AUTO':
-        current_action = Decision.AutoTurn180(filter, cameras, nt_table, april_executor, 'auto')
+        current_action = Decision.AwaitAutoStart(filter, cameras, nt_table, april_executor, 'auto')
     else:
         for camera in cameras:
             camera.shutdown()
