@@ -4,6 +4,8 @@
   - Plan the software architecture right away, and structure your experiments to fit into it
 - Make field elements
 - Use the old robot and other test platforms to test the software
+  - USE THE TEST BOARD AND OLD ROBOT
+  - Talk to mechanical, and make mock components (ex: arm made out of 2x4 attached to the test board)
 - Do it in cad first
 - Design the robot/software for the drive team
 - Make a test base (can be an old robot) and keep a git branch with the code for it
