@@ -43,7 +43,7 @@ class Action:
             self.filter.updateWithApriltag(robotLocation)
 
     def GetFilter(self):
-        logging.info(f'filter pos: {self.filter.currentTuple}')
+        #logging.info(f'filter pos: {self.filter.currentTuple}')
         return self.filter.currentTuple
 
     def GetGameObjects(self):
@@ -200,10 +200,25 @@ class DriveDumb(Action):
         offset_x = float(det.left_right)
         offset_r = float(det.yaw)
 
-        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
+        self.nt_interface.Drive(offset_x*0.003, offset_y*0.003, offset_r*0.0025)
 
     def ShouldEnd(self):
-        return False
+        cam=self.april_cams[0]
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        det = None
+        for i in dets:
+            if i.tagID == self.location:
+                det = i
+                break
+        if det is None:
+            return False
+        offset_y = float(det.distance - 100)
+        offset_x = float(det.left_right)
+        offset_r = float(det.yaw)
+        return offset_y+offset_x+offset_r<10
+
+    def MakeChild(self):
+        return AwaitAutoStart(self.filter, self.cams, self.nt_interface, self.april_executor, 'auto')
 
 class Drop(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -412,7 +427,7 @@ class DriveToGamepeice(Action):
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.5 - self.gamepeice.w / self.target_w * 0.55 
+            y = 0.6  - (self.gamepeice.w / self.target_w) * 0.6
 
         self.nt_interface.Drive(x, y, r)
 
@@ -449,7 +464,15 @@ class AutoTurn180(Action):
     def Step(self):
         logging.info("rotating")
         # just turn until we are at 180 degrees
-        self.nt_interface.Drive(0, 0, self.rotationPID(self.nt_interface.GetYaw()))
+        if self.nt_interface.GetYaw() is not None:
+            target_rotation = self.startrotation + 180.0
+            while target_rotation >= 360.0:
+                target_rotation -= 360.0
+            while target_rotation < 0.0:
+                target_rotation += 360.0
+            self.nt_interface.Drive(0, 0, (self.nt_interface.GetYaw() - target_rotation)*0.005)
+
+       
 
     def ShouldEnd(self):
         if self.nt_interface.GetYaw() == None:
