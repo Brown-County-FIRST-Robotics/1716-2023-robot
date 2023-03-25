@@ -28,7 +28,9 @@ def main():
     parser.add_argument('--logfile', '-f', action="store", dest="logfile", default="logging.log", help="Check the file for correctness")
     parser.add_argument('--loglevel', '-l', action="store", dest="loglevel", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], default="WARNING", help="Check the commits for correctness")
     parser.add_argument('--config', '-k', action="store", dest="config_file", default="configs/webcam.json", help='the config file to use')
-    parser.add_argument('--auto', '-a', action="store", dest="auto_mode", choices=['PLACEANDBALANCE', 'DEATHSTAREDEMO', 'DRIVETOAPRILTAG', 'DRIVETOGAMEPIECE', 'AUTO'], default="DRIVETOGAMEPIECE", help="The Action to start")
+    parser.add_argument('--auto', '-a', action="store", dest="auto_mode", choices=['PLACEANDBALANCE', 'DEATHSTAREDEMO', 'DRIVETOAPRILTAG', 'DRIVETOGAMEPIECE', 'AUTO'], default="AUTO", help="The Action to start")
+    parser.add_argument('--prod', action="store_true", dest="prod", help="If the robot should shut itself down")
+
 
     args = parser.parse_args()
 
@@ -99,7 +101,10 @@ def main():
             
             if nt_table.IsTeleop():
                 print("SHUTTING DOWN")
-                sys.exit(0)
+                if not args.prod:
+                    sys.exit(0)
+                else:
+                    os.system('poweroff')
 
             #cap at 10 FPS in case this loop isn't the only thing on the pi and we want to not constantly nail the cpu
             newtime = time.time()
