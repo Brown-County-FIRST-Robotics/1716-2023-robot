@@ -80,7 +80,7 @@ def main():
     elif args.auto_mode == 'DEATHSTAREDEMO':
         current_action = Decision.AddScreenVals(filter, cameras, nt_table, april_executor, 'auto')
     elif args.auto_mode == 'DRIVETOAPRILTAG':
-        current_action = Decision.DriveDumb(filter, cameras, nt_table, april_executor,0, 'DRIVETOAPRILTAG')
+        current_action = Decision.DriveDumb(filter, cameras, nt_table, april_executor,3, 'DRIVETOAPRILTAG')
     elif args.auto_mode == 'DRIVETOGAMEPIECE':        
         current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocube', 5, 100, 100, 300, 200, "cube_picked_color")
     elif args.auto_mode == 'AUTO':

@@ -43,7 +43,7 @@ class Action:
             self.filter.updateWithApriltag(robotLocation)
 
     def GetFilter(self):
-        logging.info(f'filter pos: {self.filter.currentTuple}')
+        #logging.info(f'filter pos: {self.filter.currentTuple}')
         return self.filter.currentTuple
 
     def GetGameObjects(self):
@@ -424,7 +424,7 @@ class DriveToGamepeice(Action):
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
         logging.info("STOP - AT CUBE")
-        time.sleep(5)
+        time.sleep(2)
         
     def MakeChild(self):
         if self.referrer == "auto":

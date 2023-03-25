@@ -153,7 +153,7 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), r
             if math.fabs(roll) > roll_threshold:
                 logging.info(f'discarded a value (roll:{roll})')
                 continue
-            logging.info(f'april pos: yaw:{yaw}, lr:{left_right}, ud:{up_down} distance:{distance}, rms:{rms}, tag:{detection.tag_id}')
+            logging.info(f'april pos: yaw:{str(yaw)[:5]}, lr:{str(left_right)[:7]}, distance:{str(distance)[:7]}, rms:{rms}, tag:{detection.tag_id}')
             detections.append(Detection(yaw, left_right[0], distance[0], rms[0][0], detection.tag_id))
             logging.info(f'field pos:yaw:{detections[-1].calcFieldPos()}')
     return detections
