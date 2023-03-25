@@ -494,7 +494,7 @@ class AutoTurn180(Action):
             return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
-            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 3, self.referrer)
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, int(self.nt_interface.GetAutoRoutine()[-1]), self.referrer)
         return None 
 
 class AwaitAutoStart(Action):
@@ -503,7 +503,7 @@ class AwaitAutoStart(Action):
     
 
     def ShouldEnd(self):
-        return self.nt_interface.IsAutonomous()
+        return self.nt_interface.IsAutonomous() and self.nt_interface.GetAutoRoutine()[:21]=='Raspberry Pie Control'
 
     def MakeChild(self):
         return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 

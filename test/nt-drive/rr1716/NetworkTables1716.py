@@ -26,6 +26,8 @@ class NetworkTablesWrapper:
         self.encoder_table = NetworkTables.getTable('1716Encoder')
         self.dashboard_table = NetworkTables.getTable("1716DashboardInput")
         self.motor_table = NetworkTables.getTable("1716Motors")
+        smart_dashboard_table=NetworkTables.getTable("SmartDashboard")
+        self.auto_table=smart_dashboard_table.getSubTable('Autonomus Routine')
 
     def Drive(self, x, y, r):
         logging.info(f'NetworkTablesWrapper.Drive({x},{y},{r})')
@@ -186,6 +188,9 @@ class NetworkTablesWrapper:
         vy=240*self.motor_table.getNumber('y',0)
         omega = 160*self.motor_table.getNumber('r',0)
         return vx, vy, omega
+
+    def GetAutoRoutine(self):
+        return self.auto_table.getString('active','')
 
 
 if __name__ == '__main__':
