@@ -3,74 +3,83 @@
 #include <iostream>
 
 Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDController()}, elbowEncoder{elbow.GetEncoder()},
-	shoulderPid{Shoulder_P, 0, 0} {
-	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+	elbowOutLimit{elbow.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::Type::kNormallyClosed)}, 
+	elbowInLimit{elbow.GetForwardLimitSwitch(rev::SparkMaxLimitSwitch::Type::kNormallyClosed)} 
+	{
+	//configure motors and encoders
 	shoulder.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-
-	elbowEncoder.SetPosition(0);
+	shoulder.SetInverted(true);
+	elbow.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
 	elbow.SetInverted(true);
+	elbowEncoder.SetPosition(0);
 
-	elbowPid.SetP(P);
-    elbowPid.SetI(I);
-    elbowPid.SetD(D);
+	//configure PID
+	elbowPid.SetP(elbowP);
+    elbowPid.SetI(elbowI);
+    elbowPid.SetD(elbowD);
     elbowPid.SetIZone(0);
     elbowPid.SetFF(0);
-    elbowPid.SetOutputRange(-MAX_OUTPUT, MAX_OUTPUT);
-
-	frc::SmartDashboard::PutNumber("P", P);
-	frc::SmartDashboard::PutNumber("I", I);
-	frc::SmartDashboard::PutNumber("D", D);
-	frc::SmartDashboard::PutNumber("Max Output", MAX_OUTPUT);
-	frc::SmartDashboard::PutNumber("Position", elbowPositionGoal);
-
-
-	frc::SmartDashboard::PutNumber("shoulder P", Shoulder_P);
-
+    elbowPid.SetOutputRange(-elbowMaxSpeed, elbowMaxSpeed);
 
 	shoulderPositionGoal = shoulderEncoder.Get();
-	frc::SmartDashboard::PutNumber("Shoulder Pos", shoulderPositionGoal);
+	shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
+
+
+//TEMP CODE: PID SHUFFLEBOARD CONFIG
+	// frc::SmartDashboard::PutNumber("elbowP", elbowP);
+	// frc::SmartDashboard::PutNumber("elbowI", elbowI);
+	// frc::SmartDashboard::PutNumber("elbowD", elbowD);
+	// frc::SmartDashboard::PutNumber("Max Output", elbowMaxSpeed);
+	// frc::SmartDashboard::PutNumber("Position", elbowPositionGoal);
+
+	// frc::SmartDashboard::PutNumber("shoulder elbowP", Shoulder_P);
+	// frc::SmartDashboard::PutNumber("Shoulder Pos", shoulderPositionGoal);
+//END TEMP CODE: PID SHUFFLEBOARD CONFIG
 }
 
 void Arm::Periodic() {
+	//solenoid timeout
 	if (clawTicks == 0)
 		claw.Set(frc::DoubleSolenoid::Value::kOff);
 	else if (clawTicks > -1)
 		clawTicks--;
 
-	double p = frc::SmartDashboard::GetNumber("P", 0);
-	double i = frc::SmartDashboard::GetNumber("I", 0);
-	double d = frc::SmartDashboard::GetNumber("D", 0);
-	double max = frc::SmartDashboard::GetNumber("Max Output", 0);
-	double pos = frc::SmartDashboard::GetNumber("Position", 0);
 
-	if((p != P)) { elbowPid.SetP(p); P = p; }
-    if((i != I)) { elbowPid.SetI(i); I = i; }
-    if((d != D)) { elbowPid.SetD(d); D = d; }
-    if((max != MAX_OUTPUT)) { elbowPid.SetOutputRange(-max, max); MAX_OUTPUT = max; }
-    if((pos != elbowPositionGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kPosition); elbowPositionGoal = pos; }
-	frc::SmartDashboard::PutNumber("Output", elbow.GetAppliedOutput());
+//TEMP CODE: PID SHUFFLEBOARD CONFIG
+	// double p = frc::SmartDashboard::GetNumber("elbowP", 0);
+	// double i = frc::SmartDashboard::GetNumber("elbowI", 0);
+	// double d = frc::SmartDashboard::GetNumber("elbowD", 0);
+	// double max = frc::SmartDashboard::GetNumber("Max Output", 0);
+	// double pos = frc::SmartDashboard::GetNumber("Position", 0);
 
+	// if((p != elbowP)) { elbowPid.SetP(p); elbowP = p; }
+    // if((i != elbowI)) { elbowPid.SetI(i); elbowI = i; }
+    // if((d != elbowD)) { elbowPid.SetD(d); elbowD = d; }
+    // if((max != elbowMaxSpeed)) { elbowPid.SetOutputRange(-max, max); elbowMaxSpeed = max; }
+    // if((pos != elbowPositionGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kPosition); elbowPositionGoal = pos; }
+	// frc::SmartDashboard::PutNumber("Elbow Output", elbow.GetAppliedOutput());
 
-	frc::SmartDashboard::PutNumber("Shoulder encoder", shoulderEncoder.Get());
-	shoulderPositionGoal = frc::SmartDashboard::GetNumber("Shoulder Pos", shoulderPositionGoal);
-
-
-	double shoulderp = frc::SmartDashboard::GetNumber("P", 0);
-	if((shoulderp != Shoulder_P)) { shoulderPid.SetP(shoulderp); Shoulder_P = shoulderp; }
+	// frc::SmartDashboard::PutNumber("Shoulder encoder", shoulderEncoder.Get());
+	// shoulderPositionGoal = frc::SmartDashboard::GetNumber("Shoulder Pos", shoulderPositionGoal);
+//END TEMP CODE: PID SHUFFLEBOARD CONFIG
 
 
-	if (shoulderActive) {
-		double output = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get(), shoulderPositionGoal), -ArmConst::SHOULDER_SPEED, ArmConst::SHOULDER_SPEED);
-		if (output > 0 && shoulderEncoder.Get() > 78) //enforce limits
-			// shoulder.Set(output);
-			std::cout << output;
-		else if (output < 0 && shoulderEncoder.Get() < 130)
-			// shoulder.Set(output);
-			std::cout << output;
-		else
-			// shoulder.Set(0);
-			std::cout << 0;
-	}
+	//shoulder PID control
+	shoulderPidOutput = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get(), shoulderPositionGoal), -ArmConst::SHOULDER_MAX_SPEED, ArmConst::SHOULDER_MAX_SPEED); 
+		//cache pid output with a limit for safety for use in if statements
+		
+	if (shoulderPidOutput < 0 && shoulderEncoder.Get() > ArmConst::SHOULDER_EXTREME[0] && !shoulderPid.AtSetpoint()) //enforce limits
+		shoulder.Set(shoulderPidOutput);
+	else if (shoulderPidOutput > 0 && shoulderEncoder.Get() < ArmConst::SHOULDER_EXTREME[1] && !shoulderPid.AtSetpoint())
+		shoulder.Set(shoulderPidOutput);
+	else
+		shoulder.Set(0);
+
+
+//TEMP CODE: LIMIT SWITH TESTING
+	frc::SmartDashboard::PutBoolean("Elbow out limit", elbowOutLimit.Get());
+	frc::SmartDashboard::PutBoolean("Elbow in limit", elbowInLimit.Get());
+//END TEMP CODE: LIMIT SWITCH TESTING
 }
 
 void Arm::SetShoulderGoal(double position) {
@@ -86,7 +95,7 @@ double Arm::GetShoulderPosition() {
 }
 
 void Arm::SetShoulderActive(bool activate) {
-	shoulderActive = activate;
+	// shoulderActive = activate;
 }
 
 void Arm::SetElbowGoal(double position) {
@@ -103,7 +112,7 @@ double Arm::GetElbowPosition() {
 }
 
 void Arm::SetElbowActive(bool activateElbow) {
-	elbowPid.SetReference(elbowEncoder.GetPosition(), rev::CANSparkMax::ControlType::kPosition); //TEST ENCODER UNITS
+	// elbowPid.SetReference(elbowEncoder.GetPosition(), rev::CANSparkMax::ControlType::kPosition); //TEST ENCODER UNITS
 }
 
 void Arm::ToggleClaw() {
