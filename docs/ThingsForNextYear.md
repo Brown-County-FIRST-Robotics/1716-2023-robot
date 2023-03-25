@@ -27,3 +27,5 @@
 
 ## things to maybe buy
 - more sharpie colors
+- third hand tool
+- solder ventilation 
