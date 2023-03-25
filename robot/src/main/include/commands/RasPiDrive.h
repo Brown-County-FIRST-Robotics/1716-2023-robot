@@ -37,4 +37,7 @@ private:
 	nt::BooleanEntry armHigh; 
 	nt::BooleanEntry armLowNode;
 	nt::BooleanEntry armHighNode;
+
+	nt::BooleanEntry pickupObject;
+	nt::BooleanEntry dropObject;
 };

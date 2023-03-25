@@ -21,6 +21,9 @@ RasPiDrive::RasPiDrive(Drivetrain* drive, Arm* arm) : drivetrain(drive), arm(arm
 	armHigh = driveTable->GetBooleanTopic("setArmHigh").GetEntry(false);
 	armLowNode = driveTable->GetBooleanTopic("setArmLowNode").GetEntry(false);
 	armHighNode = driveTable->GetBooleanTopic("setArmHighNode").GetEntry(false);
+
+	dropObject = driveTable->GetBooleanTopic("dropObject").GetEntry(false);
+	pickupObject = driveTable->GetBooleanTopic("pickupObject").GetEntry(false);
 }
 
 void RasPiDrive::Execute() {
@@ -55,6 +58,14 @@ void RasPiDrive::Execute() {
 		armHigh.Set(false);
 		armLowNode.Set(false);
 		armHighNode.Set(false);
+	}
+	if (dropObject.Get(false)){
+		arm->SetClaw(ArmConst::CLAW_OPEN);
+		dropObject.Set(false);
+	}
+	if (pickupObject.Get(false)) {
+		arm->SetClaw(ArmConst::CLAW_CLOSED);
+		pickupObject.Set(false);
 	}
 }
 

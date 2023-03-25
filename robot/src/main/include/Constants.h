@@ -2,6 +2,7 @@
 // #include <units/time.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
+#include <frc/DoubleSolenoid.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -51,6 +52,9 @@ namespace ArmConst
 	const double I = 0;
 	const double D = 0;
 	const double MAX_OUTPUT = .15;
+
+	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
+	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
 };
 
 
