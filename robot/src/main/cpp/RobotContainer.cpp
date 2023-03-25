@@ -37,7 +37,10 @@ RobotContainer::RobotContainer() {
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
 	autonomousChooser.AddOption("Back Up", &backUp);
-	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiDrive);
+	autonomousChooser.AddOption("Raspberry Pie Control 1", &rasPiDrive);
+	autonomousChooser.AddOption("Raspberry Pie Control 3", &rasPiDrive);
+	autonomousChooser.AddOption("Raspberry Pie Control 6", &rasPiDrive);
+	autonomousChooser.AddOption("Raspberry Pie Control 8", &rasPiDrive);
 	autonomousChooser.AddOption("Nothing", &nothing);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
