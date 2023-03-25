@@ -18,11 +18,14 @@ void ArmTeleopControl::Execute() {
 	else if (!claw())
 		clawPressed = false;
 
-	// arm->SetShoulder(-shoulder());
-	// arm->SetElbow(-elbow());
+
+	if (fabs(shoulder()) > .05)
+		arm->AddToShoulderGoal(-shoulder() * ArmConst::SHOULDER_JOYSTICK_SPEED);
+	if (fabs(elbow()) > .05)
+		arm->AddToElbowGoal(-elbow() * ArmConst::ELBOW_JOYSTICK_SPEED);
 }
 
 void ArmTeleopControl::End(bool interrupted) {
-	// arm->SetShoulder(0);
-	// arm->SetElbow(0);
+	arm->StopShoulder();
+	arm->StopElbow();
 }

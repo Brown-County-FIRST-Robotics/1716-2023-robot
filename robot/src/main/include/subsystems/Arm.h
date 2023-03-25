@@ -16,14 +16,16 @@ public:
 	void Periodic() override;
 
 	void SetShoulderGoal(double position);
+	void AddToShoulderGoal(double value);
 	double GetShoulderGoal();
 	double GetShoulderPosition();
-	void SetShoulderActive(bool activate);
+	void StopShoulder(); //set the goal to the current position
 
 	void SetElbowGoal(double position);
+	void AddToElbowGoal(double value);
 	double GetElbowGoal();
 	double GetElbowPosition();
-	void SetElbowActive(bool activate);
+	void StopElbow(); //set the goal to the current position
 
 	void ToggleClaw();
 	void SetClaw(frc::DoubleSolenoid::Value value);
@@ -34,16 +36,16 @@ private:
 	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 	frc::AnalogPotentiometer shoulderEncoder{0, -230, 206}; //set up for degrees
 	frc2::PIDController shoulderPid{ArmConst::SHOULDER_P, 0, 0};
-	double shoulderPositionGoal;
 	double shoulderPidOutput;
 
 	//elbow
 	rev::CANSparkMax elbow{ArmConst::ELBOW_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 	rev::SparkMaxPIDController elbowPid;
 	rev::SparkMaxRelativeEncoder elbowEncoder;
-	double elbowPositionGoal = 0;
-	rev::SparkMaxLimitSwitch elbowOutLimit;
+	double elbowGoal = 0;
 	rev::SparkMaxLimitSwitch elbowInLimit;
+	rev::SparkMaxLimitSwitch elbowOutLimit;
+	bool touchingLimit = false;
 
 	//claw
 	frc::PneumaticHub& hub;
