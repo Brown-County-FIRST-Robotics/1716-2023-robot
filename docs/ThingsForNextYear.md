@@ -23,3 +23,7 @@
 ## off season
 - Organize bins, and store them better
 - Make better wrench storage
+
+
+## things to maybe buy
+- more sharpie colors
