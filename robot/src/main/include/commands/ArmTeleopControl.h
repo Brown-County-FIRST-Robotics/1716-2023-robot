@@ -22,6 +22,8 @@ private:
 	std::function<double()> shoulder;
 	std::function<double()> elbow;
 	std::function<bool()> claw;
+	bool shoulderStopped=false;
+	bool elbowStopped=false;
 
 	bool clawPressed = false;
 };

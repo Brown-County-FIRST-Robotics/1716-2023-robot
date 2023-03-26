@@ -20,12 +20,20 @@ void ArmTeleopControl::Execute() {
 		clawPressed = false;
 
 
-	if (fabs(shoulder()) > .15)
+	if (fabs(shoulder()) > .15){
 		arm->AddToShoulderGoal(-shoulder() * ArmConst::SHOULDER_JOYSTICK_SPEED);
-	else
-		arm->AddToShoulderGoal(0);
-	if (fabs(elbow()) > .05)
+		shoulderStopped=false;
+	}else if (!shoulderStopped){
+		arm->StopShoulder();//AddToShoulderGoal(0);
+		shoulderStopped=true;
+	}
+	if (fabs(elbow()) > .05){
 		arm->AddToElbowGoal(-elbow() * ArmConst::ELBOW_JOYSTICK_SPEED);
+		elbowStopped=false;
+	}else if(!elbowStopped){
+		arm->StopElbow();//AddToElbowGoal(0);
+		elbowStopped=true;
+	}
 	//std::cout << "Goal:" << arm->GetShoulderGoal() << std::endl;
 }
 

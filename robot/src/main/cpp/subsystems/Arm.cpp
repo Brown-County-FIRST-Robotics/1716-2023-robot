@@ -109,16 +109,18 @@ void Arm::Periodic() {
 
 //shoulder methods
 void Arm::SetShoulderGoal(double position) {
+	shoulderGoal = position;
 	shoulderPid.SetSetpoint(position);
 }
 
 void Arm::AddToShoulderGoal(double value) {
 	//std::cout << "adding to shoulder goal\n";
-	shoulderPid.SetSetpoint(shoulderEncoder.Get() + value);
+	shoulderGoal = shoulderEncoder.Get() + value;
+	shoulderPid.SetSetpoint(shoulderGoal);
 }
 
 double Arm::GetShoulderGoal() {
-	return shoulderPid.GetSetpoint();
+	return shoulderGoal;
 }
 
 double Arm::GetShoulderPosition() {
@@ -136,8 +138,11 @@ void Arm::SetElbowGoal(double position) {
 }
 
 void Arm::AddToElbowGoal(double value) {
-	elbowPid.SetReference(elbowGoal + value, rev::CANSparkMax::ControlType::kPosition);
-	elbowGoal += value;
+
+	if (touchingLimit && value < 0)
+		value = 0;
+	elbowGoal = elbowEncoder.GetPosition() + value;
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kPosition);
 }
 
 double Arm::GetElbowGoal() {
