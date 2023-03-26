@@ -68,13 +68,20 @@ void Arm::Periodic() {
 	//shoulder PID control
 	shoulderPidOutput = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get()), -ArmConst::SHOULDER_MAX_SPEED, ArmConst::SHOULDER_MAX_SPEED); 
 		//cache pid output with a limit for safety for use in if statements
-
-	if (shoulderPidOutput < 0 && shoulderEncoder.Get() > ArmConst::SHOULDER_EXTREME[0])// && !shoulderPid.AtSetpoint()) //enforce limits
+		//std::cout << "encoder pos:" << shoulderEncoder.Get() << std::endl;
+	//std::cout << "shoulderPID" << shoulderPidOutput	 << std::endl;
+	if (shoulderPidOutput < 0 && shoulderEncoder.Get() > ArmConst::SHOULDER_EXTREME[0]){// && !shoulderPid.AtSetpoint()) //enforce limits
+		//std::cout << "at extreme 1:" << shoulderPidOutput << std::endl;
 		shoulder.Set(shoulderPidOutput);
-	else if (shoulderPidOutput > 0 && shoulderEncoder.Get() < ArmConst::SHOULDER_EXTREME[1])// && !shoulderPid.AtSetpoint())
+	}
+	else if (shoulderPidOutput > 0 && shoulderEncoder.Get() < ArmConst::SHOULDER_EXTREME[1]){// && !shoulderPid.AtSetpoint())
+		//std::cout << "at extreme 2:" << shoulderPidOutput << std::endl;
 		shoulder.Set(shoulderPidOutput);
-	else
+	}
+	else{
 		shoulder.Set(0);
+		//std::cout << "None\n";
+	}
 
 
 //TEMP CODE: LIMIT SWITH TESTING
@@ -106,7 +113,8 @@ void Arm::SetShoulderGoal(double position) {
 }
 
 void Arm::AddToShoulderGoal(double value) {
-	shoulderPid.SetSetpoint(shoulderPid.GetSetpoint() + value);
+	//std::cout << "adding to shoulder goal\n";
+	shoulderPid.SetSetpoint(shoulderEncoder.Get() + value);
 }
 
 double Arm::GetShoulderGoal() {
