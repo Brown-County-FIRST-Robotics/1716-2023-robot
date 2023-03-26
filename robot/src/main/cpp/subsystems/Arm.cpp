@@ -14,12 +14,12 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
 	elbowEncoder.SetPosition(0);
 
 	//configure PID
-	elbowPid.SetP(elbowP);
-    elbowPid.SetI(elbowI);
-    elbowPid.SetD(elbowD);
+	elbowPid.SetP(ArmConst::ELBOW_P);
+    elbowPid.SetI(ArmConst::ELBOW_I);
+    elbowPid.SetD(ArmConst::ELBOW_D);
     elbowPid.SetIZone(0);
     elbowPid.SetFF(0);
-    elbowPid.SetOutputRange(-elbowMaxSpeed, elbowMaxSpeed);
+    elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
 
 
 	shoulderPid.SetSetpoint(shoulderEncoder.Get());
@@ -28,8 +28,8 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
 
 //TEMP CODE: PID SHUFFLEBOARD CONFIG
 	// frc::SmartDashboard::PutNumber("elbowP", elbowP);
-	// frc::SmartDashboard::PutNumber("elbowI", elbowI);
-	// frc::SmartDashboard::PutNumber("elbowD", elbowD);
+	 //frc::SmartDashboard::PutNumber("elbowI", elbowI);
+	 //frc::SmartDashboard::PutNumber("elbowD", elbowD);
 	// frc::SmartDashboard::PutNumber("Max Output", elbowMaxSpeed);
 	// frc::SmartDashboard::PutNumber("Position", elbowGoal);
 
@@ -68,7 +68,6 @@ void Arm::Periodic() {
 	//shoulder PID control
 	shoulderPidOutput = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get()), -ArmConst::SHOULDER_MAX_SPEED, ArmConst::SHOULDER_MAX_SPEED); 
 		//cache pid output with a limit for safety for use in if statements
-
 	if (shoulderPidOutput < 0 && shoulderEncoder.Get() > ArmConst::SHOULDER_EXTREME[0])// && !shoulderPid.AtSetpoint()) //enforce limits
 		shoulder.Set(shoulderPidOutput);
 	else if (shoulderPidOutput > 0 && shoulderEncoder.Get() < ArmConst::SHOULDER_EXTREME[1])// && !shoulderPid.AtSetpoint())
@@ -98,19 +97,25 @@ void Arm::Periodic() {
 	}
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
+
 }
 
 //shoulder methods
 void Arm::SetShoulderGoal(double position) {
+	shoulderGoal = position;
 	shoulderPid.SetSetpoint(position);
 }
 
 void Arm::AddToShoulderGoal(double value) {
-	shoulderPid.SetSetpoint(shoulderPid.GetSetpoint() + value);
+	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
+	//this works better then just adding to goal because it can't get really big thithout the human knowing
+	//while the arm is slow and then keep moving when the human lets go.
+	shoulderGoal = shoulderEncoder.Get() + value; // Add the joystick value onto the encoder value
+	shoulderPid.SetSetpoint(shoulderGoal);
 }
 
 double Arm::GetShoulderGoal() {
-	return shoulderPid.GetSetpoint();
+	return shoulderGoal;
 }
 
 double Arm::GetShoulderPosition() {
@@ -128,8 +133,14 @@ void Arm::SetElbowGoal(double position) {
 }
 
 void Arm::AddToElbowGoal(double value) {
-	elbowPid.SetReference(elbowGoal + value, rev::CANSparkMax::ControlType::kPosition);
-	elbowGoal += value;
+
+	if (touchingLimit && value > 0)
+		value = 0;
+	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
+	//this works better then just adding to goal because it can't get really big thithout the human knowing
+	//while the arm is slow and then keep moving when the human lets go.
+	elbowGoal = elbowEncoder.GetPosition() + value;
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kPosition);
 }
 
 double Arm::GetElbowGoal() {

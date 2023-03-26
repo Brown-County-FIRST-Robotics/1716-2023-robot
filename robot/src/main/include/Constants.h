@@ -43,21 +43,21 @@ namespace ArmConst
 	const int SHOULDER_POTENTIOMETER_ID = 0;
 
 	//max speeds
-	const double SHOULDER_MAX_SPEED = 0.5;
-	const double ELBOW_MAX_SPEED = 0.2;
+	const double SHOULDER_MAX_SPEED = 0.8;
+	const double ELBOW_MAX_SPEED = 0.4;
 
 	//manual control
-	const double SHOULDER_JOYSTICK_SPEED = 0.5;
-	const double ELBOW_JOYSTICK_SPEED = .5;
+	const double SHOULDER_JOYSTICK_SPEED = 20;
+	const double ELBOW_JOYSTICK_SPEED = 3;
 
 	//PID
 	const double SHOULDER_P = 0.02;
 
-	const double ELBOW_P = 0.08;
-	const double ELBOW_I = 0.0002;
-	const double ELBOW_D = 2.0;
+	const double ELBOW_P = 0.16;
+	const double ELBOW_I = 0.0004;
+	const double ELBOW_D = 4.0;
 
 	//shoulder misc.
-	const int SHOULDER_EXTREME[2] = {50, 120}; //min, max
+	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
 };
