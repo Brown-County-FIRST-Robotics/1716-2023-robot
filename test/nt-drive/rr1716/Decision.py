@@ -180,7 +180,7 @@ class AwaitSetHeight(Action):
         if self.referrer == 'auto':
             return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
         elif self.referrer == 'pickup':
-            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "return")
+            return Pickup(self.filter, self.cams, self.nt_interface, self.april_executor, "return")
         elif self.referrer == 'putdown':
             return Drop(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
 
@@ -527,7 +527,7 @@ class Pickup(Action):
         nt_interface.PickupObject()
 
     def MakeChild(self):
-        return None
+        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
 
 
 
