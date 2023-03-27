@@ -506,7 +506,15 @@ class AwaitAutoStart(Action):
         return self.nt_interface.IsAutonomous() and self.nt_interface.GetAutoRoutine()[:21]=='Raspberry Pie Control'
 
     def MakeChild(self):
-        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 
+        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
+
+class Pickup(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        nt_interface.PickupObject()
+
+    def MakeChild(self):
+        return None
 
 
 
