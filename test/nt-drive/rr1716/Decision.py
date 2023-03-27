@@ -118,8 +118,12 @@ class AsyncSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, -293, 0], self.referrer)
-
+            return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
+        elif self.referrer == 'pickup':
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
+        elif self.referrer == 'return':
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 0, self.referrer)
+     
 
 class DriveToLocation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
@@ -174,7 +178,11 @@ class AwaitSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+            return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+        elif self.referrer == 'pickup':
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "return")
+        elif self.referrer == 'putdown':
+            return Drop(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
 
 
 class DriveDumb(Action):
@@ -218,7 +226,8 @@ class DriveDumb(Action):
         return offset_y+offset_x+offset_r<10
 
     def MakeChild(self):
-        return AwaitAutoStart(self.filter, self.cams, self.nt_interface, self.april_executor, 'auto')
+        return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "putdown")
+        #return AwaitAutoStart(self.filter, self.cams, self.nt_interface, self.april_executor, 'auto')
 
 class Drop(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -228,8 +237,9 @@ class Drop(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
-
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
+            #return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+        return None
 
 class GetOnStation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -442,9 +452,7 @@ class DriveToGamepeice(Action):
         time.sleep(2)
         
     def MakeChild(self):
-        if self.referrer == "auto":
-            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogamepeice")
-        return None
+        return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "pickup")
 
 class AutoTurn180(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -491,10 +499,13 @@ class AutoTurn180(Action):
     def MakeChild(self):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
-            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "pickup", 0)
+            #return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
-            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, int(self.nt_interface.GetAutoRoutine()[-1]), self.referrer)
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 3, self.referrer)
+        elif self.referrer == "return":
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 3)
         return None 
 
 class AwaitAutoStart(Action):
@@ -503,10 +514,10 @@ class AwaitAutoStart(Action):
     
 
     def ShouldEnd(self):
-        return self.nt_interface.IsAutonomous() and self.nt_interface.GetAutoRoutine()[:21]=='Raspberry Pie Control'
+        return self.nt_interface.IsAutonomous()
 
     def MakeChild(self):
-        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 
+        return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 4)
 
 
 
