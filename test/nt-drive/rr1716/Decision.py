@@ -376,9 +376,9 @@ class DriveToGamepeice(Action):
         self.gamepeice = Vision.GamePiece()
         while len(col) < 3:
             col.append(0)
-        
-        lower = [col[0] - col_range_h, col[1] - col_range_s, col[2] - col_range_v]
-        upper = [col[0] + col_range_h, col[1] + col_range_s, col[2] + col_range_v]
+         
+        lower = [col[0] + Strategy.cube_color_range.lower_h_range, col[1] + Strategy.cube_color_range.lower_s_range, col[2] + Strategy.cube_color_range.lower_v_range]
+        upper = [col[0] + Strategy.cube_color_range.upper_h_range, col[1] + Strategy.cube_color_range.upper_s_range, col[2] + Strategy.cube_color_range.upper_v_range]
     
         for i in range(len(lower)):
             if lower[i] < 0:
@@ -491,7 +491,7 @@ class AutoTurn180(Action):
     def MakeChild(self):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
-            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=3.0 / 5.0, maxRatio=5.0 / 3.0)
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 3, self.referrer)
