@@ -32,4 +32,5 @@ private:
 	nt::GenericEntry* medium;
 	nt::GenericEntry* floor;
 	nt::GenericEntry* portal;
+	nt::GenericEntry* drive;
 };

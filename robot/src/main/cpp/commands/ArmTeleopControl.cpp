@@ -26,6 +26,10 @@ ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoul
 		.Add("Portal", false)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.GetEntry();
+	drive = frc::Shuffleboard::GetTab("Arm Presets")
+		.Add("Drive", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.GetEntry();
 }
 
 void ArmTeleopControl::Execute() {
@@ -76,6 +80,11 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
 		arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
 		portal->SetBoolean(false);
+	}
+	else if (drive->GetBoolean(false)) {
+		arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
+		arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+		drive->SetBoolean(false);
 	}
 }
 

@@ -54,12 +54,12 @@ namespace ArmConst
 	//PID
 	const double SHOULDER_P = 0.02;
 
-	const double ELBOW_P = 0.16;
+	const double ELBOW_P = 0.08;
 	const double ELBOW_I = 0.0004;
-	const double ELBOW_D = 4.0;
+	const double ELBOW_D = 16.0;
 
 	//shoulder misc.
-	const int SHOULDER_EXTREME[2] = {85, 106}; //min, max
+	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
 
 	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
@@ -70,8 +70,9 @@ namespace ArmConst
 namespace ArmHeightConst{
 	// {shoulder, elbow}
 	const double FLOOR[2]={124, -40};
-	const double PORTAL[2]={129, -23};
-	const double MEDIUM[2]={117, -28};
-	const double HIGH[2]={120, -23};
+	const double PORTAL[2]={107, -31};
+	const double MEDIUM[2]={107, -32};
+	const double HIGH[2]={107, -27};
+	const double DRIVE[2]={90, -47};
 	const double THRESHOLD = 1; 
 };
