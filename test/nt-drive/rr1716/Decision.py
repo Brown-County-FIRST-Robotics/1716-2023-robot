@@ -189,6 +189,8 @@ class DriveDumb(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
+        if self.location is None or self.location==0:
+            self.location=int(self.nt_interface.GetAutoRoutine()[-1])
 
 
     def Step(self):
@@ -518,6 +520,14 @@ class AwaitAutoStart(Action):
 
     def MakeChild(self):
         return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 4)
+
+class Pickup(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        nt_interface.PickupObject()
+
+    def MakeChild(self):
+        return None
 
 
 
