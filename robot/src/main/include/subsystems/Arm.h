@@ -56,9 +56,9 @@ private:
 
 
 //TEMP CODE: ELBOW PID CONFIG
-	double elbowP = 0.08;
-	double elbowI = 0.0002;
-	double elbowD = 2;
-	double elbowMaxSpeed = 0.2;
+//	double elbowP = 0.08;
+//	double elbowI = 0.0002;
+//	double elbowD = 2;
+//	double elbowMaxSpeed = 0.2;
 //END TEMP CODE: ELBOW PID CONFIG
 };

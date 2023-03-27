@@ -55,7 +55,7 @@ namespace ArmConst
 
 	const double ELBOW_P = 0.16;
 	const double ELBOW_I = 0.0004;
-	const double ELBOW_D = 2.0;
+	const double ELBOW_D = 4.0;
 
 	//shoulder misc.
 	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max

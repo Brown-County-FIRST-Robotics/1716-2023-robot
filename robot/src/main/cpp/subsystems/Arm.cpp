@@ -14,12 +14,12 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
 	elbowEncoder.SetPosition(0);
 
 	//configure PID
-	elbowPid.SetP(elbowP);
-    elbowPid.SetI(elbowI);
-    elbowPid.SetD(elbowD);
+	elbowPid.SetP(ArmConst::ELBOW_P);
+    elbowPid.SetI(ArmConst::ELBOW_I);
+    elbowPid.SetD(ArmConst::ELBOW_D);
     elbowPid.SetIZone(0);
     elbowPid.SetFF(0);
-    elbowPid.SetOutputRange(-elbowMaxSpeed, elbowMaxSpeed);
+    elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
 
 
 	shoulderPid.SetSetpoint(shoulderEncoder.Get());
@@ -28,8 +28,8 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
 
 //TEMP CODE: PID SHUFFLEBOARD CONFIG
 	// frc::SmartDashboard::PutNumber("elbowP", elbowP);
-	// frc::SmartDashboard::PutNumber("elbowI", elbowI);
-	// frc::SmartDashboard::PutNumber("elbowD", elbowD);
+	 //frc::SmartDashboard::PutNumber("elbowI", elbowI);
+	 //frc::SmartDashboard::PutNumber("elbowD", elbowD);
 	// frc::SmartDashboard::PutNumber("Max Output", elbowMaxSpeed);
 	// frc::SmartDashboard::PutNumber("Position", elbowGoal);
 
@@ -105,6 +105,9 @@ void Arm::Periodic() {
 	}
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
+	std::cout << "elbow goal:" << elbowGoal << "\nelbow pos:" << elbowEncoder.GetPosition() << std::endl;
+
+	std::cout << "elbow out limit:" << elbowOutLimit.Get() << "\nelbow in limit:" << elbowInLimit.Get() << std::endl;
 }
 
 //shoulder methods
@@ -139,7 +142,7 @@ void Arm::SetElbowGoal(double position) {
 
 void Arm::AddToElbowGoal(double value) {
 
-	if (touchingLimit && value < 0)
+	if (touchingLimit && value > 0)
 		value = 0;
 	elbowGoal = elbowEncoder.GetPosition() + value;
 	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kPosition);
