@@ -14,6 +14,7 @@ RasPiDrive::RasPiDrive(Drivetrain* drive, bool isAutonomous) : drivetrain(drive)
 	y = driveTable->GetFloatTopic("y").Subscribe(0.0, {.pollStorage = 1}); //with a default of 0 and a memory of 1 term
 	z = driveTable->GetFloatTopic("rotation").Subscribe(0.0, {.pollStorage = 1});
 	isTank = driveTable->GetBooleanTopic("isTank").Subscribe(false);
+	drivetrain->ActivateBreakMode(true);
 
 	autonomous = isAutonomous; //for odometry
 	if (autonomous) {
@@ -39,6 +40,7 @@ void RasPiDrive::Execute() {
 
 void RasPiDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
+	drivetrain->ActivateBreakMode(false);
 }
 
 bool RasPiDrive::IsFinished() {
