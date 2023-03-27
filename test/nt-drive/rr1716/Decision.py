@@ -514,7 +514,7 @@ class AwaitAutoStart(Action):
     
 
     def ShouldEnd(self):
-        return self.nt_interface.IsAutonomous()
+        return self.nt_interface.IsAutonomous() and self.nt_interface.GetAutoRoutine()[:21]=='Raspberry Pie Control'
 
     def MakeChild(self):
         return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 4)
