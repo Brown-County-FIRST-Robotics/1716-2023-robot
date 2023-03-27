@@ -21,6 +21,7 @@ namespace DrivetrainConst {
 
 	//0 is forward, 1 is reverse
 	const int SOLENOID_ID[2] = {0, 1};
+	const double LOW_SPEED=.2;
 
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
 };

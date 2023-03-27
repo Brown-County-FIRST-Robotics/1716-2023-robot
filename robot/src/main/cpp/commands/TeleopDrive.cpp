@@ -3,16 +3,16 @@
 #include <utility>
 
 TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
-	std::function<bool()> brake, std::function<bool()> headlessToggle) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake)), headlessButton(std::move(headlessToggle))
+	std::function<bool()> brake, std::function<bool()> headlessToggle, std::function<bool()> lowSpeedMode) 
+	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake)), headlessButton(std::move(headlessToggle)), lowSpeedButton(std::move(lowSpeedMode))
 {
 	AddRequirements(subsystem);
 }
 
 void TeleopDrive::Execute() {
-	xSquare = x() * fabs(x()); //multiply each axis by its absolute value, this makes acceleration exponential rather than linear
-	ySquare = y() * fabs(y());
-	zSquare = z() * fabs(z());
+	xSquare = x() * fabs(x()) * currentSpeed; //multiply each axis by its absolute value, this makes acceleration exponential rather than linear
+	ySquare = y() * fabs(y()) * currentSpeed;
+	zSquare = z() * fabs(z()) * currentSpeed;
 
 	if (!headless)
 		drivetrain->Drive(
@@ -27,6 +27,8 @@ void TeleopDrive::Execute() {
 			true);
 
 	UpdateBrake(doBrake());
+	if(lowSpeedButton())
+		currentSpeed=1+DrivetrainConst::LOW_SPEED-currentSpeed;
 	UpdateHeadless();
 }
 
