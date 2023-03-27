@@ -181,6 +181,8 @@ class DriveDumb(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
+        if self.location is None or self.location==0:
+            self.location=int(self.nt_interface.GetAutoRoutine()[-1])
 
 
     def Step(self):
