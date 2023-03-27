@@ -37,21 +37,28 @@ void RasPiDrive::Execute() {
 	}
 
 	if (armFloor.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::FLOOR);
+		arm->SetElbowGoal(ArmHeightConst::FLOOR[1]);
+		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
 	} else if (armPortal.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::PORTAL);
+		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
+		arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
 	} else if (armMedium.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::MEDIUM);
+		arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
+		arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
 	} else if (armHigh.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::HIGH);
+		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
 	} else if (armLowNode.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::LOWNODE);
+		arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
+		arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
 	} else if (armHighNode.Get(false)) {
-		arm->SetElbowGoal(ArmHeightConst::HIGHNODE);
+		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
 	}
 
 	if (ArmHeightConst::THRESHOLD > abs(arm->GetElbowGoal() - arm->GetElbowPosition())) {
 		arm->StopElbow();
+		arm->StopShoulder();
 		armFloor.Set(false);
 		armPortal.Set(false);
 		armMedium.Set(false);
@@ -72,4 +79,5 @@ void RasPiDrive::Execute() {
 void RasPiDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 	arm->StopElbow();
+	arm->StopShoulder();
 }

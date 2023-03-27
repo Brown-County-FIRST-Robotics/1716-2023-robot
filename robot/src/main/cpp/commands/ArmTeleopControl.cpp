@@ -8,10 +8,27 @@ ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoul
 	shoulder(std::move(shoulderAxis)), elbow(std::move(elbowAxis)), claw(std::move(clawButton))
 {
 	AddRequirements(subsystem);
+
+	//presets
+	high = frc::Shuffleboard::GetTab("Arm Presets")
+		.Add("High", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.GetEntry();
+	medium = frc::Shuffleboard::GetTab("Arm Presets")
+		.Add("Medium", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.GetEntry();
+	floor = frc::Shuffleboard::GetTab("Arm Presets")
+		.Add("Floor", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.GetEntry();
+	portal = frc::Shuffleboard::GetTab("Arm Presets")
+		.Add("Portal", false)
+		.WithWidget(frc::BuiltInWidgets::kToggleButton)
+		.GetEntry();
 }
 
 void ArmTeleopControl::Execute() {
-
 	if (!clawPressed && claw()) {
 		arm->ToggleClaw();
 		clawPressed = true;
@@ -37,6 +54,28 @@ void ArmTeleopControl::Execute() {
 		//After the first time, stop applying updates, or the arm can lock in new positions while drifting
 		arm->StopElbow();
 		elbowStopped=true;
+	}
+
+	//Presets
+	if (high->GetBoolean(false)) {
+		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
+		high->SetBoolean(false);
+	}
+	else if (medium->GetBoolean(false)) {
+		arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
+		arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
+		medium->SetBoolean(false);
+	}
+	else if (floor->GetBoolean(false)) {
+		arm->SetShoulderGoal(ArmHeightConst::FLOOR[0]);
+		arm->SetElbowGoal(ArmHeightConst::FLOOR[1]);
+		floor->SetBoolean(false);
+	}
+	else if (portal->GetBoolean(false)) {
+		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
+		arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
+		portal->SetBoolean(false);
 	}
 }
 

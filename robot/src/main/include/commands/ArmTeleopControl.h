@@ -26,4 +26,10 @@ private:
 	bool elbowStopped=false;
 
 	bool clawPressed = false;
+	
+	//Presets
+	nt::GenericEntry* high;
+	nt::GenericEntry* medium;
+	nt::GenericEntry* floor;
+	nt::GenericEntry* portal;
 };

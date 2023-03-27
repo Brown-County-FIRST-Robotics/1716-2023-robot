@@ -59,7 +59,7 @@ namespace ArmConst
 	const double ELBOW_D = 4.0;
 
 	//shoulder misc.
-	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
+	const int SHOULDER_EXTREME[2] = {85, 106}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
 
 	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
@@ -68,11 +68,10 @@ namespace ArmConst
 
 
 namespace ArmHeightConst{
-	const double FLOOR=0; //TODO: add real values
-	const double PORTAL=0; //TODO: add real value
-	const double MEDIUM=0; //TODO: add real values
-	const double HIGH=0; //TODO: add real values
-	const double LOWNODE=0; //TODO: add real values
-	const double HIGHNODE=0; //TODO: add real values
-	const double THRESHOLD=1; 
+	// {shoulder, elbow}
+	const double FLOOR[2]={124, -40};
+	const double PORTAL[2]={129, -23};
+	const double MEDIUM[2]={117, -28};
+	const double HIGH[2]={120, -23};
+	const double THRESHOLD = 1; 
 };
