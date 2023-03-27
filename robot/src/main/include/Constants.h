@@ -2,6 +2,7 @@
 // #include <units/time.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
+#include <frc/DoubleSolenoid.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -60,4 +61,18 @@ namespace ArmConst
 	//shoulder misc.
 	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
+
+	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
+	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
+};
+
+
+namespace ArmHeightConst{
+	const double FLOOR=0; //TODO: add real values
+	const double PORTAL=0; //TODO: add real value
+	const double MEDIUM=0; //TODO: add real values
+	const double HIGH=0; //TODO: add real values
+	const double LOWNODE=0; //TODO: add real values
+	const double HIGHNODE=0; //TODO: add real values
+	const double THRESHOLD=1; 
 };
