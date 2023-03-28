@@ -100,7 +100,7 @@ class AsyncSetHeight(Action):
         5:Low cone node
         6:High cone node
         '''
-        self.height = height
+        self.height = -1
         if self.height == 0:
             self.nt_interface.SetArmFloor()
         elif self.height == 1:
@@ -122,7 +122,7 @@ class AsyncSetHeight(Action):
         elif self.referrer == 'pickup':
             return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == 'return':
-            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 0, self.referrer)
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 1, self.referrer)
      
 
 class DriveToLocation(Action):
@@ -174,7 +174,7 @@ class AwaitSetHeight(Action):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
 
     def ShouldEnd(self):
-        return self.nt_interface.IsArmDone()
+        return self.nt_interface.IsArmDone() or True
 
     def MakeChild(self):
         if self.referrer == 'auto':
@@ -493,7 +493,7 @@ class AutoTurn180(Action):
             target_rotation -= 360.0
         while target_rotation < 0.0:
             target_rotation += 360.0
-        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 4.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 10.0
     
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
