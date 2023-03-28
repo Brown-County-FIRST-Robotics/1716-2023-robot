@@ -48,6 +48,8 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.WithSize(2, 2)
 		.GetEntry();
+
+	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
 }
 
 void Drivetrain::Periodic() {
