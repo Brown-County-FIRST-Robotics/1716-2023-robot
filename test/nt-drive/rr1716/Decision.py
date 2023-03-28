@@ -100,7 +100,7 @@ class AsyncSetHeight(Action):
         5:Low cone node
         6:High cone node
         '''
-        self.height = -1
+        self.height = height
         if self.height == 0:
             self.nt_interface.SetArmFloor()
         elif self.height == 1:
@@ -122,7 +122,7 @@ class AsyncSetHeight(Action):
         elif self.referrer == 'pickup':
             return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == 'return':
-            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 1, self.referrer)
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 1, self.referrer) # TODO: change to 0
      
 
 class DriveToLocation(Action):
@@ -174,7 +174,7 @@ class AwaitSetHeight(Action):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
 
     def ShouldEnd(self):
-        return self.nt_interface.IsArmDone() or True
+        return self.nt_interface.IsArmDone()
 
     def MakeChild(self):
         if self.referrer == 'auto':
