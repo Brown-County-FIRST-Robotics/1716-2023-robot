@@ -1,4 +1,4 @@
-# Python based robot controll
+# Python based robot control
 
 ```mermaid
 ---

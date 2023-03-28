@@ -26,7 +26,7 @@ public:
 
 class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
 public:
-	explicit RasPiAutonomous(Drivetrain* drive);
+	explicit RasPiAutonomous(Drivetrain* drive, Arm* arm);
 };
 
 class RobotContainer {
@@ -57,7 +57,7 @@ private:
 	DriveBackThenBalance driveBackThenBalance{&drivetrain};
 	Nothing nothing;
 	BackUp backUp{&drivetrain};
-	RasPiAutonomous rasPiAutonomous{&drivetrain};
+	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
 
 	//Controller logging
 	nt::GenericEntry* a;

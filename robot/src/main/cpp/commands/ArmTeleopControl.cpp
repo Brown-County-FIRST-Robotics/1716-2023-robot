@@ -3,15 +3,46 @@
 #include <utility>
 #include <iostream>
 
-ArmTeleopControl::ArmTeleopControl(Arm* subsystem, std::function<double()> shoulderAxis, 
-	std::function<double()> elbowAxis, std::function<bool()> clawButton) : arm(subsystem),
-	shoulder(std::move(shoulderAxis)), elbow(std::move(elbowAxis)), claw(std::move(clawButton))
+ArmTeleopControl::ArmTeleopControl(Arm* subsystem, 
+	std::function<int()> elbowPov,
+	std::function<bool()> clawBool,
+	std::function<bool()> floorBool,
+	std::function<bool()> mediumBool,
+	std::function<bool()> highBool,
+	std::function<bool()> driveBool,
+	std::function<bool()> portalBool)
+	: arm(subsystem), elbow(std::move(elbowPov)), claw(std::move(clawBool)), 
+	floorButton(std::move(floorBool)), mediumButton(std::move(mediumBool)), highButton(std::move(highBool)), 
+	driveButton(std::move(driveBool)), portalButton(std::move(portalBool))
 {
 	AddRequirements(subsystem);
+
+	//presets
+//TEMP CODE: SHUFFLEBOARD PRESETS
+	// high = frc::Shuffleboard::GetTab("Arm Presets")
+	// 	.Add("High", false)
+	// 	.WithWidget(frc::BuiltInWidgets::kToggleButton)
+	// 	.GetEntry();
+	// medium = frc::Shuffleboard::GetTab("Arm Presets")
+	// 	.Add("Medium", false)
+	// 	.WithWidget(frc::BuiltInWidgets::kToggleButton)
+	// 	.GetEntry();
+	// floor = frc::Shuffleboard::GetTab("Arm Presets")
+	// 	.Add("Floor", false)
+	// 	.WithWidget(frc::BuiltInWidgets::kToggleButton)
+	// 	.GetEntry();
+	// portal = frc::Shuffleboard::GetTab("Arm Presets")
+	// 	.Add("Portal", false)
+	// 	.WithWidget(frc::BuiltInWidgets::kToggleButton)
+	// 	.GetEntry();
+	// drive = frc::Shuffleboard::GetTab("Arm Presets")
+	// 	.Add("Drive", false)
+	// 	.WithWidget(frc::BuiltInWidgets::kToggleButton)
+	// 	.GetEntry();
+//END TEMP CODE: SHUFFLEBOARD PRESETS
 }
 
 void ArmTeleopControl::Execute() {
-
 	if (!clawPressed && claw()) {
 		arm->ToggleClaw();
 		clawPressed = true;
@@ -19,22 +50,89 @@ void ArmTeleopControl::Execute() {
 	else if (!claw())
 		clawPressed = false;
 
-
-	if (fabs(shoulder()) > .15){
-		arm->AddToShoulderGoal(-shoulder() * ArmConst::SHOULDER_JOYSTICK_SPEED);
-		shoulderStopped=false;
-	}else if (!shoulderStopped){
-		arm->StopShoulder();//AddToShoulderGoal(0);
-		shoulderStopped=true;
+	if (elbow() == 315 || elbow() == 0 || elbow() == 45){
+		arm->AddToElbowGoal(ArmConst::ELBOW_MANUAL_SPEED);
+		elbowStopped = false;
 	}
-	if (fabs(elbow()) > .05){
-		arm->AddToElbowGoal(-elbow() * ArmConst::ELBOW_JOYSTICK_SPEED);
-		elbowStopped=false;
-	}else if(!elbowStopped){
-		arm->StopElbow();//AddToElbowGoal(0);
+	else if (elbow() == 135 || elbow() == 180 || elbow() == 225) {
+		arm->AddToElbowGoal(-ArmConst::ELBOW_MANUAL_SPEED);
+		elbowStopped = false;
+	}
+	else if(!elbowStopped){
+		// when you let go of DPad, stop the arm, but only the first time. 
+		//After the first time, stop applying updates, or the arm can lock in new positions while drifting
+		arm->StopElbow();
 		elbowStopped=true;
 	}
-	//std::cout << "Goal:" << arm->GetShoulderGoal() << std::endl;
+
+	//Presets
+//TEMP CODE: SHUFFLEBOARD PRESETS
+	// if (high->GetBoolean(false)) {
+	// 	arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+	// 	arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
+	// 	high->SetBoolean(false);
+	// }
+	// else if (medium->GetBoolean(false)) {
+	// 	arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
+	// 	arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
+	// 	medium->SetBoolean(false);
+	// }
+	// else if (floor->GetBoolean(false)) {
+	// 	arm->SetShoulderGoal(ArmHeightConst::FLOOR[0]);
+	// 	arm->SetElbowGoal(ArmHeightConst::FLOOR[1]);
+	// 	floor->SetBoolean(false);
+	// }
+	// else if (portal->GetBoolean(false)) {
+	// 	arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
+	// 	arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
+	// 	portal->SetBoolean(false);
+	// }
+	// else if (drive->GetBoolean(false)) {
+	// 	arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
+	// 	arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+	// 	drive->SetBoolean(false);
+	// }
+//TEMP CODE: SHUFFLEBOARD PRESETS
+	if (floorButton() && !floorButtonPrevState) {
+		arm->SetShoulderGoal(ArmHeightConst::FLOOR[0]);
+		arm->SetElbowGoal(ArmHeightConst::FLOOR[1]);
+		floorButtonPrevState = true;
+	}
+	else if (!floorButton() && floorButtonPrevState) {
+		floorButtonPrevState = false;
+	}
+	if (mediumButton() && !mediumButtonPrevState) {
+		arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
+		arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
+		mediumButtonPrevState = true;
+	}
+	else if (!mediumButton() && mediumButtonPrevState) {
+		mediumButtonPrevState = false;
+	}
+	if (highButton() && !highButtonPrevState) {
+		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
+		highButtonPrevState = true;
+	}
+	else if (!highButton() && highButtonPrevState) {
+		highButtonPrevState = false;
+	}
+	if (driveButton() && !driveButtonPrevState) {
+		arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
+		arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+		driveButtonPrevState = true;
+	}
+	else if (!driveButton() && driveButtonPrevState) {
+		driveButtonPrevState = false;
+	}
+	if (portalButton() && !portalButtonPrevState) {
+		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
+		arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
+		portalButtonPrevState = true;
+	}
+	else if (!portalButton() && portalButtonPrevState) {
+		portalButtonPrevState = false;
+	}
 }
 
 void ArmTeleopControl::End(bool interrupted) {

@@ -105,9 +105,6 @@ void Arm::Periodic() {
 	}
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
-	std::cout << "elbow goal:" << elbowGoal << "\nelbow pos:" << elbowEncoder.GetPosition() << std::endl;
-
-	std::cout << "elbow out limit:" << elbowOutLimit.Get() << "\nelbow in limit:" << elbowInLimit.Get() << std::endl;
 }
 
 //shoulder methods
@@ -117,8 +114,10 @@ void Arm::SetShoulderGoal(double position) {
 }
 
 void Arm::AddToShoulderGoal(double value) {
-	//std::cout << "adding to shoulder goal\n";
-	shoulderGoal = shoulderEncoder.Get() + value;
+	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
+	//this works better then just adding to goal because it can't get really big thithout the human knowing
+	//while the arm is slow and then keep moving when the human lets go.
+	shoulderGoal = shoulderEncoder.Get() + value; // Add the joystick value onto the encoder value
 	shoulderPid.SetSetpoint(shoulderGoal);
 }
 
@@ -144,6 +143,9 @@ void Arm::AddToElbowGoal(double value) {
 
 	if (touchingLimit && value > 0)
 		value = 0;
+	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
+	//this works better then just adding to goal because it can't get really big thithout the human knowing
+	//while the arm is slow and then keep moving when the human lets go.
 	elbowGoal = elbowEncoder.GetPosition() + value;
 	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kPosition);
 }
@@ -183,4 +185,13 @@ void Arm::SetClaw(frc::DoubleSolenoid::Value value) {
 
 frc::DoubleSolenoid::Value Arm::GetClaw() {
 	return clawPos;
+}
+
+void Arm::SetStowing(bool stowing) {
+	if (stowing) {
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED * .5, ArmConst::ELBOW_MAX_SPEED * .5);
+	}
+	else {
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
+	}
 }

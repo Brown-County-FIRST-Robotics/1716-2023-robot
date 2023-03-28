@@ -9,10 +9,11 @@
 #include <networktables/NetworkTableInstance.h>
 
 #include "subsystems/Drivetrain.h"
+#include "subsystems/Arm.h"
 
 class RasPiDrive : public frc2::CommandHelper<frc2::CommandBase, RasPiDrive> {
 public:
-	explicit RasPiDrive(Drivetrain* drive, bool isAutonomous = false);
+	explicit RasPiDrive(Drivetrain *drive, Arm *arm, bool isAutonomous = false);
 	
 	void Execute() override;
 
@@ -22,6 +23,7 @@ public:
 
 private:
 	Drivetrain* drivetrain;
+	Arm* arm;
 
 	nt::NetworkTableInstance networkTableInst;
 	std::shared_ptr<nt::NetworkTable> driveTable;
@@ -35,4 +37,16 @@ private:
 	double motorStartPos;
 	double rotationStartPos;
 	bool hasStopped = false;
+	
+	nt::BooleanEntry armFloor;
+	nt::BooleanEntry armPortal;
+	nt::BooleanEntry armMedium;
+	nt::BooleanEntry armHigh; 
+	nt::BooleanEntry armLowNode;
+	nt::BooleanEntry armHighNode;
+	nt::BooleanEntry isUnstowing;
+	bool isUnstowingPrevState = true;
+
+	nt::BooleanEntry pickupObject;
+	nt::BooleanEntry dropObject;
 };

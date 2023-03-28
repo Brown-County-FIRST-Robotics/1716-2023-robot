@@ -48,6 +48,8 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.WithSize(2, 2)
 		.GetEntry();
+
+	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
 }
 
 void Drivetrain::Periodic() {
@@ -85,13 +87,13 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
 		if (!headless)
-			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
-			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED, 
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
 				pigeon.GetRotation2d().operator*(-1));
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
 	}
 }
 

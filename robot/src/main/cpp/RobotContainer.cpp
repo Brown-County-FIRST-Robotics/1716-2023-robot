@@ -28,11 +28,17 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetLeftTriggerAxis() > 0.2; },
-		[this] { return controller.GetAButton(); } ));
+		[this] { return controller.GetRightStickButton(); },
+		[this] { return controller.GetLeftStickButton(); },
+		[this] { return controller.GetStartButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetRightY(); }, 
-		[this] { return controller2.GetLeftY(); }, [this] { return controller2.GetXButton(); }));
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller.GetPOV(); }, 
+		[this] { return controller.GetRightTriggerAxis() > 0.2; },
+		[this] { return controller.GetAButton(); },
+		[this] { return controller.GetBButton(); },
+		[this] { return controller.GetYButton(); },
+		[this] { return controller.GetRightBumper(); },
+		[this] { return controller.GetLeftBumper(); }));
 
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
@@ -44,12 +50,11 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetRightTriggerAxis() > .2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
-	controller.B().OnTrue(AutoBalance(&drivetrain)
-	 	.Until([this] { return controller.GetBackButtonPressed(); }));
+	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
 	 	//Auto balancing
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
@@ -114,9 +119,9 @@ BackUp::BackUp(Drivetrain* subsystem)
 	);
 }
 
-RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem)
+RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem, Arm* arm)
 {
 	AddCommands(
-		RasPiDrive(subsystem, true)
+		RasPiDrive(subsystem, arm, true)
 	);
 }

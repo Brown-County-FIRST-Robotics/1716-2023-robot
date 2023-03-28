@@ -12,6 +12,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <frc/AddressableLED.h>
+#include <array>
 
 #include "RobotContainer.h"
 

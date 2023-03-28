@@ -6,6 +6,7 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PneumaticHub.h>
 #include <frc/controller/PIDController.h>
+#include <frc/shuffleboard/Shuffleboard.h>
 
 #include "Constants.h"
 
@@ -31,6 +32,8 @@ public:
 	void SetClaw(frc::DoubleSolenoid::Value value);
 	frc::DoubleSolenoid::Value GetClaw();
 
+	void SetStowing(bool stowing);
+
 private:
 	//shoulder
 	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
@@ -54,6 +57,8 @@ private:
 	int clawTicks = -1;
 	frc::DoubleSolenoid::Value clawPos = frc::DoubleSolenoid::Value::kReverse;
 
+	//misc.
+	bool isStowing;
 
 //TEMP CODE: ELBOW PID CONFIG
 //	double elbowP = 0.08;

@@ -3,8 +3,9 @@
 #include <utility>
 
 TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
-	std::function<bool()> brake, std::function<bool()> headlessToggle) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake)), headlessButton(std::move(headlessToggle))
+	std::function<bool()> activateBrake, std::function<bool()> deactivateBrake, std::function<bool()> headlessToggle) 
+	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), 
+	startBrake(std::move(activateBrake)), stopBrake(std::move(deactivateBrake)), headlessButton(std::move(headlessToggle))
 {
 	AddRequirements(subsystem);
 }
@@ -26,7 +27,7 @@ void TeleopDrive::Execute() {
 			CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)),
 			true);
 
-	UpdateBrake(doBrake());
+	UpdateBrake(startBrake(), stopBrake());
 	UpdateHeadless();
 }
 
@@ -34,11 +35,11 @@ void TeleopDrive::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 }
 
-void TeleopDrive::UpdateBrake(bool brake) {
-	if (brake) {
+void TeleopDrive::UpdateBrake(bool doBrake, bool dontBrake) {
+	if (doBrake) {
 		drivetrain->ActivateBreakMode(true);
 	}
-	else {
+	else if (dontBrake) {
 		drivetrain->ActivateBreakMode(false);
 	}
 }
