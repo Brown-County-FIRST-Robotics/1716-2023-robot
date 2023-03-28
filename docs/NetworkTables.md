@@ -18,6 +18,7 @@
 | setArmHighNode   | boolean | Tells the robot to set the arm to the highest level cone node |
 | retractArm       | boolean | Tells the robot to retract the arm                            |
 | dropObject       | boolean | Tells the robot to drop piece it is holding                   |
+| isUnstowing      | boolean | Tells the robot whether it's unstowing the arm (defaults true)|
 
 ### Notes on how some functions should work
 

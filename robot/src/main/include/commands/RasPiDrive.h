@@ -37,6 +37,8 @@ private:
 	nt::BooleanEntry armHigh; 
 	nt::BooleanEntry armLowNode;
 	nt::BooleanEntry armHighNode;
+	nt::BooleanEntry isUnstowing;
+	bool isUnstowingPrevState = true;
 
 	nt::BooleanEntry pickupObject;
 	nt::BooleanEntry dropObject;

@@ -22,6 +22,10 @@ RasPiDrive::RasPiDrive(Drivetrain* drive, Arm* arm) : drivetrain(drive), arm(arm
 	armLowNode = driveTable->GetBooleanTopic("setArmLowNode").GetEntry(false);
 	armHighNode = driveTable->GetBooleanTopic("setArmHighNode").GetEntry(false);
 
+	isUnstowing = driveTable->GetBooleanTopic("isUnstowing").GetEntry(false);
+	isUnstowing.Set(true);
+	arm->SetStowing(true);
+
 	dropObject = driveTable->GetBooleanTopic("dropObject").GetEntry(false);
 	pickupObject = driveTable->GetBooleanTopic("pickupObject").GetEntry(false);
 }
@@ -54,6 +58,15 @@ void RasPiDrive::Execute() {
 	} else if (armHighNode.Get(false)) {
 		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
 		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
+	}
+
+	if (isUnstowing.Get(false) && !isUnstowingPrevState) {
+		arm->SetStowing(true);
+		isUnstowingPrevState = true;
+	}
+	else if (!isUnstowing.Get(false) && isUnstowingPrevState) {
+		arm->SetStowing(false);
+		isUnstowingPrevState = false;
 	}
 
 	if (ArmHeightConst::THRESHOLD > abs(arm->GetElbowGoal() - arm->GetElbowPosition())) {

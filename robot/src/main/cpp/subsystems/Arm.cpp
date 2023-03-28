@@ -179,3 +179,12 @@ void Arm::SetClaw(frc::DoubleSolenoid::Value value) {
 frc::DoubleSolenoid::Value Arm::GetClaw() {
 	return clawPos;
 }
+
+void Arm::SetStowing(bool stowing) {
+	if (stowing) {
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED * .5, ArmConst::ELBOW_MAX_SPEED * .5);
+	}
+	else {
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
+	}
+}
