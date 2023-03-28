@@ -97,6 +97,7 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::FLOOR[0]);
 		arm->SetElbowGoal(ArmHeightConst::FLOOR[1]);
 		floorButtonPrevState = true;
+		elbowStopped=true;
 	}
 	else if (!floorButton() && floorButtonPrevState) {
 		floorButtonPrevState = false;
@@ -105,6 +106,7 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::MEDIUM[0]);
 		arm->SetElbowGoal(ArmHeightConst::MEDIUM[1]);
 		mediumButtonPrevState = true;
+		elbowStopped = true;
 	}
 	else if (!mediumButton() && mediumButtonPrevState) {
 		mediumButtonPrevState = false;
@@ -113,6 +115,7 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
 		arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
 		highButtonPrevState = true;
+		elbowStopped = true;
 	}
 	else if (!highButton() && highButtonPrevState) {
 		highButtonPrevState = false;
@@ -121,6 +124,7 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
 		arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
 		driveButtonPrevState = true;
+		elbowStopped = true;
 	}
 	else if (!driveButton() && driveButtonPrevState) {
 		driveButtonPrevState = false;
@@ -129,6 +133,7 @@ void ArmTeleopControl::Execute() {
 		arm->SetShoulderGoal(ArmHeightConst::PORTAL[0]);
 		arm->SetElbowGoal(ArmHeightConst::PORTAL[1]);
 		portalButtonPrevState = true;
+		elbowStopped = true;
 	}
 	else if (!portalButton() && portalButtonPrevState) {
 		portalButtonPrevState = false;
