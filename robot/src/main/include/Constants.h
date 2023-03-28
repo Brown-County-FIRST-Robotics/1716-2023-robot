@@ -36,21 +36,30 @@ namespace AutolevelConst {
 
 namespace ArmConst
 {
+	//IDs
 	const int SHOULDER_ID = 50;
 	const int ELBOW_ID = 51;
+	const int CLAW_ID[2] = {2, 3};	//0 is forward, 1 is reverse
+	const int SHOULDER_POTENTIOMETER_ID = 0;
 
-	//0 is forward, 1 is reverse
-	const int CLAW_ID[2] = {6, 7};
+	//max speeds
+	const double SHOULDER_MAX_SPEED = 0.8;
+	const double ELBOW_MAX_SPEED = 0.4;
 
-	const double SHOULDER_SPEED = 1;
+	//manual control
+	const double SHOULDER_JOYSTICK_SPEED = 20;
+	const double ELBOW_JOYSTICK_SPEED = 3;
 
-	//Analog ID
-	const int ARM_POTENTIOMETER_ID = 0;
+	//PID
+	const double SHOULDER_P = 0.02;
 
-	const double P = .000001;
-	const double I = 0;
-	const double D = 0;
-	const double MAX_OUTPUT = .15;
+	const double ELBOW_P = 0.16;
+	const double ELBOW_I = 0.0004;
+	const double ELBOW_D = 4.0;
+
+	//shoulder misc.
+	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
+	const int SHOULDER_PID_TOLERANCE = 2;
 };
 
 namespace AutonomousConst
