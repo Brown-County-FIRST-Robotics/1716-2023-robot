@@ -130,7 +130,7 @@ double Arm::GetShoulderPosition() {
 }
 
 void Arm::StopShoulder() {
-	shoulderPid.SetSetpoint(shoulderEncoder.Get());
+	SetShoulderGoal(shoulderEncoder.Get());
 }
 
 //elbow methods
@@ -159,7 +159,7 @@ double Arm::GetElbowPosition() {
 }
 
 void Arm::StopElbow() {
-	elbowPid.SetReference(elbowEncoder.GetPosition(), rev::CANSparkMax::ControlType::kPosition);
+	SetElbowGoal(elbowEncoder.GetPosition());
 }
 
 //claw methods
