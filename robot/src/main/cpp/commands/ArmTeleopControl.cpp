@@ -50,6 +50,23 @@ void ArmTeleopControl::Execute() {
 	else if (!claw())
 		clawPressed = false;
 
+	if (elbow() == 135 || elbow() == 90 || elbow() == 45){
+		arm->AddToShoulderGoal(ArmConst::SHOULDER_MANUAL_SPEED);
+		shoulderStopped = false;
+	}
+	else if (elbow() == 225 || elbow() == 270 || elbow() == 315) {
+		arm->AddToShoulderGoal(-ArmConst::SHOULDER_MANUAL_SPEED);
+		shoulderStopped = false;
+	}
+	else if(!shoulderStopped){
+		// when you let go of DPad, stop the arm, but only the first time. 
+		//After the first time, stop applying updates, or the arm can lock in new positions while drifting
+		arm->StopShoulder();
+		shoulderStopped=true;
+	}
+
+
+
 	if (elbow() == 315 || elbow() == 0 || elbow() == 45){
 		arm->AddToElbowGoal(ArmConst::ELBOW_MANUAL_SPEED);
 		elbowStopped = false;
