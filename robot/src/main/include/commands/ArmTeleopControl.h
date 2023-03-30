@@ -28,7 +28,6 @@ private:
 	bool shoulderStopped=false;
 
 	bool elbowStopped = false;
-	bool shoulderStopped = false;
 
 
 	bool clawPressed = false;

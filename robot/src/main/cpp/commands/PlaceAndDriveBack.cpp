@@ -17,14 +17,14 @@ PlaceAndDriveBack::PlaceAndDriveBack(Drivetrain* drive, Arm* arm)
 			[]{}, // No execute function 
 			[arm](bool interupted){
 				arm->SetClaw(ArmConst::CLAW_OPEN);
-				arm->SetElbowGoal(ArmHeightConst::DRIVE{1});
-				arm->SetShoulderGoal(ArmHeightConst::DRIVE{0});
+				arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+				arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
 			}, // End function
 			[arm]{
 				return fabs(arm->GetElbowGoal()-arm->GetElbowPosition())+fabs(arm->GetShoulderGoal()-arm->GetShoulderPosition())>ArmHeightConst::THRESHOLD;
 				}, // IsFinished
 			{arm} // requirenents
 		),
-		DriveBackThenBalance(arm)
+		DriveBackThenBalance(drive)
 	);
 }
