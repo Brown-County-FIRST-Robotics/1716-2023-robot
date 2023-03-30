@@ -42,8 +42,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftBumper(); }));
 
 	//Autonomous:
-	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
-	autonomousChooser.AddOption("Back Up", &backUp);
+	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
+	autonomousChooser.AddOption("Drive Forward", &driveForward);
 	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
 
@@ -109,15 +109,14 @@ void RobotContainer::UpdateControllerLogging() {
 
 bool Nothing::IsFinished() { return true; }
 
-BackUp::BackUp(Drivetrain* subsystem)
+DriveForward::DriveForward(Drivetrain* subsystem)
 {
 	AddCommands(
 		frc2::ParallelDeadlineGroup(
-			frc2::WaitCommand(2_s),
-			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(-0.3, 0, 0);}, 
-				[subsystem] { subsystem->Drive(0, 0, 0); }) //command that backs up
-		)
-	);
+			frc2::WaitCommand(7_s),
+			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(0.2, 0, 0);}, 
+				[subsystem] { subsystem->Drive(0, 0, 0); }, {subsystem}) //command that backs up
+		));
 }
 
 RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem, Arm* arm)

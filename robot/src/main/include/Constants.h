@@ -54,7 +54,7 @@ namespace ArmConst
 	const double SHOULDER_MANUAL_SPEED = 10;
 
 	//PID
-	const double SHOULDER_P = 0.02;
+	const double SHOULDER_P = 0.04;
 
 	const double ELBOW_P = 0.08;
 	const double ELBOW_I = 0.0004;

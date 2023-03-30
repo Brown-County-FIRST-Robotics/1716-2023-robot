@@ -11,7 +11,7 @@
 
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
-#include "commands/DriveBackThenBalance.h"
+#include "commands/DriveForwardThenBalance.h"
 #include "commands/RasPiDrive.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
@@ -19,9 +19,9 @@ public:
 	bool IsFinished() override;
 };
 
-class BackUp : public frc2::CommandHelper<frc2::SequentialCommandGroup, BackUp> {
+class DriveForward : public frc2::CommandHelper<frc2::SequentialCommandGroup, DriveForward> {
 public:
-	explicit BackUp(Drivetrain* drive);
+	explicit DriveForward(Drivetrain* drive);
 };
 
 class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
@@ -54,9 +54,9 @@ private:
 
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
-	DriveBackThenBalance driveBackThenBalance{&drivetrain};
+	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
-	BackUp backUp{&drivetrain};
+	DriveForward driveForward{&drivetrain};
 	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
 
 	//Controller logging
