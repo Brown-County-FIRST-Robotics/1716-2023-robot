@@ -32,7 +32,8 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftStickButton(); },
 		[this] { return controller.GetStartButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller.GetPOV(); }, 
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, 
+		[this] { return controller.GetPOV(); }, 
 		[this] { return controller.GetRightTriggerAxis() > 0.2; },
 		[this] { return controller.GetAButton(); },
 		[this] { return controller.GetBButton(); },

@@ -25,10 +25,13 @@ private:
 
 	std::function<int()> elbow;
 	std::function<bool()> claw;
-	bool shoulderStopped=false;
 
 	bool elbowStopped = false;
+
+	
+//TEMP CODE: MANUAL SHOULDER CONTROL
 	bool shoulderStopped = false;
+//END TEMP CODE: MANUAL SHOULDER CONTROL
 
 
 	bool clawPressed = false;

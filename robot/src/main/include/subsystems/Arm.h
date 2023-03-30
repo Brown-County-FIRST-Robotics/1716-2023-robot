@@ -40,7 +40,7 @@ private:
 	frc::AnalogPotentiometer shoulderEncoder{0, -230, 206}; //set up for degrees
 	frc2::PIDController shoulderPid{ArmConst::SHOULDER_P, 0, 0};
 	double shoulderPidOutput;
-	double shoulderGoal =88;
+	double shoulderGoal = 88;
 
 	//elbow
 	rev::CANSparkMax elbow{ArmConst::ELBOW_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};

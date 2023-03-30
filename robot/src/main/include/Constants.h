@@ -51,16 +51,20 @@ namespace ArmConst
 	const double SHOULDER_JOYSTICK_SPEED = 20;
 	const double ELBOW_JOYSTICK_SPEED = 3;
 	const double ELBOW_MANUAL_SPEED = 1.5;
-	const double SHOULDER_MANUAL_SPEED = 1.5;
+	const double SHOULDER_MANUAL_SPEED = 10;
 
 	//PID
 	const double SHOULDER_P = 0.02;
-
 
 	const double ELBOW_P = 0.08;
 	const double ELBOW_I = 0.0004;
 	const double ELBOW_D = 16.0;
 
+	//Smartmotion:
+	const double CLOSED_LOOP_ERROR = .03;
+	const int MAX_VELOCITY = 1740; //RPM
+	const int MIN_VELOCITY = 150; //RPM
+	const int MAX_ACCEL = 208800; //RPM^2
 
 	//shoulder misc.
 	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max

@@ -21,10 +21,14 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
     elbowPid.SetFF(0);
     elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
 
-
 	shoulderPid.SetSetpoint(shoulderEncoder.Get());
 	// shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
 
+	//configure smartmotion
+	// elbowPid.SetSmartMotionAllowedClosedLoopError(ArmConst::CLOSED_LOOP_ERROR);
+	// elbowPid.SetSmartMotionMaxVelocity(ArmConst::MAX_VELOCITY);
+	// elbowPid.SetSmartMotionMinOutputVelocity(ArmConst::MIN_VELOCITY);
+	// elbowPid.SetSmartMotionMaxAccel(ArmConst::MAX_ACCEL);
 
 //TEMP CODE: PID SHUFFLEBOARD CONFIG
 	// frc::SmartDashboard::PutNumber("elbowP", elbowP);
@@ -94,6 +98,10 @@ void Arm::Periodic() {
 	frc::SmartDashboard::PutNumber("Elbow Goal", elbowGoal);
 	frc::SmartDashboard::PutNumber("Shoulder Position", shoulderEncoder.Get());
 	frc::SmartDashboard::PutNumber("Elbow Position", elbowEncoder.GetPosition());
+	std::cout << "Shoulder Goal: " << shoulderPid.GetSetpoint() << "\n";
+	std::cout << "Shoulder Position: " << shoulderEncoder.Get() << "\n";
+	std::cout << "Elbow Goal: " << elbowGoal << "\n";
+	std::cout << "Elbow Position: " << elbowEncoder.GetPosition() << "\n";
 
 
 	//reset elbow encoder on limit switch

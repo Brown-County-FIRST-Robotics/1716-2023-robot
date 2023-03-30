@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <iostream>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 ArmTeleopControl::ArmTeleopControl(Arm* subsystem, 
 	std::function<int()> elbowPov,
@@ -43,6 +44,10 @@ ArmTeleopControl::ArmTeleopControl(Arm* subsystem,
 }
 
 void ArmTeleopControl::Execute() {
+	frc::SmartDashboard::PutNumber("POV", elbow());
+	std::cout << "POV: " << elbow() << "\n";
+
+
 	if (!clawPressed && claw()) {
 		arm->ToggleClaw();
 		clawPressed = true;
@@ -50,6 +55,8 @@ void ArmTeleopControl::Execute() {
 	else if (!claw())
 		clawPressed = false;
 
+
+//TEMP CODE: MANUAL SHOULDER CONTROL
 	if (elbow() == 135 || elbow() == 90 || elbow() == 45){
 		arm->AddToShoulderGoal(ArmConst::SHOULDER_MANUAL_SPEED);
 		shoulderStopped = false;
@@ -64,7 +71,7 @@ void ArmTeleopControl::Execute() {
 		arm->StopShoulder();
 		shoulderStopped=true;
 	}
-
+//END TEMP CODE: MANUAL SHOULDER CONTROL
 
 
 	if (elbow() == 315 || elbow() == 0 || elbow() == 45){
