@@ -50,6 +50,7 @@ private:
 	rev::SparkMaxLimitSwitch elbowInLimit;
 	rev::SparkMaxLimitSwitch elbowOutLimit;
 	bool touchingLimit = false;
+	double GetElbowAngleToGround();
 
 	//claw
 	frc::PneumaticHub& hub;

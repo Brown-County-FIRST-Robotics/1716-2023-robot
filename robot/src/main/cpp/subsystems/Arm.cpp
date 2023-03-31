@@ -1,6 +1,9 @@
+#define _USE_MATH_DEFINES
+
 #include "subsystems/Arm.h"
 #include <frc/SmartDashboard/SmartDashboard.h>
 #include <iostream>
+#include <cmath>
 
 Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDController()}, elbowEncoder{elbow.GetEncoder()},
 	elbowInLimit{elbow.GetReverseLimitSwitch(rev::SparkMaxLimitSwitch::Type::kNormallyClosed)}, 
@@ -18,7 +21,7 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
     elbowPid.SetI(ArmConst::ELBOW_I);
     elbowPid.SetD(ArmConst::ELBOW_D);
     elbowPid.SetIZone(0);
-    elbowPid.SetFF(0);
+    elbowPid.SetFF(ArmConst::ELBOW_FEED_FORWARD);
     elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 
 	shoulderPid.SetSetpoint(shoulderEncoder.Get());
@@ -61,7 +64,7 @@ void Arm::Periodic() {
     // if((i != elbowI)) { elbowPid.SetI(i); elbowI = i; }
     // if((d != elbowD)) { elbowPid.SetD(d); elbowD = d; }
     // if((max != elbowMaxSpeed)) { elbowPid.SetOutputRange(-max, max); elbowMaxSpeed = max; }
-    // if((pos != elbowGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kPosition); elbowGoal = pos; }
+    // if((pos != elbowGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); elbowGoal = pos; }
 	// frc::SmartDashboard::PutNumber("Elbow Output", elbow.GetAppliedOutput());
 
 	// frc::SmartDashboard::PutNumber("Shoulder encoder", shoulderEncoder.Get());
@@ -107,14 +110,14 @@ void Arm::Periodic() {
 	//reset elbow encoder on limit switch
 	if (elbowOutLimit.Get() && !touchingLimit) {
 		elbowEncoder.SetPosition(0);
-		elbowPid.SetReference(0, rev::CANSparkMax::ControlType::kSmartMotion);
+		elbowPid.SetReference(0, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD);
 		elbowGoal = 0;
 		touchingLimit = true;
 	}
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
 
-	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion); //update feedforward
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); //update feedforward
 }
 
 //shoulder methods
@@ -145,7 +148,7 @@ void Arm::StopShoulder() {
 
 //elbow methods
 void Arm::SetElbowGoal(double position) {
-	elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kSmartMotion);
+	elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD);
 	elbowGoal = position;
 }
 
@@ -157,7 +160,7 @@ void Arm::AddToElbowGoal(double value) {
 	//this works better then just adding to goal because it can't get really big thithout the human knowing
 	//while the arm is slow and then keep moving when the human lets go.
 	elbowGoal = elbowEncoder.GetPosition() + value;
-	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion);
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD);
 }
 
 double Arm::GetElbowGoal() {
@@ -204,4 +207,12 @@ void Arm::SetStowing(bool stowing) {
 	else {
 		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 	}
+}
+
+
+double Arm::GetElbowAngleToGround() {
+	double angle = ((elbowEncoder.GetPosition() / ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO) + 301.0) - (shoulderEncoder.Get() - 90.0);
+		//arm straight down is 0 and arm sticking out is 90
+	std::cout << "Elbow angle from ground: " << angle << "\n";
+	return angle;
 }
