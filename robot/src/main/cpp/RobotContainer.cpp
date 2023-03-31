@@ -113,7 +113,7 @@ DriveForward::DriveForward(Drivetrain* subsystem)
 {
 	AddCommands(
 		frc2::ParallelDeadlineGroup(
-			frc2::WaitCommand(7_s),
+			frc2::WaitCommand(5_s),
 			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(0.2, 0, 0);}, 
 				[subsystem] { subsystem->Drive(0, 0, 0); }, {subsystem}) //command that backs up
 		));
