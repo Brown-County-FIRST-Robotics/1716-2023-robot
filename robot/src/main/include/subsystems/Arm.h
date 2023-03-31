@@ -7,6 +7,7 @@
 #include <frc/PneumaticHub.h>
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/DutyCycleEncoder.h>
 
 #include "Constants.h"
 
@@ -37,7 +38,7 @@ public:
 private:
 	//shoulder
 	rev::CANSparkMax shoulder{ArmConst::SHOULDER_ID, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
-	frc::AnalogPotentiometer shoulderEncoder{0, -230, 206}; //set up for degrees
+	frc::DutyCycleEncoder shoulderEncoder{0};
 	frc2::PIDController shoulderPid{ArmConst::SHOULDER_P, 0, 0};
 	double shoulderPidOutput;
 	double shoulderGoal = 88;

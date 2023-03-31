@@ -24,7 +24,7 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
     elbowPid.SetFF(ArmConst::ELBOW_FEED_FORWARD);
     elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 
-	shoulderPid.SetSetpoint(shoulderEncoder.Get());
+	shoulderPid.SetSetpoint(GetShoulderPosition());
 	// shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
 
 	//configure smartmotion
@@ -67,21 +67,21 @@ void Arm::Periodic() {
     // if((pos != elbowGoal)) { elbowPid.SetReference(pos, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); elbowGoal = pos; }
 	// frc::SmartDashboard::PutNumber("Elbow Output", elbow.GetAppliedOutput());
 
-	// frc::SmartDashboard::PutNumber("Shoulder encoder", shoulderEncoder.Get());
+	// frc::SmartDashboard::PutNumber("Shoulder encoder", GetShoulderPosition());
 	// shoulderPositionGoal = frc::SmartDashboard::GetNumber("Shoulder Pos", shoulderPositionGoal);
 //END TEMP CODE: PID SHUFFLEBOARD CONFIG
 
 
 	//shoulder PID control
-	shoulderPidOutput = std::clamp(shoulderPid.Calculate(shoulderEncoder.Get()), -ArmConst::SHOULDER_MAX_SPEED, ArmConst::SHOULDER_MAX_SPEED); 
+	shoulderPidOutput = std::clamp(shoulderPid.Calculate(GetShoulderPosition()), -ArmConst::SHOULDER_MAX_SPEED, ArmConst::SHOULDER_MAX_SPEED); 
 		//cache pid output with a limit for safety for use in if statements
-		//std::cout << "encoder pos:" << shoulderEncoder.Get() << std::endl;
+		//std::cout << "encoder pos:" << GetShoulderPosition() << std::endl;
 	//std::cout << "shoulderPID" << shoulderPidOutput	 << std::endl;
-	if (shoulderPidOutput < 0 && shoulderEncoder.Get() > ArmConst::SHOULDER_EXTREME[0]){// && !shoulderPid.AtSetpoint()) //enforce limits
+	if (shoulderPidOutput < 0 && GetShoulderPosition() > ArmConst::SHOULDER_EXTREME[0]){// && !shoulderPid.AtSetpoint()) //enforce limits
 		//std::cout << "at extreme 1:" << shoulderPidOutput << std::endl;
 		shoulder.Set(shoulderPidOutput);
 	}
-	else if (shoulderPidOutput > 0 && shoulderEncoder.Get() < ArmConst::SHOULDER_EXTREME[1]){// && !shoulderPid.AtSetpoint())
+	else if (shoulderPidOutput > 0 && GetShoulderPosition() < ArmConst::SHOULDER_EXTREME[1]){// && !shoulderPid.AtSetpoint())
 		//std::cout << "at extreme 2:" << shoulderPidOutput << std::endl;
 		shoulder.Set(shoulderPidOutput);
 	}
@@ -99,10 +99,10 @@ void Arm::Periodic() {
 	//log goals and positions
 	//frc::SmartDashboard::PutNumber("Shoulder Goal", shoulderPid.GetSetpoint());
 	//frc::SmartDashboard::PutNumber("Elbow Goal", elbowGoal);
-	//frc::SmartDashboard::PutNumber("Shoulder Position", shoulderEncoder.Get());
+	//frc::SmartDashboard::PutNumber("Shoulder Position", GetShoulderPosition());
 	//frc::SmartDashboard::PutNumber("Elbow Position", elbowEncoder.GetPosition());
 	//std::cout << "Shoulder Goal: " << shoulderPid.GetSetpoint() << "\n";
-	//std::cout << "Shoulder Position: " << shoulderEncoder.Get() << "\n";
+	//std::cout << "Shoulder Position: " << GetShoulderPosition() << "\n";
 	//std::cout << "Elbow Goal: " << elbowGoal << "\n";
 	std::cout << "Version: 12\n";
 	//std::cout << elbowPid.GetFF() << "\n";
@@ -118,6 +118,8 @@ void Arm::Periodic() {
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
 
+	std::cout << "Fancy Encoder: " << GetShoulderPosition() << "\n";
+
 	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); //update feedforward
 }
 
@@ -131,7 +133,7 @@ void Arm::AddToShoulderGoal(double value) {
 	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
 	//this works better then just adding to goal because it can't get really big thithout the human knowing
 	//while the arm is slow and then keep moving when the human lets go.
-	shoulderGoal = shoulderEncoder.Get() + value; // Add the joystick value onto the encoder value
+	shoulderGoal = GetShoulderPosition() + value; // Add the joystick value onto the encoder value
 	shoulderPid.SetSetpoint(shoulderGoal);
 }
 
@@ -140,11 +142,11 @@ double Arm::GetShoulderGoal() {
 }
 
 double Arm::GetShoulderPosition() {
-	return shoulderEncoder.Get();
+	return ((0.419 - shoulderEncoder.GetAbsolutePosition()) * 360) + 90;
 }
 
 void Arm::StopShoulder() {
-	SetShoulderGoal(shoulderEncoder.Get());
+	SetShoulderGoal(GetShoulderPosition());
 }
 
 //elbow methods
@@ -212,7 +214,7 @@ void Arm::SetStowing(bool stowing) {
 
 
 double Arm::GetElbowAngleToGround() {
-	double angle = ((elbowEncoder.GetPosition() / ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO) + 301.0) - (shoulderEncoder.Get() - 90.0);
+	double angle = ((elbowEncoder.GetPosition() / ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO) + 301.0) - (GetShoulderPosition() - 90.0);
 		//arm straight down is 0 and arm sticking out is 90
 	std::cout << "Elbow angle from ground: " << angle << "\n";
 	return angle;

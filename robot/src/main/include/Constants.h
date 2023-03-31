@@ -85,7 +85,7 @@ namespace ArmConst
 	const double ELBOW_ROTAIONS_TO_ANGLE_RATIO = (12.75 * (64.0 / 14.0)) / 360;
 
 	//shoulder misc.
-	const int SHOULDER_EXTREME[2] = {85, 130}; //min, max
+	const int SHOULDER_EXTREME[2] = {80, 120}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
 
 	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
