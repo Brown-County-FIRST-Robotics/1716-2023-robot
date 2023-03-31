@@ -56,12 +56,26 @@ namespace ArmConst
 	//PID
 	const double SHOULDER_P = 0.04;
 
-	const double ELBOW_P = 0.00002;
-	const double ELBOW_I = 5e-7;
+	const double ELBOW_P = 0.0002;
+	const double ELBOW_I = 0;//5e-7;
 	const double ELBOW_D = 0.0;
 	const double ELBOW_FEED_FORWARD = 0; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
 
 	const double ELBOW_ARBITRARY_FEED_FORWARD = 1.0;
+
+	const double ELBOW_IZONE = 0;
+
+/**
+ * 
+	const double ELBOW_P = 0.0002;
+	const double ELBOW_I = 5e-7;
+	const double ELBOW_D = 1.0;
+	const double ELBOW_FEED_FORWARD = 0.0002; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
+//maybe 1.0/5000 for the motor kv at max rpm?
+
+ * 
+*/
+
 
 	//Smartmotion:
 	const double CLOSED_LOOP_ERROR = 1.0;
