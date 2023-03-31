@@ -19,16 +19,16 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
     elbowPid.SetD(ArmConst::ELBOW_D);
     elbowPid.SetIZone(0);
     elbowPid.SetFF(0);
-    elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
+    elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 
 	shoulderPid.SetSetpoint(shoulderEncoder.Get());
 	// shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
 
 	//configure smartmotion
-	// elbowPid.SetSmartMotionAllowedClosedLoopError(ArmConst::CLOSED_LOOP_ERROR);
-	// elbowPid.SetSmartMotionMaxVelocity(ArmConst::MAX_VELOCITY);
-	// elbowPid.SetSmartMotionMinOutputVelocity(ArmConst::MIN_VELOCITY);
-	// elbowPid.SetSmartMotionMaxAccel(ArmConst::MAX_ACCEL);
+	elbowPid.SetSmartMotionAllowedClosedLoopError(ArmConst::CLOSED_LOOP_ERROR);
+	elbowPid.SetSmartMotionMaxVelocity(ArmConst::MAX_VELOCITY);
+	elbowPid.SetSmartMotionMinOutputVelocity(ArmConst::MIN_VELOCITY);
+	elbowPid.SetSmartMotionMaxAccel(ArmConst::MAX_ACCEL);
 
 //TEMP CODE: PID SHUFFLEBOARD CONFIG
 	// frc::SmartDashboard::PutNumber("elbowP", elbowP);
@@ -107,12 +107,14 @@ void Arm::Periodic() {
 	//reset elbow encoder on limit switch
 	if (elbowOutLimit.Get() && !touchingLimit) {
 		elbowEncoder.SetPosition(0);
-		elbowPid.SetReference(0, rev::CANSparkMax::ControlType::kPosition);
+		elbowPid.SetReference(0, rev::CANSparkMax::ControlType::kSmartMotion);
 		elbowGoal = 0;
 		touchingLimit = true;
 	}
 	else if (!elbowOutLimit.Get())
 		touchingLimit = false;
+
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion); //update feedforward
 }
 
 //shoulder methods
@@ -143,7 +145,7 @@ void Arm::StopShoulder() {
 
 //elbow methods
 void Arm::SetElbowGoal(double position) {
-	elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kPosition);
+	elbowPid.SetReference(position, rev::CANSparkMax::ControlType::kSmartMotion);
 	elbowGoal = position;
 }
 
@@ -155,7 +157,7 @@ void Arm::AddToElbowGoal(double value) {
 	//this works better then just adding to goal because it can't get really big thithout the human knowing
 	//while the arm is slow and then keep moving when the human lets go.
 	elbowGoal = elbowEncoder.GetPosition() + value;
-	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kPosition);
+	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion);
 }
 
 double Arm::GetElbowGoal() {
@@ -197,9 +199,9 @@ frc::DoubleSolenoid::Value Arm::GetClaw() {
 
 void Arm::SetStowing(bool stowing) {
 	if (stowing) {
-		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED * .5, ArmConst::ELBOW_MAX_SPEED * .5);
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT * .5, ArmConst::ELBOW_MAX_OUTPUT * .5);
 	}
 	else {
-		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_SPEED, ArmConst::ELBOW_MAX_SPEED);
+		elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 	}
 }
