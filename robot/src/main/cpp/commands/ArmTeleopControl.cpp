@@ -148,8 +148,9 @@ void ArmTeleopControl::Execute() {
 		highButtonPrevState = false;
 	}
 	if (driveButton() && !driveButtonPrevState) {
-		arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
-		arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+		// arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
+		// arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
+		arm->InitiateDrivePreset();
 		driveButtonPrevState = true;
 		elbowStopped = true;
 		shoulderStopped=true;

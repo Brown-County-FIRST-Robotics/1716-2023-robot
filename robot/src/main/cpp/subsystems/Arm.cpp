@@ -25,7 +25,7 @@ Arm::Arm(frc::PneumaticHub& hubRef) : hub{hubRef}, elbowPid{elbow.GetPIDControll
     elbowPid.SetOutputRange(-ArmConst::ELBOW_MAX_OUTPUT, ArmConst::ELBOW_MAX_OUTPUT);
 
 	shoulderPid.SetSetpoint(GetShoulderPosition());
-	// shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
+	shoulderPid.SetTolerance(ArmConst::SHOULDER_PID_TOLERANCE);
 
 	//configure smartmotion
 	elbowPid.SetSmartMotionAllowedClosedLoopError(ArmConst::CLOSED_LOOP_ERROR);
@@ -121,6 +121,14 @@ void Arm::Periodic() {
 	std::cout << "Fancy Encoder: " << GetShoulderPosition() << "\n";
 
 	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); //update feedforward
+
+	if (isDoingDrivePreset && shoulderPid.AtSetpoint() && !drivePresetShoulderIsFinished) {
+		drivePresetShoulderIsFinished = true;
+		SetElbowGoal(ArmHeightConst::DRIVE[1]);
+	}
+	else if (drivePresetShoulderIsFinished && fabs(GetElbowGoal() - GetElbowPosition()) < 2) {
+		isDoingDrivePreset = false;
+	}
 }
 
 //shoulder methods
@@ -212,10 +220,15 @@ void Arm::SetStowing(bool stowing) {
 	}
 }
 
-
 double Arm::GetElbowAngleToGround() {
 	double angle = ((elbowEncoder.GetPosition() / ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO) + 301.0) - (GetShoulderPosition() - 90.0);
 		//arm straight down is 0 and arm sticking out is 90
 	std::cout << "Elbow angle from ground: " << angle << "\n";
 	return angle;
+}
+
+void Arm::InitiateDrivePreset() {
+	isDoingDrivePreset = true;
+	drivePresetShoulderIsFinished = false;
+	SetShoulderGoal(ArmHeightConst::DRIVE[0]);
 }
