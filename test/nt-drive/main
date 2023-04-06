@@ -2,9 +2,11 @@
 
 import argparse
 import logging
+from threading import Thread
+import rr1716
 from rr1716 import Camera
-from rr1716 import DEATHSTARE
 from rr1716 import Decision
+from flask import Flask
 from rr1716 import NetworkTables1716
 from rr1716 import StateEstimator
 import configs
@@ -73,9 +75,15 @@ def main(args):
         for camera in cameras:
             camera.shutdown()
         assert False, f'"{args.auto_mode}" does not have a matching `elif` block'
-    
 
-    DEATHSTARE.start(cameras, filter)
+    app = Flask(__name__)
+    app.register_blueprint(rr1716.Web.StateVis.state_vis_bp)
+    app.register_blueprint(rr1716.Web.DEATHSTARE.ds_bp)
+    app.Cameras = cameras
+    thread = Thread(target=app.run, kwargs={'host': "0.0.0.0"})
+    thread.start()
+    app.filter = filter
+
 
     lastframetime = 0
     try:
