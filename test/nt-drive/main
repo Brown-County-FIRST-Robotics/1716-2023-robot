@@ -58,27 +58,10 @@ def main(args):
     nt_table = NetworkTables1716.NetworkTablesWrapper()
     filter=StateEstimator.StateEstimator()
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
- 
-    
-    
-    if args.auto_mode == 'PLACEANDBALANCE':
-        current_action = Decision.StartFilter(filter, cameras, nt_table, april_executor, 'auto')
-    elif args.auto_mode == 'DEATHSTAREDEMO':
-        current_action = Decision.AddScreenVals(filter, cameras, nt_table, april_executor, 'auto')
-    elif args.auto_mode == 'DRIVETOAPRILTAG':
-        current_action = Decision.DriveDumb(filter, cameras, nt_table, april_executor,3, 'DRIVETOAPRILTAG')
-    elif args.auto_mode == 'DRIVETOGAMEPIECE':        
-        current_action = Decision.DriveToGamepeice(filter, cameras, nt_table, april_executor, 'drivetocube', 5, 100, 100, 300, 200, "cube_picked_color")
-    elif args.auto_mode == 'AUTO':
-        current_action = Decision.AwaitAutoStart(filter, cameras, nt_table, april_executor, 'auto')
-    else:
-        for camera in cameras:
-            camera.shutdown()
-        assert False, f'"{args.auto_mode}" does not have a matching `elif` block'
-
+    # TODO: add decision code
     app = Flask(__name__)
-    app.register_blueprint(rr1716.Web.StateVis.state_vis_bp)
-    app.register_blueprint(rr1716.Web.DEATHSTARE.ds_bp)
+    rr1716.Web.StateVis.start(app)
+    rr1716.Web.DEATHSTARE.start(app)
     app.Cameras = cameras
     thread = Thread(target=app.run, kwargs={'host': "0.0.0.0"})
     thread.start()
@@ -106,10 +89,10 @@ def main(args):
                 cam.startupdate()
             for cam in cameras:
                 cam.wait()
-            if args.config_file[:9]!='CALIBRATE':
-                res = Decision.doCurrentAction(current_action)
-                if res is not None:
-                    current_action = res
+            #if args.config_file[:9]!='CALIBRATE':
+                # res = Decision.doCurrentAction(current_action)
+                #if res is not None:
+                #    current_action = res
 
 
     finally:
