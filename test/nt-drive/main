@@ -3,6 +3,7 @@
 import argparse
 import logging
 from threading import Thread
+import asyncio
 import rr1716
 from rr1716 import Camera
 from rr1716 import Decision
@@ -17,7 +18,7 @@ import signal
 from concurrent.futures import ThreadPoolExecutor
 
 
-def main(args):
+async def main(args):
     file_handler = logging.FileHandler(filename=args.logfile)
     stderr_handler = logging.StreamHandler(stream=sys.stderr)
     handlers = [file_handler, stderr_handler]
@@ -56,8 +57,9 @@ def main(args):
     signal.signal(signal.SIGINT, handler)
 
     nt_table = NetworkTables1716.NetworkTablesWrapper()
-    filter=StateEstimator.StateEstimator()
+    state_est = StateEstimator.StateEstimator()
     april_executor = ThreadPoolExecutor(max_workers=len(cameras))
+    conecube_executor = ThreadPoolExecutor(max_workers=len(cameras))
     # TODO: add decision code
     app = Flask(__name__)
     rr1716.Web.StateVis.start(app)
@@ -65,8 +67,16 @@ def main(args):
     app.Cameras = cameras
     thread = Thread(target=app.run, kwargs={'host': "0.0.0.0"})
     thread.start()
-    app.filter = filter
+    app.filter = state_est
+    app.auto_schedule = None
 
+    while app.auto_schedule is None:
+        logging.info('Waiting for user to select routine')
+        await asyncio.sleep(0.01)
+
+    while not nt_table.IsAutonomous():
+        logging.info('Waiting for auto start')
+        await asyncio.sleep(0.01)
 
     lastframetime = 0
     try:
@@ -109,5 +119,5 @@ if __name__ == "__main__":
     parser.add_argument('--auto', '-a', action="store", dest="auto_mode", choices=['PLACEANDBALANCE', 'DEATHSTAREDEMO', 'DRIVETOAPRILTAG', 'DRIVETOGAMEPIECE', 'AUTO'], default="AUTO", help="The Action to start")
     parser.add_argument('--prod', action="store_true", dest="prod", help="If the robot should shut itself down")
 
-    main(parser.parse_args())
+    asyncio.run(main(parser.parse_args()))
 
