@@ -100,7 +100,7 @@ namespace ArmHeightConst{
 	const double MEDIUM[2]={107, -32};
 	const double HIGH[2]={107, -27};
 	const double DRIVE[2]={90, -47};
-	const double THRESHOLD = 1; 
+	const double THRESHOLD = 20;
 };
 
 namespace AutonomousConst
