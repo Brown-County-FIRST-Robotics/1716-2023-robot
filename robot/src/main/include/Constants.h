@@ -86,6 +86,7 @@ namespace ArmConst
 	//shoulder misc.
 	const int SHOULDER_EXTREME[2] = {80, 120}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
+	const float ELBOW_IN_LIMIT_POS = -290;
 
 	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
 	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
