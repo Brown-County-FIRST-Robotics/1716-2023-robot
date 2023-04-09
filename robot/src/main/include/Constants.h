@@ -98,7 +98,7 @@ namespace ArmHeightConst{
 	const double FLOOR[2]={124, -40};
 	const double PORTAL[2]={107, -31};
 	const double MEDIUM[2]={107, -32};
-	const double HIGH[2]={107, -27};
+	const double HIGH[2]={114, -27};
 	const double DRIVE[2]={90, -47};
 	const double THRESHOLD = 5;
 };
