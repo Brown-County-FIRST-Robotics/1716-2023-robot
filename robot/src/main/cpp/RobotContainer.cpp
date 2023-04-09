@@ -47,6 +47,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
 	autonomousChooser.AddOption("Place", &place);
+	autonomousChooser.AddOption("Place then leave community", &placeMob);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
