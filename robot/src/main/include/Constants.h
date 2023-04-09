@@ -30,9 +30,9 @@ namespace AutolevelConst {
 	const double ULTIMATEGAIN = .0067;
 	const double OSCPERIOD = 3.49;
 
-	const double PROPORTIONAL_FACTOR = ((.0067 * .6) * 1.9 * 1.5)*.7;
-	const double INTEGRAL_FACTOR = (((ULTIMATEGAIN * 1.2) / OSCPERIOD) * .3);
-	const double DERIVATIVE_FACTOR = ((ULTIMATEGAIN * OSCPERIOD) * 0.075) * 0;
+	const double PROPORTIONAL_FACTOR = (.0067 * .6) * 1.9 * 1.5;
+	const double INTEGRAL_FACTOR = (((ULTIMATEGAIN * 1.2) / OSCPERIOD) * .5);
+	const double DERIVATIVE_FACTOR = ((ULTIMATEGAIN * OSCPERIOD) * 0.075) * 1.5;
 };
 
 namespace ArmConst
@@ -44,12 +44,13 @@ namespace ArmConst
 	const int SHOULDER_POTENTIOMETER_ID = 0;
 
 	//max speeds
-	const double SHOULDER_MAX_SPEED = 1;
+	const double SHOULDER_MAX_SPEED = 0.8;
 	const double ELBOW_MAX_OUTPUT = 1;
 
 	//manual control
 	const double SHOULDER_JOYSTICK_SPEED = 20;
-	const double ELBOW_MANUAL_SPEED = 2.5;
+	const double ELBOW_JOYSTICK_SPEED = 3;
+	const double ELBOW_MANUAL_SPEED = 1.5;
 	const double SHOULDER_MANUAL_SPEED = 10;
 
 	//PID
@@ -78,18 +79,17 @@ namespace ArmConst
 
 	//Smartmotion:
 	const double CLOSED_LOOP_ERROR = 1.0;
-	const int MAX_VELOCITY = 2000; //RPM
+	const int MAX_VELOCITY = 1000; //RPM
 	const int MIN_VELOCITY = 15; //RPM
-	const int MAX_ACCEL = 6000; //RPM^2
+	const int MAX_ACCEL = 8000; //RPM^2
 	const double ELBOW_ROTAIONS_TO_ANGLE_RATIO = (12.75 * (64.0 / 14.0)) / 360;
 
-	//shoulder misc.$
-	const int SHOULDER_EXTREME[2] = {56, 110}; //min, max
+	//shoulder misc.
+	const int SHOULDER_EXTREME[2] = {80, 120}; //min, max
 	const int SHOULDER_PID_TOLERANCE = 2;
-	const float ELBOW_IN_LIMIT_POS = -290;
 
-	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
 	const frc::DoubleSolenoid::Value CLAW_OPEN = frc::DoubleSolenoid::kForward;
+	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
 };
 
 
@@ -100,7 +100,7 @@ namespace ArmHeightConst{
 	const double MEDIUM[2]={107, -32};
 	const double HIGH[2]={114, -27};
 	const double DRIVE[2]={90, -47};
-	const double THRESHOLD = 5;
+	const double THRESHOLD = 20;
 };
 
 namespace AutonomousConst
