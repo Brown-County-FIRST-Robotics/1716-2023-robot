@@ -12,6 +12,7 @@
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveForwardThenBalance.h"
+#include "commands/PlaceAndDriveBack.h"
 #include "commands/RasPiDrive.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
@@ -58,6 +59,7 @@ private:
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};
 	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
+	PlaceAndDriveBack place{&drivetrain, &arm};
 
 	//Controller logging
 	nt::GenericEntry* a;

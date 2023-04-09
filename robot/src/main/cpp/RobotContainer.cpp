@@ -46,6 +46,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Drive Forward", &driveForward);
 	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
+	autonomousChooser.AddOption("Place", &place);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }

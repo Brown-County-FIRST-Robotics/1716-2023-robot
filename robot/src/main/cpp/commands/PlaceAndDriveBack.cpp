@@ -16,15 +16,27 @@ PlaceAndDriveBack::PlaceAndDriveBack(Drivetrain* drive, Arm* arm)
 			}, 
 			[]{}, // No execute function 
 			[arm](bool interupted){
-				arm->SetClaw(ArmConst::CLAW_OPEN);
-				arm->SetElbowGoal(ArmHeightConst::DRIVE[1]);
-				arm->SetShoulderGoal(ArmHeightConst::DRIVE[0]);
 			}, // End function
 			[arm]{
-				return fabs(arm->GetElbowGoal()-arm->GetElbowPosition())+fabs(arm->GetShoulderGoal()-arm->GetShoulderPosition())>ArmHeightConst::THRESHOLD;
+				return fabs(arm->GetElbowGoal()-arm->GetElbowPosition())
+				+fabs(arm->GetShoulderGoal()-arm->GetShoulderPosition())<ArmHeightConst::THRESHOLD;
 				}, // IsFinished
 			{arm} // requirenents
 		),
-		DriveBackThenBalance(drive)
+		frc2::FunctionalCommand(
+			[arm] {
+				arm->SetClaw(ArmConst::CLAW_OPEN);
+				arm->InitiateDrivePreset();
+			}, 
+			[]{}, // No execute function 
+			[arm](bool interupted){
+			}, // End function
+			[arm]{
+				return fabs(arm->GetElbowGoal()-arm->GetElbowPosition())
+				+fabs(arm->GetShoulderGoal()-arm->GetShoulderPosition())<ArmHeightConst::THRESHOLD;
+				}, // IsFinished
+			{arm} // requirenents
+		),
+		DriveForwardThenBalance(drive)
 	);
-}
+} 	
