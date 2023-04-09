@@ -6,7 +6,7 @@
 #include "subsystems/Drivetrain.h"
 #include "commands/Autobalance.h"
 
-class DriveBackThenBalance : public frc2::CommandHelper<frc2::SequentialCommandGroup, DriveBackThenBalance> {
+class DriveForwardThenBalance : public frc2::CommandHelper<frc2::SequentialCommandGroup, DriveForwardThenBalance> {
 public:
-	explicit DriveBackThenBalance(Drivetrain* drive);
+	explicit DriveForwardThenBalance(Drivetrain* drive);
 };

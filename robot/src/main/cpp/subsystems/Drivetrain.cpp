@@ -48,6 +48,8 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.WithSize(2, 2)
 		.GetEntry();
+
+	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
 }
 
 void Drivetrain::Periodic() {
@@ -70,12 +72,7 @@ void Drivetrain::Periodic() {
 	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
 	yAccel.Set(GetY());
 	
-	if ((int)GetYaw() % 360 >= 0) { //make it between 0 and 359
-		yaw.Set((int)GetYaw() % 360);
-	}
-	else {
-		yaw.Set(((int)GetYaw() % 360) + 360);
-	}
+	yaw.Set(GetYaw());
 
 	if (resetPigeonPos->GetBoolean(false)) {
 		pigeon.Reset();
@@ -90,13 +87,13 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 
 	if (solenoidPos == frc::DoubleSolenoid::Value::kReverse) {
 		if (!headless)
-			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED);
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
-			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED, 
+			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
 				pigeon.GetRotation2d().operator*(-1));
 	}
 	else { //don't strafe in traction mode
-		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED);
+		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
 	}
 }
 
@@ -123,8 +120,13 @@ double Drivetrain::GetPitch() {
 	return pigeon.GetPitch();
 }
 
-double Drivetrain::GetYaw() {
-	return pigeon.GetYaw();
+int Drivetrain::GetYaw() {
+	if ((int)pigeon.GetYaw() % 360 >= 0) { //make it between 0 and 359
+		return (int)pigeon.GetYaw() % 360;
+	}
+	else {
+		return ((int)pigeon.GetYaw() % 360) + 360;
+	}
 }
 
 int16_t Drivetrain::GetX() {
