@@ -109,16 +109,24 @@ void Arm::Periodic() {
 
 
 	//reset elbow encoder on limit switch
-	if (elbowOutLimit.Get() && !touchingLimit) {
+	if (elbowOutLimit.Get() && !touchingOutLimit) {
 		elbowEncoder.SetPosition(0);
 		elbowPid.SetReference(0, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD);
 		elbowGoal = 0;
-		touchingLimit = true;
+		touchingOutLimit = true;
 	}
 	else if (!elbowOutLimit.Get())
-		touchingLimit = false;
+		touchingOutLimit = false;
 
-	std::cout << "Fancy Encoder: " << GetShoulderPosition() << "\n";
+	std::cout << "Elbo raw:" << elbowEncoder.GetPosition() << '\n';
+	if (elbowInLimit.Get() && !touchingInLimit) {
+		elbowGoal = ArmConst::ELBOW_IN_LIMIT_POS * ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO;
+		elbowEncoder.SetPosition(elbowGoal);
+		elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD);
+		touchingInLimit = true;
+	}
+	else if (!elbowInLimit.Get())
+		touchingInLimit = false;
 
 	elbowPid.SetReference(elbowGoal, rev::CANSparkMax::ControlType::kSmartMotion, 0, sin(GetElbowAngleToGround() * (M_PI / 180)) * ArmConst::ELBOW_ARBITRARY_FEED_FORWARD); //update feedforward
 
@@ -165,8 +173,10 @@ void Arm::SetElbowGoal(double position) {
 
 void Arm::AddToElbowGoal(double value) {
 
-	if (touchingLimit && value > 0)
+	if (touchingOutLimit && value > 0)
 		value = 0;
+	if (touchingInLimit && value < ArmConst::ELBOW_IN_LIMIT_POS)
+		value = ArmConst::ELBOW_IN_LIMIT_POS;
 	//act kind of like velocity mode.  The human is commanding a change from where they see the arm currently is
 	//this works better then just adding to goal because it can't get really big thithout the human knowing
 	//while the arm is slow and then keep moving when the human lets go.

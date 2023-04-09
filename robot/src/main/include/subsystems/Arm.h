@@ -52,7 +52,8 @@ private:
 	double elbowGoal = 0;
 	rev::SparkMaxLimitSwitch elbowInLimit;
 	rev::SparkMaxLimitSwitch elbowOutLimit;
-	bool touchingLimit = false;
+	bool touchingInLimit = false;
+	bool touchingOutLimit = false;
 	double GetElbowAngleToGround();
 
 	//claw
