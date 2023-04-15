@@ -48,12 +48,11 @@ namespace ArmConst
 	const double ELBOW_MAX_OUTPUT = 1;
 
 	//manual control
-	const double SHOULDER_JOYSTICK_SPEED = 20;
 	const double ELBOW_MANUAL_SPEED = 2.5;
-	const double SHOULDER_MANUAL_SPEED = 10;
+	const double SHOULDER_MANUAL_SPEED = 30;
 
 	//PID
-	const double SHOULDER_P = 0.04;
+	const double SHOULDER_P = 0.2;
 
 	const double ELBOW_P = 0.0002;
 	const double ELBOW_I = 0;//5e-7;
