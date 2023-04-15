@@ -14,6 +14,8 @@
 #include <networktables/NetworkTableInstance.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/PneumaticHub.h>
+#include <frc/kinematics/MecanumDriveOdometry.h>
+#include <frc/estimator/MecanumDrivePoseEstimator.h>
 
 
 #include "Constants.h"
@@ -33,6 +35,7 @@ public:
 	void Periodic() override;
 
 	void ActivateBreakMode(bool doBrakeMode);
+	frc::Pose2d FetchPos();
 
 	double GetRoll();
 	double GetPitch();
@@ -89,4 +92,36 @@ private:
 	nt::FloatPublisher yAccel;
 
 	nt::GenericEntry* resetPigeonPos;
+
+       //these are from the tutorial and do not match our robot.  we're getting away with it for now
+	frc::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
+	frc::Translation2d m_frontRightLocation{0.381_m, -0.381_m};
+	frc::Translation2d m_backLeftLocation{-0.381_m, 0.381_m};
+	frc::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
+
+	// Creating my kinematics object using the wheel locations.
+	frc::MecanumDriveKinematics m_kinematics{
+	m_frontLeftLocation, m_frontRightLocation,
+	m_backLeftLocation, m_backRightLocation
+	};
+
+	// Creating my odometry object from the kinematics object. Here,
+	// our starting pose is 5 meters along the long end of the field and in the
+	// center of the field along the short end, facing forward.
+	frc::MecanumDrivePoseEstimator odometry{
+	m_kinematics,
+	frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	frc::MecanumDriveWheelPositions{
+		units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
+		units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},	
+		units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
+		units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+	},
+	frc::Pose2d{0_m, 0_m, 0_rad}};
+
+
+
+
+
+
 };

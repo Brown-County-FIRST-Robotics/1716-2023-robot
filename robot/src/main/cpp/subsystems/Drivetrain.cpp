@@ -42,6 +42,16 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.GetEntry();
 
 	pigeon.Reset();
+	odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	frc::MecanumDriveWheelPositions{
+				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+	},
+	frc::Pose2d{0_m, 0_m, 0_rad});
+
+
 	pigeon.ConfigMountPose(ctre::phoenix::sensors::AxisDirection::PositiveX, ctre::phoenix::sensors::AxisDirection::PositiveZ);
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
 		.Add("Reset Pigeon Position", false)
@@ -64,10 +74,10 @@ void Drivetrain::Periodic() {
 		resetEncodersEntry.Set(false);
 	}
 
-	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID));
-	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID));
-	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID));
-	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID));
+	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID)/0.44);
+	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID)/0.44);
+	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID)/0.44);
+	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID)/0.44);
 
 	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
 	yAccel.Set(GetY());
@@ -76,8 +86,28 @@ void Drivetrain::Periodic() {
 
 	if (resetPigeonPos->GetBoolean(false)) {
 		pigeon.Reset();
+		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+		frc::MecanumDriveWheelPositions{
+				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+			},
+			frc::Pose2d{0_m, 0_m, 0_rad});
+
 		resetPigeonPos->SetBoolean(false);
 	}
+		odometry.Update(
+			frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+			frc::MecanumDriveWheelPositions{
+				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
+				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+			}
+		);
+	auto pos=FetchPos();
+	std::cout << "x:" << pos.X().value() << "\ty:" << pos.Y().value() << "\tr:" << pos.Rotation().Degrees().value()  << '\n';
 }
 
 void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented
@@ -204,4 +234,11 @@ void Drivetrain::ResetEncoders() {
 	frontRightEncoder.SetPosition(0);
 	backLeftEncoder.SetPosition(0);
 	backRightEncoder.SetPosition(0);
+}
+
+
+
+
+frc::Pose2d Drivetrain::FetchPos(){
+	return odometry.GetEstimatedPosition();
 }
