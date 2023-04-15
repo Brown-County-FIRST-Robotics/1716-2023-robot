@@ -60,7 +60,7 @@ private:
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};
 	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
-	PlaceAndDriveBack place{&drivetrain, &arm};
+	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
 
 	//Controller logging
