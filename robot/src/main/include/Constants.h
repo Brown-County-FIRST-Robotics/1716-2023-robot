@@ -3,6 +3,7 @@
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
 #include <frc/DoubleSolenoid.h>
+#include <frc/geometry/Pose2d.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -26,6 +27,25 @@ namespace DrivetrainConst {
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
 	const auto TANK_MODE = frc::DoubleSolenoid::Value::kForward;
 	const auto MECH_MODE = frc::DoubleSolenoid::Value::kReverse;
+
+	//should actually change based on which auto is selected
+	const auto INITIAL_POSE = frc::Pose2d(0_m, 0_m, 180_deg);
+
+
+	//roughly measured on robot
+	const auto WHEEL_POS_FL_MECANUM = frc::Translation2d( 25.75_in/2,  18.75_in/2);
+	const auto WHEEL_POS_FR_MECANUM = frc::Translation2d( 25.75_in/2, -18.75_in/2);
+	const auto WHEEL_POS_BL_MECANUM = frc::Translation2d(-25.75_in/2,  18.75_in/2);
+	const auto WHEEL_POS_BR_MECANUM = frc::Translation2d(-25.75_in/2, -18.75_in/2);
+
+	const auto WHEEL_EFFECTIVE_DIAMETER_MECANUM = 0.05411255411255412; //meters per motor encoder unint (rotations for us)
+
+
+	//roughly measured on robot
+	const auto WHEEL_POS_FL_TANK = frc::Translation2d( 15.25_in/2,  17.5_in/2);
+	const auto WHEEL_POS_FR_TANK = frc::Translation2d( 15.25_in/2, -17.5_in/2);
+	const auto WHEEL_POS_BL_TANK = frc::Translation2d(-15.25_in/2,  17.5_in/2);
+	const auto WHEEL_POS_BR_TANK = frc::Translation2d(-15.25_in/2, -17.5_in/2);
 };
 
 namespace AutolevelConst {

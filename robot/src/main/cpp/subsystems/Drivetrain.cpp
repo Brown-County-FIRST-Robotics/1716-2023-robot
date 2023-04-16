@@ -46,12 +46,12 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	pigeon.ConfigMountPose(ctre::phoenix::sensors::AxisDirection::PositiveX, ctre::phoenix::sensors::AxisDirection::PositiveZ);
 	odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
 	frc::MecanumDriveWheelPositions{
-				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 	},
-	frc::Pose2d{0_m, 0_m, 180_deg});
+	DrivetrainConst::INITIAL_POSE);
 
 
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
@@ -89,24 +89,25 @@ void Drivetrain::Periodic() {
 		pigeon.Reset();
 		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
 		frc::MecanumDriveWheelPositions{
-				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 			},
-			frc::Pose2d{0_m, 0_m, 180_deg});
+			DrivetrainConst::INITIAL_POSE);
 
 		resetPigeonPos->SetBoolean(false);
 	}
-		odometry.Update(
-			frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
-			frc::MecanumDriveWheelPositions{
-				units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
-				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
-			}
-		);
+
+	odometry.Update(
+		frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+		frc::MecanumDriveWheelPositions{
+			units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+			units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+			units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+			units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
+		}
+	);
 	auto pos=FetchPos();
 	std::cout << "x:" << pos.X().value() << "\ty:" << pos.Y().value() << "\tr:" << pos.Rotation().Degrees().value()  << '\n';
 }

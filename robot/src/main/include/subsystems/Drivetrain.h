@@ -93,17 +93,12 @@ private:
 
 	nt::GenericEntry* resetPigeonPos;
 
-       //these are from the tutorial and do not match our robot.  we're getting away with it for now
-	frc::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
-	frc::Translation2d m_frontRightLocation{0.381_m, -0.381_m};
-	frc::Translation2d m_backLeftLocation{-0.381_m, 0.381_m};
-	frc::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
-
-	// Creating my kinematics object using the wheel locations.
+	// Creating kinematics object using the wheel locations.
 	frc::MecanumDriveKinematics m_kinematics{
-	m_frontLeftLocation, m_frontRightLocation,
-	m_backLeftLocation, m_backRightLocation
-	};
+		DrivetrainConst::WHEEL_POS_FL_MECANUM,
+		DrivetrainConst::WHEEL_POS_FR_MECANUM,
+		DrivetrainConst::WHEEL_POS_BL_MECANUM,
+		DrivetrainConst::WHEEL_POS_BR_MECANUM};
 
 	// Creating my odometry object from the kinematics object. Here,
 	// our starting pose is 5 meters along the long end of the field and in the
@@ -112,12 +107,12 @@ private:
 	m_kinematics,
 	frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
 	frc::MecanumDriveWheelPositions{
-		units::meter_t{frontLeftEncoder.GetPosition()/0.44/42.0},
-		units::meter_t{frontRightEncoder.GetPosition()/0.44/42.0},	
-		units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
-		units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
+		units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+		units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},	
+		units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+		units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 	},
-	frc::Pose2d{0_m, 0_m, 0_rad}};
+	DrivetrainConst::INITIAL_POSE};
 
 
 
