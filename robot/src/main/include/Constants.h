@@ -93,15 +93,15 @@ namespace ArmConst
 	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
 };
 
-
 namespace ArmHeightConst{
 	// {shoulder, elbow}
-	const double FLOOR[2]={124, -40};
+	const double FLOOR[2]={124, -41};
 	const double PORTAL[2]={107, -31};
 	const double MEDIUM[2]={107, -32};
-	const double HIGH[2]={114, -27};
+	const double HIGH[2]={114, -23.5};
 	const double DRIVE[2]={90, -47};
 	const double THRESHOLD = 5;
+	const double HIGHCUBE[2]={114, -27};
 };
 
 namespace AutonomousConst
