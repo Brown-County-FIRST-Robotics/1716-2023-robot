@@ -50,16 +50,16 @@ namespace ArmConst
 	const double ELBOW_MAX_OUTPUT = 1;
 
 	//manual control
-	const double ELBOW_MANUAL_SPEED = 2.5;
+	const double ELBOW_MANUAL_SPEED = 3;
 	const double SHOULDER_MANUAL_SPEED = 30;
 
 	//PID
 	const double SHOULDER_P = 0.2;
 
-	const double ELBOW_P = 0.0002;
-	const double ELBOW_I = 0;//5e-7;
+	const double ELBOW_P = 0.00003;
+	const double ELBOW_I = 0;//2e-6;
 	const double ELBOW_D = 0.0;
-	const double ELBOW_FEED_FORWARD = 0; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
+	const double ELBOW_FEED_FORWARD = 0.0002; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
 
 	const double ELBOW_ARBITRARY_FEED_FORWARD = 1.0;
 
@@ -79,9 +79,9 @@ namespace ArmConst
 
 	//Smartmotion:
 	const double CLOSED_LOOP_ERROR = 1.0;
-	const int MAX_VELOCITY = 2000; //RPM
-	const int MIN_VELOCITY = 15; //RPM
-	const int MAX_ACCEL = 6000; //RPM^2
+	const int MAX_VELOCITY = 5000; //RPM
+	const int MIN_VELOCITY = 0; //RPM
+	const int MAX_ACCEL = 2000; //RPM^2
 	const double ELBOW_ROTAIONS_TO_ANGLE_RATIO = (12.75 * (64.0 / 14.0)) / 360;
 
 	//shoulder misc.
