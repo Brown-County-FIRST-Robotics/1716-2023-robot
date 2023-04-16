@@ -1,7 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "subsystems/Arm.h"
-#include <frc/SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <iostream>
 #include <cmath>
 

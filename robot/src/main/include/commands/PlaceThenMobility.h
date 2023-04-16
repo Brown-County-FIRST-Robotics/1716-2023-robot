@@ -5,7 +5,7 @@
 
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
-#include "commands/Autobalance.h"
+#include "commands/AutoBalance.h"
 
 
 class PlaceThenMobility : public frc2::CommandHelper<frc2::SequentialCommandGroup, PlaceThenMobility> {
