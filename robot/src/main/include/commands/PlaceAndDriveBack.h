@@ -5,7 +5,7 @@
 
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
-#include "commands/Autobalance.h"
+#include "commands/AutoBalance.h"
 #include "commands/DriveForwardThenBalance.h"
 
 
