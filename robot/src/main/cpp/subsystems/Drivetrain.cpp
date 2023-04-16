@@ -51,7 +51,7 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
 				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
 	},
-	frc::Pose2d{0_m, 0_m, 0_rad});
+	frc::Pose2d{0_m, 0_m, 180_deg});
 
 
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
@@ -94,7 +94,7 @@ void Drivetrain::Periodic() {
 				units::meter_t{backLeftEncoder.GetPosition()/0.44/42.0},
 				units::meter_t{backRightEncoder.GetPosition()/0.44/42.0}
 			},
-			frc::Pose2d{0_m, 0_m, 0_rad});
+			frc::Pose2d{0_m, 0_m, 180_deg});
 
 		resetPigeonPos->SetBoolean(false);
 	}
@@ -117,7 +117,7 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
-				pigeon.GetRotation2d().operator*(-1));
+				FetchPos().Rotation().operator*(-1));
 	}
 	else { //don't strafe in traction mode
 		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
