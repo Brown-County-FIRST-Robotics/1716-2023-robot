@@ -24,6 +24,8 @@ namespace DrivetrainConst {
 	const int SOLENOID_ID[2] = {0, 1};
 
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
+	const auto TANK_MODE = frc::DoubleSolenoid::Value::kForward;
+	const auto MECH_MODE = frc::DoubleSolenoid::Value::kReverse;
 };
 
 namespace AutolevelConst {

@@ -36,7 +36,7 @@ public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
 	void UpdateControllerLogging();
-
+	void Init();
 private:
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};

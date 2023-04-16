@@ -52,6 +52,10 @@ RobotContainer::RobotContainer() {
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
+void RobotContainer::Init(){
+	drivetrain.SetSolenoid(DrivetrainConst::MECH_MODE);
+}
+
 void RobotContainer::ConfigureButtonBindings() {
 	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid

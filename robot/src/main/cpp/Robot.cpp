@@ -133,7 +133,7 @@ void Robot::AutonomousInit() {
 	if (autonomousCommand != nullptr) {
 		autonomousCommand->Schedule();
 	}
-
+	robotContainer.Init();
 	//Networktables variable update
 	isAutonomous.Set(true);
 }
@@ -151,6 +151,7 @@ void Robot::TeleopInit() {
 
 	//Controller logging
 	frc::Shuffleboard::StartRecording();
+	robotContainer.Init();
 }
 
 void Robot::TeleopPeriodic() {
