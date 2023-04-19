@@ -20,6 +20,8 @@
   - Actually review the pull requests instead of clicking approve and moving on
   - Don't treat another branch like main; just use main
   - potential idea: Have "file owners"; people who must approve any PR with changes to those files
+- candy in pit?
+- use butterfly
 
 
 ## off season
