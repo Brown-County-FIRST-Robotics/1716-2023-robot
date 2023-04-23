@@ -2,12 +2,12 @@
 
 #include <utility>
 
-TeleopDrive::TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
+TeleopDrive::TeleopDrive(Drivetrain* drive, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
 	std::function<bool()> activateBrake, std::function<bool()> deactivateBrake, std::function<bool()> headlessToggle) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), 
+	: drivetrain(drive), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), 
 	startBrake(std::move(activateBrake)), stopBrake(std::move(deactivateBrake)), headlessButton(std::move(headlessToggle))
 {
-	AddRequirements(subsystem);
+	AddRequirements(drive);
 }
 
 void TeleopDrive::Execute() {
