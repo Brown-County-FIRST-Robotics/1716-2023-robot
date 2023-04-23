@@ -13,7 +13,6 @@
 #include "subsystems/Arm.h"
 #include "commands/DriveForwardThenBalance.h"
 #include "commands/PlaceAndDriveBack.h"
-#include "commands/RasPiDrive.h"
 #include "commands/PlaceThenMobility.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
@@ -26,10 +25,6 @@ public:
 	explicit DriveForward(Drivetrain* drive);
 };
 
-class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
-public:
-	explicit RasPiAutonomous(Drivetrain* drive, Arm* arm);
-};
 
 class RobotContainer {
 public:
@@ -59,7 +54,6 @@ private:
 	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};
-	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
 	PlaceAndDriveBack place{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
 

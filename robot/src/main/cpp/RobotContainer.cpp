@@ -19,8 +19,6 @@ RobotContainer::RobotContainer() {
 	InitControllerLogging();
 
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
-	driveTable = networkTableInst.GetTable("1716Drive");
-	startAutoBalance = driveTable->GetBooleanTopic("startAutoBalance").GetEntry(false);
 
 	ConfigureButtonBindings();
 	
@@ -44,7 +42,6 @@ RobotContainer::RobotContainer() {
 	//Autonomous:
 	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
 	autonomousChooser.AddOption("Drive Forward", &driveForward);
-	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
 	autonomousChooser.AddOption("Place", &place);
 	autonomousChooser.AddOption("Place then leave community", &placeMob);
@@ -119,11 +116,4 @@ DriveForward::DriveForward(Drivetrain* subsystem)
 			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(0.2, 0, 0);}, 
 				[subsystem] { subsystem->Drive(0, 0, 0); }, {subsystem}) //command that backs up
 		));
-}
-
-RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem, Arm* arm)
-{
-	AddCommands(
-		RasPiDrive(subsystem, arm, true)
-	);
 }
