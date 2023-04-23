@@ -10,8 +10,8 @@ PlaceThenMobility::PlaceThenMobility(Drivetrain* drive, Arm* arm)
 	AddCommands(
 		frc2::FunctionalCommand(
 			[arm] {
-				arm->SetElbowGoal(ArmHeightConst::HIGH[1]);
-				arm->SetShoulderGoal(ArmHeightConst::HIGH[0]);
+				arm->SetElbowGoal(ArmHeightConst::HIGHCUBE[1]);
+				arm->SetShoulderGoal(ArmHeightConst::HIGHCUBE[0]);
 				arm->SetClaw(ArmConst::CLAW_CLOSED);
 			}, 
 			[]{}, // No execute function 

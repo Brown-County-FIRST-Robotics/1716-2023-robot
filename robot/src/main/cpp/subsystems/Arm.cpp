@@ -91,6 +91,8 @@ void Arm::Periodic() {
 	}
 
 
+	//std::cout << "elbow:" << elbow.GetAppliedOutput() << "  " <<  elbow.GetOutputCurrent() << std::endl;
+
 //TEMP CODE: LIMIT SWITH TESTING
 	// frc::SmartDashboard::PutBoolean("Elbow out limit", elbowInLimit.Get());
 	// frc::SmartDashboard::PutBoolean("Elbow in limit", elbowOutLimit.Get());
@@ -104,7 +106,7 @@ void Arm::Periodic() {
 	//std::cout << "Shoulder Goal: " << shoulderPid.GetSetpoint() << "\n";
 	//std::cout << "Shoulder Position: " << GetShoulderPosition() << "\n";
 	//std::cout << "Elbow Goal: " << elbowGoal << "\n";
-	std::cout << "Version: 12\n";
+	//std::cout << "Version: 12\n";
 	//std::cout << elbowPid.GetFF() << "\n";
 
 
@@ -118,7 +120,7 @@ void Arm::Periodic() {
 	else if (!elbowOutLimit.Get())
 		touchingOutLimit = false;
 
-	std::cout << "Elbo raw:" << elbowEncoder.GetPosition() << '\n';
+	//std::cout << "Elbo raw:" << elbowEncoder.GetPosition() << '\n';
 	if (elbowInLimit.Get() && !touchingInLimit) {
 		elbowGoal = ArmConst::ELBOW_IN_LIMIT_POS * ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO;
 		elbowEncoder.SetPosition(elbowGoal);
@@ -233,7 +235,7 @@ void Arm::SetStowing(bool stowing) {
 double Arm::GetElbowAngleToGround() {
 	double angle = ((elbowEncoder.GetPosition() / ArmConst::ELBOW_ROTAIONS_TO_ANGLE_RATIO) + 301.0) - (GetShoulderPosition() - 90.0);
 		//arm straight down is 0 and arm sticking out is 90
-	std::cout << "Elbow angle from ground: " << angle << "\n";
+	//std::cout << "Elbow angle from ground: " << angle << "\n";
 	return angle;
 }
 
