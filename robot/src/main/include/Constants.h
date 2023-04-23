@@ -3,6 +3,7 @@
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
 #include <frc/DoubleSolenoid.h>
+#include <frc/geometry/Pose2d.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -24,6 +25,27 @@ namespace DrivetrainConst {
 	const int SOLENOID_ID[2] = {0, 1};
 
 	const int ACCELERATION_CAP = 3; //the acceleration cap in joystick units/second, higher is faster
+	const auto TANK_MODE = frc::DoubleSolenoid::Value::kForward;
+	const auto MECH_MODE = frc::DoubleSolenoid::Value::kReverse;
+
+	//should actually change based on which auto is selected
+	const auto INITIAL_POSE = frc::Pose2d(0_m, 0_m, 180_deg);
+
+
+	//roughly measured on robot
+	const auto WHEEL_POS_FL_MECANUM = frc::Translation2d( 25.75_in/2,  18.75_in/2);
+	const auto WHEEL_POS_FR_MECANUM = frc::Translation2d( 25.75_in/2, -18.75_in/2);
+	const auto WHEEL_POS_BL_MECANUM = frc::Translation2d(-25.75_in/2,  18.75_in/2);
+	const auto WHEEL_POS_BR_MECANUM = frc::Translation2d(-25.75_in/2, -18.75_in/2);
+
+	const auto WHEEL_EFFECTIVE_DIAMETER_MECANUM = 0.05411255411255412; //meters per motor encoder unint (rotations for us)
+
+
+	//roughly measured on robot
+	const auto WHEEL_POS_FL_TANK = frc::Translation2d( 15.25_in/2,  17.5_in/2);
+	const auto WHEEL_POS_FR_TANK = frc::Translation2d( 15.25_in/2, -17.5_in/2);
+	const auto WHEEL_POS_BL_TANK = frc::Translation2d(-15.25_in/2,  17.5_in/2);
+	const auto WHEEL_POS_BR_TANK = frc::Translation2d(-15.25_in/2, -17.5_in/2);
 };
 
 namespace AutolevelConst {
@@ -48,17 +70,16 @@ namespace ArmConst
 	const double ELBOW_MAX_OUTPUT = 1;
 
 	//manual control
-	const double SHOULDER_JOYSTICK_SPEED = 20;
-	const double ELBOW_MANUAL_SPEED = 2.5;
-	const double SHOULDER_MANUAL_SPEED = 10;
+	const double ELBOW_MANUAL_SPEED = 3;
+	const double SHOULDER_MANUAL_SPEED = 30;
 
 	//PID
-	const double SHOULDER_P = 0.04;
+	const double SHOULDER_P = 0.2;
 
-	const double ELBOW_P = 0.0002;
-	const double ELBOW_I = 0;//5e-7;
+	const double ELBOW_P = 0.00003;
+	const double ELBOW_I = 0;//2e-6;
 	const double ELBOW_D = 0.0;
-	const double ELBOW_FEED_FORWARD = 0; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
+	const double ELBOW_FEED_FORWARD = 0.0002; //this is direct feed forward of the setpoint, NOT a constant for the arbitrary feed forward!
 
 	const double ELBOW_ARBITRARY_FEED_FORWARD = 1.0;
 
@@ -78,9 +99,9 @@ namespace ArmConst
 
 	//Smartmotion:
 	const double CLOSED_LOOP_ERROR = 1.0;
-	const int MAX_VELOCITY = 2000; //RPM
-	const int MIN_VELOCITY = 15; //RPM
-	const int MAX_ACCEL = 6000; //RPM^2
+	const int MAX_VELOCITY = 5000; //RPM
+	const int MIN_VELOCITY = 0; //RPM
+	const int MAX_ACCEL = 2000; //RPM^2
 	const double ELBOW_ROTAIONS_TO_ANGLE_RATIO = (12.75 * (64.0 / 14.0)) / 360;
 
 	//shoulder misc.
@@ -92,15 +113,15 @@ namespace ArmConst
 	const frc::DoubleSolenoid::Value CLAW_CLOSED = frc::DoubleSolenoid::kReverse;
 };
 
-
 namespace ArmHeightConst{
 	// {shoulder, elbow}
-	const double FLOOR[2]={124, -40};
+	const double FLOOR[2]={124, -41};
 	const double PORTAL[2]={107, -31};
 	const double MEDIUM[2]={107, -32};
-	const double HIGH[2]={114, -27};
+	const double HIGH[2]={114, -23.5};
 	const double DRIVE[2]={90, -47};
 	const double THRESHOLD = 5;
+	const double HIGHCUBE[2]={114, -27};
 };
 
 namespace AutonomousConst

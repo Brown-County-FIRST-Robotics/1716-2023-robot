@@ -43,10 +43,14 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
 	autonomousChooser.AddOption("Drive Forward", &driveForward);
 	autonomousChooser.AddOption("Nothing", &nothing);
-	autonomousChooser.AddOption("Place", &place);
+	autonomousChooser.AddOption("Place And Balance", &placeAndBalance);
 	autonomousChooser.AddOption("Place then leave community", &placeMob);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
+}
+
+void RobotContainer::Init(){
+	drivetrain.SetSolenoid(DrivetrainConst::MECH_MODE);
 }
 
 void RobotContainer::ConfigureButtonBindings() {

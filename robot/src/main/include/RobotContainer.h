@@ -31,7 +31,7 @@ public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
 	void UpdateControllerLogging();
-
+	void Init();
 private:
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};
@@ -54,7 +54,7 @@ private:
 	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};
-	PlaceAndDriveBack place{&drivetrain, &arm};
+	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
 
 	//Controller logging
