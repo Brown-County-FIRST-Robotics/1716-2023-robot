@@ -61,9 +61,6 @@ void RobotContainer::ConfigureButtonBindings() {
 	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
 	 	//Auto balancing
 
-	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
-		.OnTrue(AutoBalance(&drivetrain)
-	 	.Until([this] { return !startAutoBalance.Get() || controller.GetBackButtonPressed(); }));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command

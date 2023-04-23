@@ -44,8 +44,6 @@ private:
 	void ConfigureButtonBindings();
 
 	nt::NetworkTableInstance networkTableInst;
-	std::shared_ptr<nt::NetworkTable> driveTable;
-	nt::BooleanEntry startAutoBalance;
 
 	void InitControllerLogging();
 

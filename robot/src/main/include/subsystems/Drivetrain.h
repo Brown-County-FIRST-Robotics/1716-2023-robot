@@ -48,7 +48,7 @@ public:
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
 
-	double GetEncoder(int motorID);
+	std::vector<double> GetEncoder();
 	void ResetEncoders();
 
 private:
@@ -76,21 +76,6 @@ private:
 	//Networktables:
 	nt::NetworkTableInstance networkTableInst;
 
-	std::shared_ptr<nt::NetworkTable> driveTable;
-	std::shared_ptr<nt::NetworkTable> encoderTable;
-	std::shared_ptr<nt::NetworkTable> pigeonTable;
-	std::shared_ptr<nt::NetworkTable> motorTable;
-
-	nt::FloatPublisher flEncoder;
-	nt::FloatPublisher blEncoder;
-	nt::FloatPublisher frEncoder;
-	nt::FloatPublisher brEncoder;
-	nt::BooleanEntry resetEncodersEntry;
-
-	nt::FloatPublisher yaw;
-	nt::FloatPublisher xAccel;
-	nt::FloatPublisher yAccel;
-
 	nt::GenericEntry* resetPigeonPos;
 
 	// Creating kinematics object using the wheel locations.
@@ -113,10 +98,6 @@ private:
 		units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 	},
 	DrivetrainConst::INITIAL_POSE};
-
-
-
-
 
 
 };
