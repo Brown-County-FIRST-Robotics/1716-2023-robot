@@ -17,6 +17,15 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 
 	//networktables value updates
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	secondsightTable = networkTableInst.GetTable("SecondSight")->GetSubTable("Apriltags");
+	/*
+	This entry has not yet been created in SecondSight
+	{x,y,r,x_std,y_std,r_std, timestamp}
+	x,y,x_std,y_std: cm
+	r,r_std: degrees
+	timestamp: seconds
+	*/
+	aprilEntry = secondsightTable->GetDoubleArrayTopic("field_position").Subscribe({});
 
 	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
 		.Add("Drive Solenoid", false)
@@ -78,6 +87,9 @@ void Drivetrain::Periodic() {
 			units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 		}
 	);
+	auto april=aprilEntry.Get();
+	frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
+	odometry.AddVisionMeasurement(pose, 1_s * april[6], {april[3], april[4], april[5]});
 	auto pos=FetchPos();
 	std::cout << "x:" << pos.X().value() << "\ty:" << pos.Y().value() << "\tr:" << pos.Rotation().Degrees().value()  << '\n';
 }

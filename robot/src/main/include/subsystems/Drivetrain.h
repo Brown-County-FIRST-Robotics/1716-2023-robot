@@ -16,6 +16,7 @@
 #include <frc/PneumaticHub.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/estimator/MecanumDrivePoseEstimator.h>
+#include <networktables/DoubleArrayTopic.h>
 
 
 #include "Constants.h"
@@ -75,6 +76,8 @@ private:
 
 	//Networktables:
 	nt::NetworkTableInstance networkTableInst;
+	std::shared_ptr<nt::NetworkTable> secondsightTable;
+	nt::DoubleArraySubscriber aprilEntry;
 
 	nt::GenericEntry* resetPigeonPos;
 
