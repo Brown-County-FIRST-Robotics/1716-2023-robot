@@ -46,7 +46,7 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	},
 	DrivetrainConst::INITIAL_POSE);
 
-
+	frc::Shuffleboard::GetTab("SmartDashboard").Add("Robot Position", poseSender);
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
 		.Add("Reset Pigeon Position", false)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
@@ -91,7 +91,7 @@ void Drivetrain::Periodic() {
 	frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
 	odometry.AddVisionMeasurement(pose, 1_s * april[6], {april[3], april[4], april[5]});
 	auto pos=FetchPos();
-	std::cout << "x:" << pos.X().value() << "\ty:" << pos.Y().value() << "\tr:" << pos.Rotation().Degrees().value()  << '\n';
+	poseSender.SetRobotPose(pos);
 }
 
 void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented

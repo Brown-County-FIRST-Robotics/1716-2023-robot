@@ -17,6 +17,7 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/estimator/MecanumDrivePoseEstimator.h>
 #include <networktables/DoubleArrayTopic.h>
+#include <frc/smartdashboard/Field2d.h>
 
 
 #include "Constants.h"
@@ -101,6 +102,7 @@ private:
 		units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 	},
 	DrivetrainConst::INITIAL_POSE};
+	frc::Field2d poseSender;
 
 
 };
