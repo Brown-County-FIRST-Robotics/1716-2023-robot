@@ -137,3 +137,13 @@ namespace LEDConst
 	const int UPDATE_SPEED = 2;
 	const int NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS = 7;
 };
+
+namespace AutoConst
+{
+	const double X_PID[3] = {1,1,1}; // TODO: add real values
+	const double Y_PID[3] = {1,1,1}; // TODO: add real values
+	const double THETA_PID[3] = {1,1,1}; // TODO: add real values
+	const double X_TOL = 1; // TODO: add real values(meters)
+	const double Y_TOL = 1; // TODO: add real values(meters)
+	const double THETA_TOL = 1; // TODO: add real values(degrees)
+};
