@@ -8,17 +8,17 @@ void Robot::RobotInit() {
 	//Pickup and placement position selector
 	pickUpPos[0] = pickUpGrid
 		.Add("Drop", false)
-		.WithPosition(0, 0)
+		.WithPosition(3, 0)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.GetEntry();
 	pickUpPos[1] = pickUpGrid
 		.Add("Left Slide", false)
-		.WithPosition(1, 0)
+		.WithPosition(4, 0)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.GetEntry();
 	pickUpPos[2] = pickUpGrid
 		.Add("Right Slide", false)
-		.WithPosition(2, 0)
+		.WithPosition(5, 0)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
 		.GetEntry();
 	

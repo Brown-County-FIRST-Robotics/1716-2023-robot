@@ -27,7 +27,7 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	*/
 	aprilEntry = secondsightTable->GetDoubleArrayTopic("field_position").Subscribe({});
 
-	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
+	solenoidIndicator = frc::Shuffleboard::GetTab("Teleop")
 		.Add("Drive Solenoid", false)
 		.WithSize(2, 2)
 		.WithProperties({
@@ -46,7 +46,7 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	},
 	DrivetrainConst::INITIAL_POSE);
 
-	frc::Shuffleboard::GetTab("SmartDashboard").Add("Robot Position", poseSender);
+	frc::Shuffleboard::GetTab("Pre Match").Add("Robot Position", poseSender);
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
 		.Add("Reset Pigeon Position", false)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)

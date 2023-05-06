@@ -41,14 +41,14 @@ private:
 	nt::DoublePublisher matchTime;
 
 	//Selector for pickup and placement positions
-	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Pick Up")
+	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Teleop")
 		.GetLayout("Pick Up Positions", frc::BuiltInLayouts::kGrid)
 		.WithSize(4, 2)
 		.WithProperties({
 			{"Number of rows", nt::Value::MakeInteger(1)},
 			{"Number of columns", nt::Value::MakeInteger(3)},
 			{"Label Position", nt::Value::MakeString("HIDDEN")}});
-	frc::ShuffleboardLayout& placeGrid = frc::Shuffleboard::GetTab("Place")
+	frc::ShuffleboardLayout& placeGrid = frc::Shuffleboard::GetTab("Teleop")
 		.GetLayout("Placement Positions", frc::BuiltInLayouts::kGrid)
 		.WithSize(10, 4)
 		.WithProperties({

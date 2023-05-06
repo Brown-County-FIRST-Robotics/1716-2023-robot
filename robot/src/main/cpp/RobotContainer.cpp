@@ -46,7 +46,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Place And Balance", &placeAndBalance);
 	autonomousChooser.AddOption("Place then leave community", &placeMob);
 
-	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
+	frc::Shuffleboard::GetTab("Pre Match").Add("Autonomous Routine", &autonomousChooser);
 }
 
 void RobotContainer::Init(){
