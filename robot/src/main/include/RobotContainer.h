@@ -14,6 +14,8 @@
 #include "commands/DriveForwardThenBalance.h"
 #include "commands/PlaceAndDriveBack.h"
 #include "commands/PlaceThenMobility.h"
+#include "commands/LogController.h"
+
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
 public:
@@ -30,7 +32,6 @@ class RobotContainer {
 public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
-	void UpdateControllerLogging();
 	void Init();
 private:
 	frc2::CommandXboxController controller{0};
@@ -45,8 +46,6 @@ private:
 
 	nt::NetworkTableInstance networkTableInst;
 
-	void InitControllerLogging();
-
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
 	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
@@ -54,23 +53,5 @@ private:
 	DriveForward driveForward{&drivetrain};
 	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
-
-	//Controller logging
-	nt::GenericEntry* a;
-	nt::GenericEntry* b;
-	nt::GenericEntry* x;
-	nt::GenericEntry* y;
-	nt::GenericEntry* lb;
-	nt::GenericEntry* rb;
-	nt::GenericEntry* lt;
-	nt::GenericEntry* rt;
-	nt::GenericEntry* pov;
-	nt::GenericEntry* back;
-	nt::GenericEntry* start;
-	nt::GenericEntry* lx;
-	nt::GenericEntry* ly;
-	nt::GenericEntry* rx;
-	nt::GenericEntry* ry;
-	nt::GenericEntry* ls;
-	nt::GenericEntry* rs;
+	LogController controllerLogger{controller}; // Don't log the second controller for now, because we will ditch it later
 };

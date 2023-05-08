@@ -56,6 +56,7 @@ void Robot::RobotInit() {
 	ledChooser.SetDefaultOption("Knight Rider", 0);
 	ledChooser.AddOption("Wierdness", 1);
 	frc::SmartDashboard::PutData("LED Mode", &ledChooser);
+	frc::Shuffleboard::StartRecording();
 }
 
 void Robot::RobotPeriodic() {
@@ -92,13 +93,10 @@ void Robot::TeleopInit() {
 	}
 
 	//Controller logging
-	frc::Shuffleboard::StartRecording();
 	robotContainer.Init();
 }
 
 void Robot::TeleopPeriodic() {
-	//Controller logging
-	robotContainer.UpdateControllerLogging();
 }
 
 void Robot::DisabledInit() {	
