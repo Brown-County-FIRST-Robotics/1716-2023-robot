@@ -9,6 +9,7 @@ class LED : public frc2::SubsystemBase {
 public:
 	LED();
 	void SetAllLeds(int r, int g, int b);
+	void SetAllLeds(std::vector<int> color);
 	void SetLed(int id, int r, int g, int b);
 
 

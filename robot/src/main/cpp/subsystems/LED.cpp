@@ -14,6 +14,11 @@ void LED::SetAllLeds(int r, int g, int b) {
 	}
 }
 
+void LED::SetAllLeds(std::vector<int> color) {
+	SetAllLeds(color[0], color[1], color[2]);
+}
+
+
 void LED::SetLed(int id, int r, int g, int b) {
 	ledBuffer[id].SetRGB(r, g, b);
 }
