@@ -48,25 +48,6 @@ void Robot::RobotInit() {
 			.GetEntry();
 	}
 	
-	//Update networktables info
-	networkTableInst = nt::NetworkTableInstance::GetDefault();
-	dashboardTable = networkTableInst.GetTable("1716DashboardInput");
-	gameInfoTable = networkTableInst.GetTable("1716GameInfo");
-
-	isAutonomous = gameInfoTable->GetBooleanTopic("isAutonomous").Publish();
-	isTeleop = gameInfoTable->GetBooleanTopic("isTeleop").Publish();
-	isRedAlliance = gameInfoTable->GetBooleanTopic("isRedAlliance").Publish();
-	matchTime = gameInfoTable->GetDoubleTopic("matchTime").Publish();
-
-	isRedAlliance.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed);
-	isAutonomous.Set(false);
-	isTeleop.Set(false);
-	matchTime.Set(0);
-
-	//Pickup and place selector
-	pickUpPublisher = dashboardTable->GetIntegerTopic("pickUpPos").Publish();
-	placePublisher = dashboardTable->GetIntegerArrayTopic("placePos").Publish();
-
 	//LED lights:
 	led.SetLength(LEDConst::LENGTH);
 	led.SetData(ledBuffer);
@@ -79,39 +60,6 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {
 	frc2::CommandScheduler::GetInstance().Run();
-
-	//Update matchtime networktables variable
-	matchTime.Set(frc::DriverStation::GetMatchTime());
-
-	//Pickup and place position selectors:
-	//Pick up
-	for (int i = 0; i < 3; i++) {
-		if (pickUpPos[i]->GetBoolean(false) && i != currentPickUp) {
-			if (currentPickUp != -1) {
-				pickUpPos[currentPickUp]->SetBoolean(false);
-			}
-			currentPickUp = i;
-			pickUpPublisher.Set(i + 1);
-		}
-	}
-
-	//Place
-	for (int r = 0; r < 3; r++) {
-		for (int c = 0; c < 9; c++) {
-			if (placePos[r][c]->GetBoolean(false) && (currentPlace[0] != r || currentPlace[1] != c)) {
-				if (currentPlace[r] != -1) {
-					placePos[currentPlace[0]][currentPlace[1]]->SetBoolean(false);
-				}
-				currentPlace[0] = r;
-				currentPlace[1] = c;
-
-				placeCoords.clear();
-				placeCoords.push_back(r + 1);
-				placeCoords.push_back(c + 1);
-				placePublisher.Set(placeCoords); //this builds, DO NOT CHANGE
-			}
-		}
-	}
 
 	//LEDs:
 	ledUpdateSpeedCounter++;
@@ -134,8 +82,6 @@ void Robot::AutonomousInit() {
 		autonomousCommand->Schedule();
 	}
 	robotContainer.Init();
-	//Networktables variable update
-	isAutonomous.Set(true);
 }
 
 void Robot::TeleopInit() {
@@ -144,10 +90,6 @@ void Robot::TeleopInit() {
 		autonomousCommand->Cancel();
     	autonomousCommand = nullptr;
 	}
-
-	//Networktables
-	isAutonomous.Set(false);
-	isTeleop.Set(true);
 
 	//Controller logging
 	frc::Shuffleboard::StartRecording();
@@ -159,10 +101,7 @@ void Robot::TeleopPeriodic() {
 	robotContainer.UpdateControllerLogging();
 }
 
-void Robot::DisabledInit() {
-	//Networktables
-	isTeleop.Set(false);
-	
+void Robot::DisabledInit() {	
 	//Controller Logging
 	frc::Shuffleboard::StopRecording();
 }

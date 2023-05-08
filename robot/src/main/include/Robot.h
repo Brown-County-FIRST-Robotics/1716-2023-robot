@@ -32,13 +32,6 @@ private:
 	frc2::Command* autonomousCommand = nullptr;
 
 	//Update networktable info
-	nt::NetworkTableInstance networkTableInst;
-	std::shared_ptr<nt::NetworkTable> gameInfoTable;
-
-	nt::BooleanPublisher isAutonomous;
-	nt::BooleanPublisher isTeleop;
-	nt::BooleanPublisher isRedAlliance;
-	nt::DoublePublisher matchTime;
 
 	//Selector for pickup and placement positions
 	frc::ShuffleboardLayout& pickUpGrid = frc::Shuffleboard::GetTab("Teleop")
@@ -59,10 +52,6 @@ private:
 	nt::GenericEntry* pickUpPos[3];
 	nt::GenericEntry* placePos[3][9];
 
-	std::shared_ptr<nt::NetworkTable> dashboardTable;
-	nt::IntegerPublisher pickUpPublisher;
-	nt::IntegerArrayPublisher placePublisher;
-	std::vector<int64_t> placeCoords;
 
 	int currentPickUp = -1;
 	int currentPlace[2] = {-1, -1};
