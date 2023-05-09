@@ -128,3 +128,11 @@ void LED::SetDrivetrainMode(frc::DoubleSolenoid::Value mode) {
 	std::erase_if(oscilateColor, [currentColor] (std::vector<int> i) {return i==currentColor;});
 	oscilateColor.push_back(nextColor);
 }
+
+void LED::AddOscilateColor(std::vector<int> color){
+	oscilateColor.push_back(color);
+}
+
+void LED::RemoveOscilateColor(std::vector<int> color) {
+	std::erase_if(oscilateColor, [color] (std::vector<int> i) {return i==color;});
+}
