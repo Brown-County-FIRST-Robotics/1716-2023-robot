@@ -35,6 +35,8 @@ public:
 	frc2::Command* GetAutonomousCommand();
 	void Init();
 private:
+	nt::GenericEntry* placePos[3][9];
+
 	nt::GenericEntry* floorCube;
 	nt::GenericEntry* floorCone;
 	nt::GenericEntry* dsCone;

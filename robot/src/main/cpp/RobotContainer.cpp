@@ -18,11 +18,40 @@ using namespace frc2;
 RobotContainer::RobotContainer() {
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
 
-	floorCone = frc::Shuffleboard::GetTab("Teleop").Add("<floor>", false).WithPosition(11,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
-	floorCube = frc::Shuffleboard::GetTab("Teleop").Add("[floor]", false).WithPosition(10,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
-	dsCone = frc::Shuffleboard::GetTab("Teleop").Add("<ds>", false).WithPosition(11,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
-	dsCube = frc::Shuffleboard::GetTab("Teleop").Add("[ds]", false).WithPosition(10,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	floorCone = frc::Shuffleboard::GetTab("Teleop").Add("<floor>", false).WithPosition(10,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	floorCube = frc::Shuffleboard::GetTab("Teleop").Add("[floor]", false).WithPosition(9,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCone = frc::Shuffleboard::GetTab("Teleop").Add("<ds>", false).WithPosition(10,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCube = frc::Shuffleboard::GetTab("Teleop").Add("[ds]", false).WithPosition(9,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
 
+	placePos[0][0] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(0,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][1] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(1,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][2] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(2,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][3] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(3,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][4] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(4,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][5] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(5,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][6] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(6,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][7] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(7,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][8] = frc::Shuffleboard::GetTab("Teleop").Add("()", false).WithPosition(8,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+	placePos[1][0] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(0,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][1] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(1,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][2] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(2,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][3] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(3,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][4] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(4,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][5] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(5,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][6] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(6,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][7] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(7,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][8] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(8,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+	placePos[2][0] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(0,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][1] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(1,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][2] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(2,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][3] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(3,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][4] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(4,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][5] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(5,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][6] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(6,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][7] = frc::Shuffleboard::GetTab("Teleop").Add("[]", false).WithPosition(7,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][8] = frc::Shuffleboard::GetTab("Teleop").Add("<>", false).WithPosition(8,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
 
 	ConfigureButtonBindings();
 	
