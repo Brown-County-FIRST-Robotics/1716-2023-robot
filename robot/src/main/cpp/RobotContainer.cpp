@@ -18,6 +18,12 @@ using namespace frc2;
 RobotContainer::RobotContainer() {
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
 
+	floorCone = frc::Shuffleboard::GetTab("Teleop").Add("<floor>", false).WithPosition(11,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	floorCube = frc::Shuffleboard::GetTab("Teleop").Add("[floor]", false).WithPosition(10,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCone = frc::Shuffleboard::GetTab("Teleop").Add("<ds>", false).WithPosition(11,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCube = frc::Shuffleboard::GetTab("Teleop").Add("[ds]", false).WithPosition(10,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+
 	ConfigureButtonBindings();
 	
 	drivetrain.SetDefaultCommand(TeleopDrive(&drivetrain, 

@@ -35,6 +35,12 @@ public:
 	frc2::Command* GetAutonomousCommand();
 	void Init();
 private:
+	nt::GenericEntry* floorCube;
+	nt::GenericEntry* floorCone;
+	nt::GenericEntry* dsCone;
+	nt::GenericEntry* dsCube;
+
+
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};
 	
