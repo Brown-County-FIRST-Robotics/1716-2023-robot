@@ -118,3 +118,13 @@ void LED::SetSingleColor(std::vector<int> color) { singleColor=color; }
 std::vector<int> LED::GetSingleColor() { return singleColor; }
 void LED::SetOscilateColor(std::vector<std::vector<int>> colors) { oscilateColor=colors; }
 std::vector<std::vector<int>> LED::GetOscilateColor() { return oscilateColor; }
+void LED::SetDrivetrainMode(frc::DoubleSolenoid::Value mode) {
+	std::vector<int> currentColor = {0,255,0};
+	std::vector<int> nextColor = {255,0,0};
+	if(mode==DrivetrainConst::TANK_MODE){
+		currentColor = {255,0,0};
+		nextColor = {0,255,0};
+	}
+	std::erase_if(oscilateColor, [currentColor] (std::vector<int> i) {return i==currentColor;});
+	oscilateColor.push_back(nextColor);
+}

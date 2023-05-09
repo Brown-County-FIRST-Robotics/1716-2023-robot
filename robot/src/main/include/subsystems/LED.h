@@ -28,6 +28,7 @@ public:
 	std::vector<int> GetSingleColor();
 	
 	void SetOscilateColor(std::vector<std::vector<int>> colors);
+	void SetDrivetrainMode(frc::DoubleSolenoid::Value mode);
 	std::vector<std::vector<int>> GetOscilateColor();
 
 	void Periodic() override;

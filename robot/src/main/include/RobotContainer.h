@@ -9,6 +9,7 @@
 #include <networktables/BooleanTopic.h>
 #include <frc/PneumaticHub.h>
 
+#include "subsystems/LED.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveForwardThenBalance.h"
@@ -41,6 +42,7 @@ private:
 
 	Drivetrain drivetrain{hub};
 	Arm arm{hub};
+	LED led;
 
 	void ConfigureButtonBindings();
 

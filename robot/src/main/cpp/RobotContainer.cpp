@@ -51,9 +51,14 @@ RobotContainer::RobotContainer() {
 void RobotContainer::Init(){
 	drivetrain.SetSolenoid(DrivetrainConst::MECH_MODE);
 }
-
+/*
+purple: cube
+yellow: cone
+red: mech
+green: tank
+*/
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); led.SetDrivetrainMode(drivetrain.GetSolenoid());}, {&drivetrain, &led}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
