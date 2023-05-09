@@ -18,23 +18,35 @@ void LED::SetAllLeds(std::vector<int> color) {
 	SetAllLeds(color[0], color[1], color[2]);
 }
 
-
 void LED::SetLed(int id, int r, int g, int b) {
 	ledBuffer[id].SetRGB(r, g, b);
 }
 
 void LED::Periodic() {
 	ledUpdateSpeedCounter++;
-	// TODO: add this later
-	/*if (ledUpdateSpeedCounter > LEDConst::UPDATE_SPEED) {
-		if (ledChooser.GetSelected() == 0)
+	if (ledUpdateSpeedCounter > LEDConst::UPDATE_SPEED) {
+		if (ledStatus == LedStatus::KNIGHT_RIDER)
 			KnightRider();
-		else if (ledChooser.GetSelected() == 1)
+		else if (ledStatus == LedStatus::WEIRDNESS)
 			Weirdness();
-	}*/
-
-		led.SetData(ledBuffer);
 		ledUpdateSpeedCounter = 0;
+	}
+	if (ledStatus == LedStatus::OSCILATE){
+		if(oscilateTimer==0)
+			SetAllLeds(oscilateColor[oscilateInd]);
+		oscilateTimer++;
+		if(oscilateTimer==LEDConst::OSCILATION_SPEED){
+			oscilateTimer=0;
+			oscilateInd++;
+		}
+		if(oscilateInd==oscilateColor.size())
+			oscilateInd=0;
+	}
+	if (ledStatus == LedStatus::SINGLE_COLOR)
+		SetAllLeds(singleColor);
+	if (ledStatus == LedStatus::NONE)
+		SetAllLeds(0,0,0);
+	led.SetData(ledBuffer);
 }
 
 
@@ -98,3 +110,11 @@ void LED::Weirdness() {
 		led.SetData(ledBuffer);
 	}
 }
+
+
+void LED::SetLedStatus(int status) { ledStatus=status; }
+int LED::GetLedStatus() { return ledStatus; }
+void LED::SetSingleColor(std::vector<int> color) { singleColor=color; }
+std::vector<int> LED::GetSingleColor() { return singleColor; }
+void LED::SetOscilateColor(std::vector<std::vector<int>> colors) { oscilateColor=colors; }
+std::vector<std::vector<int>> LED::GetOscilateColor() { return oscilateColor; }

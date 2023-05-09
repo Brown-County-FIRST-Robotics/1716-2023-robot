@@ -136,6 +136,7 @@ namespace LEDConst
 	const int ID = 9;
 	const int UPDATE_SPEED = 2;
 	const int NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS = 7;
+	const int OSCILATION_SPEED = 20;
 };
 
 namespace AutoConst
