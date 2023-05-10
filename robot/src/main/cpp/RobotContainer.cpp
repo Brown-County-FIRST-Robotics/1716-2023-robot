@@ -99,7 +99,17 @@ void RobotContainer::ConfigureButtonBindings() {
 
 	//Drive modes
 	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
-	 	//Auto balancing
+	
+	for(int row=0;row<3;row++){
+		for(int col=0;col<10;col++){
+			frc2::Trigger([this, row, col] { return placePos[row][col]->GetBoolean(false); }).OnTrue(
+				frc2::SequentialCommandGroup(
+					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(false); }, {}),
+					PlacePiece(&drivetrain, &arm, &led, row, col)
+				).ToPtr()
+			);
+		}
+	}
 
 }
 

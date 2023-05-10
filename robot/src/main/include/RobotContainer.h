@@ -16,6 +16,7 @@
 #include "commands/PlaceAndDriveBack.h"
 #include "commands/PlaceThenMobility.h"
 #include "commands/LogController.h"
+#include "commands/PlacePiece.h"
 
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
