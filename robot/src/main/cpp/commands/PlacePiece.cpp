@@ -13,7 +13,7 @@ PlacePiece::PlacePiece(Drivetrain* drive, Arm* arm, LED* led, int height, int co
             },
             {drive, led, arm}
         ), 
-        DriveToPoint(drive, AutoConst::poses[col]),
+        DriveToPoint(drive, AutoConst::POSES[col]),
         frc2::InstantCommand([drive, led, arm] {
             led->RemoveOscilateColor({0,0,255});
             arm->SetClaw(ArmConst::CLAW_OPEN);

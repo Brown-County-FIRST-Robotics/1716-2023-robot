@@ -14,6 +14,18 @@ DriveToPoint::DriveToPoint(Drivetrain* drive, frc::Pose2d drive_to)
 	thetaPID.SetTolerance(AutoConst::THETA_TOL);
 }
 
+DriveToPoint::DriveToPoint(Drivetrain* drive, const double pos[3])
+	: drivetrain(drive), dest(pos[0]*1_m,pos[1]*1_m,frc::Rotation2d(pos[2]*1_deg))
+{
+	AddRequirements(drive);
+	xPID.SetSetpoint(dest.X().value());
+	yPID.SetSetpoint(dest.Y().value());
+	thetaPID.SetSetpoint(0);
+	xPID.SetTolerance(AutoConst::X_TOL);
+	yPID.SetTolerance(AutoConst::Y_TOL);
+	thetaPID.SetTolerance(AutoConst::THETA_TOL);
+}
+
 void DriveToPoint::Execute() {
 	auto pos = drivetrain->FetchPos();
 	auto rot=pos.Rotation().Degrees().value()-dest.Rotation().Degrees().value();

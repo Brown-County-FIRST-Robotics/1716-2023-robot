@@ -9,6 +9,7 @@
 class DriveToPoint : public frc2::CommandHelper<frc2::CommandBase, DriveToPoint> {
 public:
 	explicit DriveToPoint(Drivetrain* drive, frc::Pose2d drive_to);
+	explicit DriveToPoint(Drivetrain* drive, const double drive_to[3]);
 
 	void Execute() override;
 	

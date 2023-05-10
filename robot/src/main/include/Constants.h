@@ -147,15 +147,19 @@ namespace AutoConst
 	const double X_TOL = 1; // TODO: add real values(meters)
 	const double Y_TOL = 1; // TODO: add real values(meters)
 	const double THETA_TOL = 1; // TODO: add real values(degrees)
-	frc::Pose2d poses[9]={
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg)),
-		frc::Pose2d(1.0_m,1.0_m,frc::Rotation2d(1.0_deg))
-	}; // TODO: add real values and make it constant
+	// x and y are meters, theta is degrees
+	//   X  Y  Theta
+	const double POSES[9][3] = {
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1}
+	};
+
+	 // TODO: add real values, and figure out why this can't be a constant
 };
