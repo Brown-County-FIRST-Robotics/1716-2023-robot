@@ -91,6 +91,7 @@ purple: cube
 yellow: cone
 red: mech
 green: tank
+blue: auto
 */
 void RobotContainer::ConfigureButtonBindings() {
 	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); led.SetDrivetrainMode(drivetrain.GetSolenoid());}, {&drivetrain, &led}).ToPtr());
