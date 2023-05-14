@@ -20,7 +20,6 @@ public:
 private:
 	Drivetrain* drivetrain;
 	frc::Pose2d dest;
-	frc::PIDController xPID{AutoConst::X_PID[0], AutoConst::X_PID[1], AutoConst::X_PID[2]}; // TODO: use ramsete controller
-	frc::PIDController yPID{AutoConst::Y_PID[0], AutoConst::Y_PID[1], AutoConst::Y_PID[2]};
+	frc::PIDController distPID{AutoConst::DIST_PID[0], AutoConst::DIST_PID[1], AutoConst::DIST_PID[2]};
 	frc::PIDController thetaPID{AutoConst::THETA_PID[0], AutoConst::THETA_PID[1], AutoConst::THETA_PID[2]};
 };

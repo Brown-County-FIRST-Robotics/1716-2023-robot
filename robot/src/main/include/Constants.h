@@ -141,11 +141,9 @@ namespace LEDConst
 
 namespace AutoConst
 {
-	const double X_PID[3] = {1,1,1}; // TODO: add real values
-	const double Y_PID[3] = {1,1,1}; // TODO: add real values
-	const double THETA_PID[3] = {1,1,1}; // TODO: add real values
-	const double X_TOL = 1; // TODO: add real values(meters)
-	const double Y_TOL = 1; // TODO: add real values(meters)
+	const double DIST_PID[3] = {-1,1,1}; // TODO: add real values
+	const double THETA_PID[3] = {-0.001,0.000001,0.000001}; // TODO: add real values
+	const double DIST_TOL = 1; // TODO: add real values(meters)
 	const double THETA_TOL = 1; // TODO: add real values(degrees)
 	// x and y are meters, theta is degrees
 	//   X  Y  Theta
@@ -161,6 +159,5 @@ namespace AutoConst
 		{610*30/12000, 42*30/12000, 0},
 		
 	};
-
-	 // TODO: add real values, and figure out why this can't be a constant
+	 // TODO: add real values
 };

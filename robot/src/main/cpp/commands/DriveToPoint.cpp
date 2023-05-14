@@ -6,11 +6,9 @@ DriveToPoint::DriveToPoint(Drivetrain* drive, frc::Pose2d drive_to)
 	: drivetrain(drive), dest(drive_to)
 {
 	AddRequirements(drive);
-	xPID.SetSetpoint(dest.X().value());
-	yPID.SetSetpoint(dest.Y().value());
+	distPID.SetSetpoint(0);
 	thetaPID.SetSetpoint(0);
-	xPID.SetTolerance(AutoConst::X_TOL);
-	yPID.SetTolerance(AutoConst::Y_TOL);
+	distPID.SetTolerance(AutoConst::DIST_TOL);
 	thetaPID.SetTolerance(AutoConst::THETA_TOL);
 }
 
@@ -18,11 +16,9 @@ DriveToPoint::DriveToPoint(Drivetrain* drive, const double pos[3])
 	: drivetrain(drive), dest(pos[0]*1_m,pos[1]*1_m,frc::Rotation2d(pos[2]*1_deg))
 {
 	AddRequirements(drive);
-	xPID.SetSetpoint(dest.X().value());
-	yPID.SetSetpoint(dest.Y().value());
+	distPID.SetSetpoint(0);
 	thetaPID.SetSetpoint(0);
-	xPID.SetTolerance(AutoConst::X_TOL);
-	yPID.SetTolerance(AutoConst::Y_TOL);
+	distPID.SetTolerance(AutoConst::DIST_TOL);
 	thetaPID.SetTolerance(AutoConst::THETA_TOL);
 }
 
@@ -34,11 +30,16 @@ void DriveToPoint::Execute() {
 	while (rot < 0.0)
 		rot += 360.0;
 
-	drivetrain->Drive(yPID.Calculate(pos.Y().value()), xPID.Calculate(pos.X().value()), thetaPID.Calculate(rot));
+	auto offset = pos-dest;
+	auto ang = atan2(offset.Y().value(), offset.X().value());
+	auto dist = sqrt(offset.X().value()*offset.X().value() + offset.Y().value()*offset.Y().value());
+	auto distOut = distPID.Calculate(dist);
+
+	drivetrain->Drive(distOut*cos(ang), distOut*sin(ang), thetaPID.Calculate(rot));
 }
 
 bool DriveToPoint::IsFinished() {
-	return xPID.AtSetpoint() && yPID.AtSetpoint() && thetaPID.AtSetpoint();
+	return distPID.AtSetpoint() && thetaPID.AtSetpoint();
 }
 
 
