@@ -88,8 +88,10 @@ void Drivetrain::Periodic() {
 		}
 	);
 	auto april=aprilEntry.Get();
-	frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
-	odometry.AddVisionMeasurement(pose, {april[3], april[4], april[5]});
+	if(april.size()==6){ //  TODO: split this up into multiple entries
+		frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
+		odometry.AddVisionMeasurement(pose, frc::Timer::GetFPGATimestamp(),{april[3], april[4], april[5]});
+	}
 	auto pos=FetchPos();
 	poseSender.SetRobotPose(pos);
 }
