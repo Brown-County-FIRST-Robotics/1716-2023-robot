@@ -2,11 +2,10 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/button/CommandXboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
+//#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Commands.h>
 
 #include "subsystems/Drivetrain.h"
-#include "commands/DriveBackThenBalance.h"
 
 class RobotContainer {
 public:
@@ -21,6 +20,5 @@ private:
 	void ConfigureButtonBindings();
 
 	//Autonomous
-	frc::SendableChooser<frc2::Command*> autonomousChooser;
-	DriveBackThenBalance driveBackThenBalance{&drivetrain};
+	//frc::SendableChooser<frc2::Command*> autonomousChooser;
 };

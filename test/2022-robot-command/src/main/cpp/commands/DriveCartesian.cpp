@@ -2,7 +2,9 @@
 
 #include <utility>
 
-DriveCartesian::DriveCartesian(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, std::function<bool()> brake) 
+DriveCartesian::DriveCartesian(Drivetrain* subsystem, 
+	std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
+	std::function<bool()> brake) 
 	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))
 {
 	AddRequirements(subsystem);
@@ -14,18 +16,18 @@ void DriveCartesian::Execute() {
 	zSquare = z() * fabs(z());
 
 	drivetrain->Drive(
-		-CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)), //x must be inverted
+		CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)),
 		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
 		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
 
-	updateBrake(doBrake);
+	UpdateBrake(doBrake);
 }
 
 void DriveCartesian::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 }
 
-void DriveCartesian::updateBrake(std::function<bool()> brake) {
+void DriveCartesian::UpdateBrake(std::function<bool()> brake) {
 	if (brake()) {
 		drivetrain->ActivateBreakMode(true);
 	}

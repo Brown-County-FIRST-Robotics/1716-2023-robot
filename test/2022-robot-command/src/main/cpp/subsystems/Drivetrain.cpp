@@ -1,11 +1,8 @@
 #include "subsystems/Drivetrain.h"
-#include <iostream>
 
 Drivetrain::Drivetrain() {
 	frontRight.SetInverted(true);
 	backRight.SetInverted(true);
-
-	robotDrive.SetSafetyEnabled(false); //delete this later
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
@@ -25,9 +22,4 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 		backLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
 		backRight.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
 	}
-}
-
-double Drivetrain::GetPitch() {
-	return pigeon.GetPitch();
-	std::cout << pigeon.GetPitch();
 }

@@ -4,8 +4,6 @@
 #include <rev/CANSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/filter/SlewRateLimiter.h>
-#include <frc/TimedRobot.h> //units::scalar
-#include <ctre/Phoenix.h>
 
 #include "Constants.h"
 
@@ -23,8 +21,6 @@ public:
 
 	void ActivateBreakMode(bool doBrakeMode);
 
-	double GetPitch();
-
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
@@ -32,6 +28,4 @@ private:
 	rev::CANSparkMax backRight{DrivetrainConst::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
-
-	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEONID};
 };
