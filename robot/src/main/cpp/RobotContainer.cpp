@@ -28,33 +28,41 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetLeftTriggerAxis() > 0.2; },
-		[this] { return controller.GetAButton(); } ));
+		[this] { return controller.GetRightStickButton(); },
+		[this] { return controller.GetLeftStickButton(); },
+		[this] { return controller.GetStartButton(); } ));
 
-	arm.SetDefaultCommand(ArmTeleopControl(&arm, [this] { return controller2.GetRightY(); }, 
-		[this] { return controller2.GetLeftY(); }, [this] { return controller2.GetXButton(); }));
+	arm.SetDefaultCommand(ArmTeleopControl(&arm, 
+		[this] { return controller.GetPOV(); }, 
+		[this] { return controller.GetRightTriggerAxis() > 0.2; },
+		[this] { return controller.GetAButton(); },
+		[this] { return controller.GetBButton(); },
+		[this] { return controller.GetYButton(); },
+		[this] { return controller.GetRightBumper(); },
+		[this] { return controller.GetLeftBumper(); }));
 
 	//Autonomous:
-	autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);
-	autonomousChooser.AddOption("Back Up", &backUp);
-	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiDrive);
+	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
+	autonomousChooser.AddOption("Drive Forward", &driveForward);
+	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
 	autonomousChooser.AddOption("Nothing", &nothing);
+	autonomousChooser.AddOption("Place And Balance", &placeAndBalance);
+	autonomousChooser.AddOption("Place then leave community", &placeMob);
 
 	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
 }
 
+void RobotContainer::Init(){
+	drivetrain.SetSolenoid(DrivetrainConst::MECH_MODE);
+}
+
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetRightTriggerAxis() > .2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
-	controller.B().OnTrue(AutoBalance(&drivetrain)
-	 	.Until([this] { return controller.GetBackButtonPressed(); }));
+	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
 	 	//Auto balancing
-
-	controller.X().OnTrue(RasPiDrive(&drivetrain)
-		.Until([this] { return controller.GetBackButton(); }));
-		//RasPi control
 
 	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
 		.OnTrue(AutoBalance(&drivetrain)
@@ -107,13 +115,19 @@ void RobotContainer::UpdateControllerLogging() {
 
 bool Nothing::IsFinished() { return true; }
 
-BackUp::BackUp(Drivetrain* subsystem)
+DriveForward::DriveForward(Drivetrain* subsystem)
 {
 	AddCommands(
 		frc2::ParallelDeadlineGroup(
-			frc2::WaitCommand(2_s),
-			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(-0.3, 0, 0);}, 
-				[subsystem] { subsystem->Drive(0, 0, 0); }) //command that backs up
-		)
+			frc2::WaitCommand(5_s),
+			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(0.2, 0, 0);}, 
+				[subsystem] { subsystem->Drive(0, 0, 0); }, {subsystem}) //command that backs up
+		));
+}
+
+RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem, Arm* arm)
+{
+	AddCommands(
+		RasPiDrive(subsystem, arm, true)
 	);
 }

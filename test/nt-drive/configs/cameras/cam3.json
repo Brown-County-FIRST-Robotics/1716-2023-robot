@@ -1,0 +1,1 @@
+{"calibration": {"calibrationResolution": [1920, 1080], "cameraMatrix": [[1311.59939, 0, 990.059456],[0, 1322.61327, 547.794290],[0, 0, 1]], "cameraDistortion": [-0.455552042,  0.203378251,  0.0000169027600,-0.00162986898, -0.0466269154], "processingResolution": [640, 480],"captureResolution": [640, 480]}, "role": "*"}

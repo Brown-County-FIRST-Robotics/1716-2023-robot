@@ -17,9 +17,11 @@ class Robot : public frc::TimedRobot {
   void chaser();
   void allOn(int,int,int);
   void allOff();
+  void knightRider();
+  void strobe();
 
  private:
-  static constexpr int kLength = 5;
+  static constexpr int kLength = 300;
 
   // PWM port 9
   // Must be a PWM header, not MXP or DIO
