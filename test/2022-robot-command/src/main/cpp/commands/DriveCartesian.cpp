@@ -4,8 +4,9 @@
 
 DriveCartesian::DriveCartesian(Drivetrain* subsystem, 
 	std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
-	std::function<bool()> brake) 
-	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)), doBrake(std::move(brake))
+	std::function<bool()> brakeButton, std::function<bool()> coastButton, std::function<int()> maxSpeedPov) 
+	: drivetrain(subsystem), x(std::move(forward)), y(std::move(right)), z(std::move(rotation)),
+	doBrake(std::move(brakeButton)), doCoast(std::move(coastButton)), maxSpeedPOV(std::move(maxSpeedPov))
 {
 	AddRequirements(subsystem);
 }
@@ -15,24 +16,43 @@ void DriveCartesian::Execute() {
 	ySquare = y() * fabs(y());
 	zSquare = z() * fabs(z());
 
-	drivetrain->Drive(
-		CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)),
-		CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
-		CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
+	if (fabs(x()) > DrivetrainConst::JOYSTICKDEADZONE || fabs(y()) > DrivetrainConst::JOYSTICKDEADZONE || fabs(z()) > DrivetrainConst::JOYSTICKDEADZONE)
+		drivetrain->Drive(
+			CloserToZero(xSquare, xAccelerationCap.Calculate(xSquare)),
+			CloserToZero(ySquare, yAccelerationCap.Calculate(ySquare)), 
+			CloserToZero(zSquare, zAccelerationCap.Calculate(zSquare)));
+	else
+		drivetrain->Drive(0, 0, 0);
 
-	UpdateBrake(doBrake);
+	UpdateBrake();
+
+	//max speed:
+	if (maxSpeedPOV() == 0 && maxSpeedPOVPrevState != 0) {
+		drivetrain->AddToMaxSpeed(0.1f);
+	}
+	if (maxSpeedPOV() == 180 && maxSpeedPOVPrevState != 180) {
+		drivetrain->AddToMaxSpeed(-0.1f);
+	}
+	maxSpeedPOVPrevState = maxSpeedPOV();
 }
 
 void DriveCartesian::End(bool interrupted) {
 	drivetrain->Drive(0, 0, 0);
 }
 
-void DriveCartesian::UpdateBrake(std::function<bool()> brake) {
-	if (brake()) {
+void DriveCartesian::UpdateBrake() {
+	if (doBrake() && !doBrakePrevState) {
 		drivetrain->ActivateBreakMode(true);
+		doBrakePrevState = true;
 	}
-	else {
+	else if (!doBrake() && doBrakePrevState)
+		doBrakePrevState = false;
+	else if (doCoast() && !doCoastPrevState) {
 		drivetrain->ActivateBreakMode(false);
+		doCoastPrevState = true;
+	}
+	else if (!doCoast() && doCoastPrevState) {
+		doCoastPrevState = false;
 	}
 }
 

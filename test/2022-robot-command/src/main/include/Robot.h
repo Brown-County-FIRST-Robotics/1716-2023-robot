@@ -3,7 +3,7 @@
 #include <frc/TimedRobot.h>
 #include <frc2/command/Command.h>
 
-//#include "RobotContainer.h"
+#include "RobotContainer.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -12,6 +12,6 @@ class Robot : public frc::TimedRobot {
 	// void TeleopInit() override;
 	
 private:
-	//RobotContainer robotContainer;
+	RobotContainer robotContainer;
 	//frc2::Command* autonomousCommand = nullptr;
 };

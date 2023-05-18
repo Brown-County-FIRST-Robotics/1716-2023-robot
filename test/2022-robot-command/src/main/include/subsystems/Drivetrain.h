@@ -21,6 +21,8 @@ public:
 
 	void ActivateBreakMode(bool doBrakeMode);
 
+	void AddToMaxSpeed(float amountToAdd);
+
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONTLEFTID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{DrivetrainConst::FRONTRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
@@ -28,4 +30,6 @@ private:
 	rev::CANSparkMax backRight{DrivetrainConst::BACKRIGHTID, rev::CANSparkMax::MotorType::kBrushless};
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
+
+	float maxSpeed = 0.3;
 };

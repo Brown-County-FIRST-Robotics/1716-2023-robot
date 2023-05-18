@@ -11,7 +11,9 @@ RobotContainer::RobotContainer() {
 		[this] { return -controller.GetLeftY(); }, 
 		[this] { return controller.GetLeftX(); }, 
 		[this] { return controller.GetRightX(); },
-		[this] { return controller.GetBButton(); } ));
+		[this] { return controller.GetBButton(); },
+		[this] { return controller.GetAButton(); },
+		[this] { return controller.GetPOV(); } ));
 
 	//Autonomous:
 	//autonomousChooser.SetDefaultOption("Drive Back and Auto-level", &driveBackThenBalance);

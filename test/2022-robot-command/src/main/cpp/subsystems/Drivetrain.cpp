@@ -6,7 +6,7 @@ Drivetrain::Drivetrain() {
 }
 
 void Drivetrain::Drive(double x, double y, double z) {
-	robotDrive.DriveCartesian(x, y, z);
+	robotDrive.DriveCartesian(x * maxSpeed, y * maxSpeed, z * maxSpeed);
 }
 
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
@@ -22,4 +22,9 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 		backLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
 		backRight.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
 	}
+}
+
+void Drivetrain::AddToMaxSpeed(float amountToAdd) {
+	if (maxSpeed + amountToAdd >= 0 || maxSpeed + amountToAdd <= 1)
+		maxSpeed += amountToAdd;
 }

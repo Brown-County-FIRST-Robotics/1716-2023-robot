@@ -10,14 +10,14 @@ class DriveCartesian : public frc2::CommandHelper<frc2::CommandBase, DriveCartes
 public:
 	explicit DriveCartesian(Drivetrain* subsystem, 
 		std::function<double()> verticalAxis, std::function<double()> horizontalAxis, std::function<double()> rotationAxis, 
-		std::function<bool()> brakeButton);
+		std::function<bool()> brakeButton, std::function<bool()> coastButton, std::function<int()> maxSpeedPov);
 
 	void Execute() override;
 	
 	void End(bool interrupted) override;
 
 private:
-	void UpdateBrake(std::function<bool()> brake);
+	void UpdateBrake();
 	double CloserToZero(double value1, double value2);
 
 	Drivetrain* drivetrain;
@@ -26,6 +26,9 @@ private:
 	std::function<double()> z;
 
 	std::function<bool()> doBrake;
+	bool doBrakePrevState;
+	std::function<bool()> doCoast;
+	bool doCoastPrevState;
 
 	double xSquare;
 	double ySquare;
@@ -34,4 +37,7 @@ private:
 	frc::SlewRateLimiter<units::scalar> xAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
 	frc::SlewRateLimiter<units::scalar> yAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
 	frc::SlewRateLimiter<units::scalar> zAccelerationCap{DrivetrainConst::ACCELERATIONCAP / 1_s};
+
+	std::function<int()> maxSpeedPOV;
+	int maxSpeedPOVPrevState = -1;
 };

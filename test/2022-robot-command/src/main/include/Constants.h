@@ -7,4 +7,6 @@ namespace DrivetrainConst {
 	const int BACKRIGHTID = 4;
 	
 	const int ACCELERATIONCAP = 3; //the acceleration cap in joystick units/second, higher is faster
+
+	const float JOYSTICKDEADZONE = 0.07f;
 };
