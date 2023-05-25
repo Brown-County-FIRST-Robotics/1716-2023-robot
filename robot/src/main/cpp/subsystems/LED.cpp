@@ -107,7 +107,7 @@ void LED::Weirdness() {
 
 	for (int i = 0; i < LEDConst::LENGTH / 2; i += 2) {
 		SetLed(i, r, g, b);
-		led.SetData(ledBuffer);
+		//led.SetData(ledBuffer);
 	}
 }
 

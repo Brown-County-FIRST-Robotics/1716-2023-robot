@@ -104,7 +104,7 @@ void RobotContainer::ConfigureButtonBindings() {
 		for(int col=0;col<10;col++){
 			frc2::Trigger([this, row, col] { return placePos[row][col]->GetBoolean(false); }).OnTrue(
 				frc2::SequentialCommandGroup(
-					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(false); }, {}),
+					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(true); }, {}),
 					PlacePiece(&drivetrain, &arm, &led, row, col)
 				).ToPtr()
 			);
