@@ -2,9 +2,6 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -18,13 +15,6 @@ public class DriveCartesian extends CommandBase {
     DoubleSupplier y;
     DoubleSupplier z;
 
-    BooleanSupplier doBrake;
-    boolean doBrakePrevState = false;
-    BooleanSupplier doCoast;
-    boolean doCoastPrevState = false;
-
-    IntSupplier pov;
-
     double xSquare;
     double ySquare;
     double zSquare;
@@ -33,10 +23,11 @@ public class DriveCartesian extends CommandBase {
     SlewRateLimiter yAccelerationCap;
     SlewRateLimiter zAccelerationCap;
 
+    BooleanSupplier povLeft; //whether the POV is pressed towards the left
+
     public DriveCartesian(Drivetrain drivetrain_p, 
         DoubleSupplier forward, DoubleSupplier right, DoubleSupplier rotation,
-        BooleanSupplier brakeButton, BooleanSupplier coastButton, 
-        IntSupplier pov_p) 
+        BooleanSupplier povLeft_p)
     {
         drivetrain = drivetrain_p;
 
@@ -44,10 +35,7 @@ public class DriveCartesian extends CommandBase {
         y = right;
         z = rotation;
 
-        doBrake = brakeButton;
-        doCoast = coastButton;
-
-        pov = pov_p;
+        povLeft = povLeft_p;
 
         addRequirements(drivetrain_p);
     }
@@ -65,8 +53,6 @@ public class DriveCartesian extends CommandBase {
         }
         else
             drivetrain.drive(0, 0, 0);
-
-        updateBrake();
     }
 
     @Override
@@ -76,21 +62,5 @@ public class DriveCartesian extends CommandBase {
 
     private double closerToZero(double value1, double value2) {
         return Math.min(Math.abs(value1), Math.abs(value2));
-    }
-
-    private void updateBrake() {
-        if (doBrake.getAsBoolean() && !doBrakePrevState) {
-            drivetrain.setNeutralMode(NeutralMode.Brake);
-            doBrakePrevState = true;
-        }
-        else if (!doBrake.getAsBoolean() && doBrakePrevState)
-            doBrakePrevState = false;
-        else if (doCoast.getAsBoolean() && !doCoastPrevState) {
-            drivetrain.setNeutralMode(NeutralMode.Coast);
-            doCoastPrevState = true;
-        }
-        else if (!doCoast.getAsBoolean() && doCoastPrevState) {
-            doCoastPrevState = false;
-        }
     }
 }
