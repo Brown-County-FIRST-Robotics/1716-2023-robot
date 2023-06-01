@@ -1,11 +1,17 @@
 package frc.robot.subsystems;
 
+
+import com.kauailabs.navx.frc.AHRS;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import frc.robot.Constants.DrivetrainConst;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation;
+
+import frc.robot.Constants.DrivetrainConst;
 
 public class Drivetrain extends SubsystemBase {
 	private final WPI_TalonFX frontLeft = new WPI_TalonFX(DrivetrainConst.FrontLeftMotorPort);
@@ -15,9 +21,18 @@ public class Drivetrain extends SubsystemBase {
 
 	private final MecanumDrive mecanumDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
 
+	AHRS navX;
+
 	public Drivetrain() {
 		frontRight.setInverted(true);
 		rearRight.setInverted(true);
+
+		try {
+			navX = new AHRS(SPI.Port.kMXP);
+		}
+		catch (RuntimeException ex) {
+			DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+		}
 	}
 
 	/**
@@ -28,7 +43,8 @@ public class Drivetrain extends SubsystemBase {
 	 * @param rot Rotational rate of the robot.
 	 */
 	public void drive(double xSpeed, double ySpeed, double rot) {
-		mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed);
+		mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed,
+			navX.getRotation2d());
 	}
 
 	public void setNeutralMode(NeutralMode neutralMode) { //brake/coast mode
