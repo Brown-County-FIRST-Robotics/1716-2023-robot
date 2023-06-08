@@ -8,6 +8,8 @@
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/BooleanTopic.h>
 #include <frc/PneumaticHub.h>
+#include <frc/trajectory/TrajectoryConfig.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
 
 #include "subsystems/LED.h"
 #include "subsystems/Drivetrain.h"
@@ -65,4 +67,7 @@ private:
 	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
 	LogController controllerLogger{controller}; // Don't log the second controller for now, because we will ditch it later
+	frc::TrajectoryConfig conf{units::meters_per_second_t(2),units::meters_per_second_squared_t(1)};
+
+	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(0_m,0_m,0_deg),{frc::Translation2d(1_m,1_m),frc::Translation2d(2_m,0.5_m)},frc::Pose2d(3_m,0_m,0_deg), conf);
 };

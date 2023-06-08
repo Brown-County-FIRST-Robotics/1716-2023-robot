@@ -4,6 +4,7 @@
 #include <frc2/command/ParallelDeadlineGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/MecanumControllerCommand.h>
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -114,7 +115,35 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	return autonomousChooser.GetSelected();
+	auto l=frc2::MecanumControllerCommand(
+		traj,
+		[this]() { return drivetrain.FetchPos(); },
+		frc::SimpleMotorFeedforward<units::meters>(1_V,0.8 * 1_V * 1_s / 1_m,0.15 * 1_V * 1_s * 1_s / 1_m),
+		drivetrain.kinematics,
+
+		frc2::PIDController{0, 0, 0},
+		frc2::PIDController{0, 0, 0},
+		frc::ProfiledPIDController<units::radians>(1, 0, 0, frc::TrapezoidProfile<units::radians>::Constraints(3_rad_per_s, 3_rad_per_s_sq)),
+		2_m / 1_s,
+		[this]() {
+			return frc::MecanumDriveWheelSpeeds{
+				units::meters_per_second_t{drivetrain.GetEncoder()[0]},
+				units::meters_per_second_t{drivetrain.GetEncoder()[1]},
+				units::meters_per_second_t{drivetrain.GetEncoder()[2]},
+				units::meters_per_second_t{drivetrain.GetEncoder()[3]}
+			};
+		},
+		frc2::PIDController{1, 0, 0},  // FrontLeft
+		frc2::PIDController{1, 0, 0},  // RearLeft
+		frc2::PIDController{1, 0, 0},  // FrontRight
+		frc2::PIDController{1, 0, 0},  // RearRight
+		[this](units::volt_t frontLeft, units::volt_t rearLeft, units::volt_t frontRight, units::volt_t rearRight) {
+			drivetrain.DriveVolts({frontLeft, rearLeft, frontRight, rearRight});
+		},
+		{&drivetrain}
+	);
+	
+	return &l;//autonomousChooser.GetSelected();
 }
 
 bool Nothing::IsFinished() { return true; }
