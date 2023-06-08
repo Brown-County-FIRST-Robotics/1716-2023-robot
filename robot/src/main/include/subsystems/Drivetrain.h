@@ -33,6 +33,8 @@ public:
 	* @param z: rotation
 	*/
 	void Drive(double x, double y, double z, bool headless = false);
+	void DriveVolts(std::vector<units::volt_t> z);
+
 
 	void Periodic() override;
 
@@ -52,6 +54,11 @@ public:
 
 	std::vector<double> GetEncoder();
 	void ResetEncoders();
+		frc::MecanumDriveKinematics kinematics{
+		DrivetrainConst::WHEEL_POS_FL_MECANUM,
+		DrivetrainConst::WHEEL_POS_FR_MECANUM,
+		DrivetrainConst::WHEEL_POS_BL_MECANUM,
+		DrivetrainConst::WHEEL_POS_BR_MECANUM};
 
 private:
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONT_LEFT_ID, rev::CANSparkMax::MotorType::kBrushless};
@@ -83,17 +90,13 @@ private:
 	nt::GenericEntry* resetPigeonPos;
 
 	// Creating kinematics object using the wheel locations.
-	frc::MecanumDriveKinematics m_kinematics{
-		DrivetrainConst::WHEEL_POS_FL_MECANUM,
-		DrivetrainConst::WHEEL_POS_FR_MECANUM,
-		DrivetrainConst::WHEEL_POS_BL_MECANUM,
-		DrivetrainConst::WHEEL_POS_BR_MECANUM};
+
 
 	// Creating my odometry object from the kinematics object. Here,
 	// our starting pose is 5 meters along the long end of the field and in the
 	// center of the field along the short end, facing forward.
 	frc::MecanumDrivePoseEstimator odometry{
-	m_kinematics,
+	kinematics,
 	frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
 	frc::MecanumDriveWheelPositions{
 		units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},

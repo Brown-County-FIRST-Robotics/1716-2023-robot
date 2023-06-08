@@ -109,6 +109,14 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 	}
 }
 
+
+void Drivetrain::DriveVolts(std::vector<units::volt_t> v){
+	frontLeft.SetVoltage(v[0]);
+	backRight.SetVoltage(v[3]);
+	frontRight.SetVoltage(v[2]);
+	backLeft.SetVoltage(v[1]);
+}
+
 void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 	if (doBrakeMode) {
 		frontLeft.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
