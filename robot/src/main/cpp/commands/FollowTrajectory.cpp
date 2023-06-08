@@ -2,7 +2,7 @@
 
 #include <utility>
 
-FollowTrajectory::FollowTrajectory(Drivetrain* drive, frc::Trajectory& traj) : drivetrain(drive), trajectory(traj)
+FollowTrajectory::FollowTrajectory(Drivetrain* drive, frc::Trajectory* traj) : drivetrain(drive), trajectory(traj)
 {
 	AddRequirements(drive);
 }
@@ -14,7 +14,7 @@ void FollowTrajectory::Execute() {
 		hasStarted=true;
 	}
 	auto pos = drivetrain->FetchPos();
-	auto p2 = trajectory.Sample(splineTimer.Get());
+	auto p2 = trajectory->Sample(splineTimer.Get());
 	auto pursuitAng=atan2(pos.Y().value()-p2.pose.Y().value(), pos.X().value()-p2.pose.X().value());
 	auto xVelocity=p2.velocity.value()*cos(pursuitAng);
 	auto yVelocity=p2.velocity.value()*sin(pursuitAng);
@@ -34,7 +34,7 @@ void FollowTrajectory::Execute() {
 }
 
 bool FollowTrajectory::IsFinished() {
-	return splineTimer.Get()>trajectory.TotalTime();
+	return splineTimer.Get().value()>trajectory->TotalTime().value();
 }
 
 

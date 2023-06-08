@@ -17,7 +17,7 @@ namespace TrajectoryConst{
 
 class FollowTrajectory : public frc2::CommandHelper<frc2::CommandBase, FollowTrajectory> {
 public:
-	explicit FollowTrajectory(Drivetrain* drive, frc::Trajectory& traj);
+	explicit FollowTrajectory(Drivetrain* drive, frc::Trajectory* traj);
 
 	void Execute() override;
 	
@@ -27,7 +27,7 @@ public:
 
 private:
 	Drivetrain* drivetrain;
-	frc::Trajectory& trajectory;
+	frc::Trajectory* trajectory;
 	bool hasStarted=false;
 	frc::Timer splineTimer;
 	frc2::PIDController rotationController{TrajectoryConst::ROTATION_P, TrajectoryConst::ROTATION_I, TrajectoryConst::ROTATION_D};
