@@ -118,13 +118,17 @@ frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently sele
 	auto l=frc2::MecanumControllerCommand(
 		traj,
 		[this]() { return drivetrain.FetchPos(); },
-		frc::SimpleMotorFeedforward<units::meters>(1_V,0.8 * 1_V * 1_s / 1_m,0.15 * 1_V * 1_s * 1_s / 1_m),
+		frc::SimpleMotorFeedforward<units::meters>(TrajectoryFollowingConst::FEEDFORWARD_GAIN, TrajectoryFollowingConst::FEEDFORWARD_VELCOITY, TrajectoryFollowingConst::FEEDFORWARD_ACCELERATION),
 		drivetrain.kinematics,
 
-		frc2::PIDController{0, 0, 0},
-		frc2::PIDController{0, 0, 0},
-		frc::ProfiledPIDController<units::radians>(1, 0, 0, frc::TrapezoidProfile<units::radians>::Constraints(3_rad_per_s, 3_rad_per_s_sq)),
-		2_m / 1_s,
+		frc2::PIDController{TrajectoryFollowingConst::X_P, TrajectoryFollowingConst::X_I, TrajectoryFollowingConst::X_D}, // x controller
+		frc2::PIDController{TrajectoryFollowingConst::Y_P, TrajectoryFollowingConst::Y_I, TrajectoryFollowingConst::Y_D}, // y controller
+		frc::ProfiledPIDController<units::radians>(
+			TrajectoryFollowingConst::THETA_P, TrajectoryFollowingConst::THETA_I, TrajectoryFollowingConst::THETA_D,
+			frc::TrapezoidProfile<units::radians>::Constraints(TrajectoryFollowingConst::MAX_ANGULAR_VELOCITY, TrajectoryFollowingConst::MAX_ANGULAR_ACCELETATION)
+		), // theta controller
+
+		TrajectoryFollowingConst::MAX_VELOCITY, // max velocity
 		[this]() {
 			return frc::MecanumDriveWheelSpeeds{
 				units::meters_per_second_t{drivetrain.GetEncoder()[0]},
@@ -133,10 +137,10 @@ frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently sele
 				units::meters_per_second_t{drivetrain.GetEncoder()[3]}
 			};
 		},
-		frc2::PIDController{1, 0, 0},  // FrontLeft
-		frc2::PIDController{1, 0, 0},  // RearLeft
-		frc2::PIDController{1, 0, 0},  // FrontRight
-		frc2::PIDController{1, 0, 0},  // RearRight
+		frc2::PIDController{TrajectoryFollowingConst::FL_P, TrajectoryFollowingConst::FL_I, TrajectoryFollowingConst::FL_D},  // FrontLeft
+		frc2::PIDController{TrajectoryFollowingConst::BL_P, TrajectoryFollowingConst::BL_I, TrajectoryFollowingConst::BL_D},  // RearLeft
+		frc2::PIDController{TrajectoryFollowingConst::FR_P, TrajectoryFollowingConst::FR_I, TrajectoryFollowingConst::FR_D},  // FrontRight
+		frc2::PIDController{TrajectoryFollowingConst::BR_P, TrajectoryFollowingConst::BR_I, TrajectoryFollowingConst::BR_D},  // RearRight
 		[this](units::volt_t frontLeft, units::volt_t rearLeft, units::volt_t frontRight, units::volt_t rearRight) {
 			drivetrain.DriveVolts({frontLeft, rearLeft, frontRight, rearRight});
 		},

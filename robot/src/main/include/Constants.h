@@ -4,6 +4,8 @@
 #include <frc/TimedRobot.h> //units::scalar
 #include <frc/DoubleSolenoid.h>
 #include <frc/geometry/Pose2d.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -160,4 +162,46 @@ namespace AutoConst
 		
 	};
 	 // TODO: add real values
+};
+
+namespace TrajectoryFollowingConst
+{
+	const auto FEEDFORWARD_GAIN=1_V;
+	const auto FEEDFORWARD_VELCOITY=0.8 * 1_V * 1_s / 1_m;
+	const auto FEEDFORWARD_ACCELERATION=0.15 * 1_V * 1_s * 1_s / 1_m;
+
+	const double FL_P=0;
+	const double FL_I=0;
+	const double FL_D=0;
+
+	const double BL_P=0;
+	const double BL_I=0;
+	const double BL_D=0;
+
+	const double FR_P=0;
+	const double FR_I=0;
+	const double FR_D=0;
+
+	const double BR_P=0;
+	const double BR_I=0;
+	const double BR_D=0;
+
+	const double X_P=0;
+	const double X_I=0;
+	const double X_D=0;
+
+	const double Y_P=0;
+	const double Y_I=0;
+	const double Y_D=0;
+
+	const double THETA_P=0;
+	const double THETA_I=0;
+	const double THETA_D=0;
+
+
+
+	const auto MAX_ANGULAR_VELOCITY=3_rad_per_s;
+
+	const auto MAX_ANGULAR_ACCELETATION=3_rad_per_s_sq;
+	const auto MAX_VELOCITY=2_m / 1_s;
 };
