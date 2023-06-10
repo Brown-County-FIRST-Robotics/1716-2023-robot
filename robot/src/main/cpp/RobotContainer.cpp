@@ -115,7 +115,9 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	auto l=frc2::MecanumControllerCommand(
+	frc::TrajectoryConfig conf{1_m / 1_s, 0.5_m / 1_s / 1_s};
+	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(0_m,0_m,0_deg),{frc::Translation2d(1_m,1_m),frc::Translation2d(1_m,0_m)},frc::Pose2d(0_m,1_m,0_deg), conf);
+	auto l=new frc2::MecanumControllerCommand(
 		traj,
 		[this]() { return drivetrain.FetchPos(); },
 		frc::SimpleMotorFeedforward<units::meters>(TrajectoryFollowingConst::FEEDFORWARD_GAIN, TrajectoryFollowingConst::FEEDFORWARD_VELCOITY, TrajectoryFollowingConst::FEEDFORWARD_ACCELERATION),
@@ -125,7 +127,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently sele
 		frc2::PIDController{TrajectoryFollowingConst::Y_P, TrajectoryFollowingConst::Y_I, TrajectoryFollowingConst::Y_D}, // y controller
 		frc::ProfiledPIDController<units::radians>(
 			TrajectoryFollowingConst::THETA_P, TrajectoryFollowingConst::THETA_I, TrajectoryFollowingConst::THETA_D,
-			frc::TrapezoidProfile<units::radians>::Constraints(TrajectoryFollowingConst::MAX_ANGULAR_VELOCITY, TrajectoryFollowingConst::MAX_ANGULAR_ACCELETATION)
+			TrajectoryFollowingConst::ROTATION_CONSTRAINTS
 		), // theta controller
 
 		TrajectoryFollowingConst::MAX_VELOCITY, // max velocity
@@ -147,7 +149,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently sele
 		{&drivetrain}
 	);
 	
-	return &l;//autonomousChooser.GetSelected();
+	return l;//autonomousChooser.GetSelected();
 }
 
 bool Nothing::IsFinished() { return true; }

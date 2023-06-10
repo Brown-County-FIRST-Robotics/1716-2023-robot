@@ -1,5 +1,5 @@
 #pragma once
-// #include <units/time.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
 #include <frc/DoubleSolenoid.h>
@@ -167,30 +167,30 @@ namespace AutoConst
 namespace TrajectoryFollowingConst
 {
 	const auto FEEDFORWARD_GAIN=1_V;
-	const auto FEEDFORWARD_VELCOITY=0.8 * 1_V * 1_s / 1_m;
+	const auto FEEDFORWARD_VELCOITY=3 * 1_V * 1_s / 1_m;
 	const auto FEEDFORWARD_ACCELERATION=0.15 * 1_V * 1_s * 1_s / 1_m;
 
-	const double FL_P=0;
+	const double FL_P=1;
 	const double FL_I=0;
 	const double FL_D=0;
 
-	const double BL_P=0;
+	const double BL_P=1;
 	const double BL_I=0;
 	const double BL_D=0;
 
-	const double FR_P=0;
+	const double FR_P=1;
 	const double FR_I=0;
 	const double FR_D=0;
 
-	const double BR_P=0;
+	const double BR_P=1;
 	const double BR_I=0;
 	const double BR_D=0;
 
-	const double X_P=0;
+	const double X_P=1;
 	const double X_I=0;
 	const double X_D=0;
 
-	const double Y_P=0;
+	const double Y_P=1;
 	const double Y_I=0;
 	const double Y_D=0;
 
@@ -198,10 +198,9 @@ namespace TrajectoryFollowingConst
 	const double THETA_I=0;
 	const double THETA_D=0;
 
-
-
 	const auto MAX_ANGULAR_VELOCITY=3_rad_per_s;
-
 	const auto MAX_ANGULAR_ACCELETATION=3_rad_per_s_sq;
 	const auto MAX_VELOCITY=2_m / 1_s;
+
+	const frc::TrapezoidProfile<units::radians>::Constraints ROTATION_CONSTRAINTS{MAX_ANGULAR_VELOCITY, MAX_ANGULAR_ACCELETATION};
 };
