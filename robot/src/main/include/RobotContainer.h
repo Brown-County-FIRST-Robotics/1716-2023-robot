@@ -11,17 +11,24 @@
 
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
-#include "commands/DriveBackThenBalance.h"
+#include "commands/DriveForwardThenBalance.h"
+#include "commands/PlaceAndDriveBack.h"
 #include "commands/RasPiDrive.h"
+#include "commands/PlaceThenMobility.h"
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
 public:
 	bool IsFinished() override;
 };
 
-class BackUp : public frc2::CommandHelper<frc2::SequentialCommandGroup, BackUp> {
+class DriveForward : public frc2::CommandHelper<frc2::SequentialCommandGroup, DriveForward> {
 public:
-	explicit BackUp(Drivetrain* drive);
+	explicit DriveForward(Drivetrain* drive);
+};
+
+class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
+public:
+	explicit RasPiAutonomous(Drivetrain* drive, Arm* arm);
 };
 
 class RobotContainer {
@@ -29,7 +36,7 @@ public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
 	void UpdateControllerLogging();
-
+	void Init();
 private:
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};
@@ -49,11 +56,12 @@ private:
 
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
-	DriveBackThenBalance driveBackThenBalance{&drivetrain};
+	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
-	BackUp backUp{&drivetrain};
-	RasPiDrive rasPiDrive{&drivetrain};
-
+	DriveForward driveForward{&drivetrain};
+	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
+	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
+	PlaceThenMobility placeMob{&drivetrain, &arm};
 
 	//Controller logging
 	nt::GenericEntry* a;

@@ -7,15 +7,20 @@
 
 class TeleopDrive : public frc2::CommandHelper<frc2::CommandBase, TeleopDrive> {
 public:
-	explicit TeleopDrive(Drivetrain* subsystem, std::function<double()> forward, std::function<double()> right, std::function<double()> rotation, 
-		std::function<bool()> brake, std::function<bool()> headlessToggle);
+	explicit TeleopDrive(Drivetrain* subsystem, 
+		std::function<double()> forward, 
+		std::function<double()> right, 
+		std::function<double()> rotation, 
+		std::function<bool()> activateBrake, 
+		std::function<bool()> deactivateBrake, 
+		std::function<bool()> headlessToggle);
 
 	void Execute() override;
 	
 	void End(bool interrupted) override;
 
 private:
-	void UpdateBrake(bool brake);
+	void UpdateBrake(bool doBrake, bool dontBrake);
 	void UpdateHeadless();
 
 	Drivetrain* drivetrain;
@@ -23,7 +28,8 @@ private:
 	std::function<double()> y;
 	std::function<double()> z;
 
-	std::function<bool()> doBrake;
+	std::function<bool()> startBrake;
+	std::function<bool()> stopBrake;
 	std::function<bool()> headlessButton;
 	bool headlessPressed = false;
 	bool headless = false;

@@ -14,6 +14,8 @@
 #include <networktables/NetworkTableInstance.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/PneumaticHub.h>
+#include <frc/kinematics/MecanumDriveOdometry.h>
+#include <frc/estimator/MecanumDrivePoseEstimator.h>
 
 
 #include "Constants.h"
@@ -33,10 +35,11 @@ public:
 	void Periodic() override;
 
 	void ActivateBreakMode(bool doBrakeMode);
+	frc::Pose2d FetchPos();
 
 	double GetRoll();
 	double GetPitch();
-	double GetYaw();
+	int GetYaw();
 	int16_t GetX();
 	int16_t GetY();
 	int16_t GetZ();
@@ -89,4 +92,31 @@ private:
 	nt::FloatPublisher yAccel;
 
 	nt::GenericEntry* resetPigeonPos;
+
+	// Creating kinematics object using the wheel locations.
+	frc::MecanumDriveKinematics m_kinematics{
+		DrivetrainConst::WHEEL_POS_FL_MECANUM,
+		DrivetrainConst::WHEEL_POS_FR_MECANUM,
+		DrivetrainConst::WHEEL_POS_BL_MECANUM,
+		DrivetrainConst::WHEEL_POS_BR_MECANUM};
+
+	// Creating my odometry object from the kinematics object. Here,
+	// our starting pose is 5 meters along the long end of the field and in the
+	// center of the field along the short end, facing forward.
+	frc::MecanumDrivePoseEstimator odometry{
+	m_kinematics,
+	frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	frc::MecanumDriveWheelPositions{
+		units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+		units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},	
+		units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+		units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
+	},
+	DrivetrainConst::INITIAL_POSE};
+
+
+
+
+
+
 };
