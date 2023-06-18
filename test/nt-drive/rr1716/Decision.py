@@ -43,7 +43,7 @@ class Action:
             self.filter.updateWithApriltag(robotLocation)
 
     def GetFilter(self):
-        logging.info(f'filter pos: {self.filter.currentTuple}')
+        #logging.info(f'filter pos: {self.filter.currentTuple}')
         return self.filter.currentTuple
 
     def GetGameObjects(self):
@@ -118,8 +118,12 @@ class AsyncSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return DriveToLocation(self.filter, self.cams, self.nt_interface,self.april_executor, [500, -293, 0], self.referrer)
-
+            return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
+        elif self.referrer == 'pickup':
+            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
+        elif self.referrer == 'return':
+            return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, 1, self.referrer) # TODO: change to 0
+     
 
 class DriveToLocation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
@@ -174,13 +178,19 @@ class AwaitSetHeight(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+            return Drop(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)
+        elif self.referrer == 'pickup':
+            return Pickup(self.filter, self.cams, self.nt_interface, self.april_executor, "return")
+        elif self.referrer == 'putdown':
+            return Drop(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
 
 
 class DriveDumb(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, location, referrer):
         super().__init__(filter, cams, nt_interface, april_executor, referrer)
         self.location = location
+        if self.location is None or self.location==0:
+            self.location=int(self.nt_interface.GetAutoRoutine()[-1])
 
 
     def Step(self):
@@ -200,10 +210,26 @@ class DriveDumb(Action):
         offset_x = float(det.left_right)
         offset_r = float(det.yaw)
 
-        self.nt_interface.Drive(offset_x*0.01, offset_y*0.01, offset_r*0.0025)
+        self.nt_interface.Drive(offset_x*0.003, offset_y*0.003, offset_r*0.0025)
 
     def ShouldEnd(self):
-        return False
+        cam=self.april_cams[0]
+        dets=AprilTags.getPosition(cam.get_gray(), cam.camera_matrix, None)
+        det = None
+        for i in dets:
+            if i.tagID == self.location:
+                det = i
+                break
+        if det is None:
+            return False
+        offset_y = float(det.distance - 100)
+        offset_x = float(det.left_right)
+        offset_r = float(det.yaw)
+        return offset_y+offset_x+offset_r<10
+
+    def MakeChild(self):
+        return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "putdown")
+        #return AwaitAutoStart(self.filter, self.cams, self.nt_interface, self.april_executor, 'auto')
 
 class Drop(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -213,8 +239,9 @@ class Drop(Action):
 
     def MakeChild(self):
         if self.referrer == 'auto':
-            return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
-
+            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
+            #return GetOnStation(self.filter, self.cams, self.nt_interface,self.april_executor, self.referrer)  # IMPORTANT: change
+        return None
 
 class GetOnStation(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -361,9 +388,9 @@ class DriveToGamepeice(Action):
         self.gamepeice = Vision.GamePiece()
         while len(col) < 3:
             col.append(0)
-        
-        lower = [col[0] - col_range_h, col[1] - col_range_s, col[2] - col_range_v]
-        upper = [col[0] + col_range_h, col[1] + col_range_s, col[2] + col_range_v]
+         
+        lower = [col[0] + Strategy.cube_color_range.lower_h_range, col[1] + Strategy.cube_color_range.lower_s_range, col[2] + Strategy.cube_color_range.lower_v_range]
+        upper = [col[0] + Strategy.cube_color_range.upper_h_range, col[1] + Strategy.cube_color_range.upper_s_range, col[2] + Strategy.cube_color_range.upper_v_range]
     
         for i in range(len(lower)):
             if lower[i] < 0:
@@ -412,7 +439,7 @@ class DriveToGamepeice(Action):
         # too far away, drive towards it
         if self.gamepeice.w < self.target_w and self.gamepeice.h < self.target_h:
             print("drive forward")
-            y = 0.5 - self.gamepeice.w / self.target_w * 0.55 
+            y = 0.6  - (self.gamepeice.w / self.target_w) * 0.6
 
         self.nt_interface.Drive(x, y, r)
 
@@ -427,9 +454,7 @@ class DriveToGamepeice(Action):
         time.sleep(2)
         
     def MakeChild(self):
-        if self.referrer == "auto":
-            return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, "drivetogamepeice")
-        return None
+        return AwaitSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "pickup")
 
 class AutoTurn180(Action):
     def __init__(self, filter, cams, nt_interface, april_executor, referrer):
@@ -449,7 +474,15 @@ class AutoTurn180(Action):
     def Step(self):
         logging.info("rotating")
         # just turn until we are at 180 degrees
-        self.nt_interface.Drive(0, 0, self.rotationPID(self.nt_interface.GetYaw()))
+        if self.nt_interface.GetYaw() is not None:
+            target_rotation = self.startrotation + 180.0
+            while target_rotation >= 360.0:
+                target_rotation -= 360.0
+            while target_rotation < 0.0:
+                target_rotation += 360.0
+            self.nt_interface.Drive(0, 0, (self.nt_interface.GetYaw() - target_rotation)*0.005)
+
+       
 
     def ShouldEnd(self):
         if self.nt_interface.GetYaw() == None:
@@ -460,7 +493,7 @@ class AutoTurn180(Action):
             target_rotation -= 360.0
         while target_rotation < 0.0:
             target_rotation += 360.0
-        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 4.0
+        return math.fabs(self.nt_interface.GetYaw() - target_rotation) < 10.0
     
     def End(self):
         self.nt_interface.Drive(0, 0, 0)
@@ -468,10 +501,13 @@ class AutoTurn180(Action):
     def MakeChild(self):
         if self.referrer == "auto":
             logging.info("switch to drive to gamepeice")
-            return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=3.0 / 5.0, maxRatio=5.0 / 3.0)
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, "pickup", 0)
+            #return DriveToGamepeice(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 5, 100, 100, Strategy.TARGET_CUBE_SIZE, Strategy.TARGET_CUBE_SIZE, "cube_picked_color", minRatio=Strategy.cube_color_range.lower_ratio, maxRatio=Strategy.cube_color_range.upper_ratio)
         elif self.referrer == "drivetogamepeice":  
             logging.info("switch to drive to april tag")
             return DriveDumb(self.filter, self.cams, self.nt_interface, self.april_executor, int(self.nt_interface.GetAutoRoutine()[-1]), self.referrer)
+        elif self.referrer == "return":
+            return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 3)
         return None 
 
 class AwaitAutoStart(Action):
@@ -482,8 +518,17 @@ class AwaitAutoStart(Action):
     def ShouldEnd(self):
         return self.nt_interface.IsAutonomous() and self.nt_interface.GetAutoRoutine()[:21]=='Raspberry Pie Control'
 
+
     def MakeChild(self):
-        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer) 
+        return AsyncSetHeight(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer, 4)
+
+class Pickup(Action):
+    def __init__(self, filter, cams, nt_interface, april_executor, referrer):
+        super().__init__(filter, cams, nt_interface, april_executor, referrer)
+        nt_interface.PickupObject()
+
+    def MakeChild(self):
+        return AutoTurn180(self.filter, self.cams, self.nt_interface, self.april_executor, self.referrer)
 
 
 

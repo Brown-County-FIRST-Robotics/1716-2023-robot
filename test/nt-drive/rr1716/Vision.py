@@ -4,6 +4,7 @@ import logging
 import numpy as np
 import cv2
 import os
+from rr1716 import Strategy 
 
 #use this for calibrating the color detector
 #pass in frame
@@ -240,8 +241,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
     while len(col) < 3:
         col.append(0)
 
-    lower = [col[0] - 5, col[1] - 100, col[2] - 100]
-    upper = [col[0] + 5, col[1] + 100, col[2] + 100]
+    lower = [col[0] + Strategy.cube_color_range.lower_h_range, col[1] + Strategy.cube_color_range.lower_s_range, col[2] + Strategy.cube_color_range.lower_v_range]
+    upper = [col[0] + Strategy.cube_color_range.upper_h_range, col[1] + Strategy.cube_color_range.upper_s_range, col[2] + Strategy.cube_color_range.upper_v_range]
 
     for i in range(len(lower)):
         if lower[i] < 0:
@@ -256,8 +257,8 @@ def gen_preview_picker(camera):  # generate frame by frame from camera
 
     cube.setLowerColor(np.array(lower, dtype=np.uint8))
     cube.setUpperColor(np.array(upper, dtype=np.uint8)) 
-    cube.setMinRatio(3.0 / 5.0)
-    cube.setMaxRatio(5.0 / 3.0)
+    cube.setMinRatio(Strategy.cube_color_range.lower_ratio)
+    cube.setMaxRatio(Strategy.cube_color_range.upper_ratio)
 
     currentFrame = 0
 
