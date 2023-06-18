@@ -115,7 +115,7 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	frc::TrajectoryConfig conf{1_m / 1_s, 0.5_m / 1_s / 1_s};
+	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
 	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(0_m,0_m,0_deg),{frc::Translation2d(1_m,1_m),frc::Translation2d(1_m,0_m)},frc::Pose2d(0_m,1_m,0_deg), conf);
 	auto l=new frc2::MecanumControllerCommand(
 		traj,

@@ -200,7 +200,8 @@ namespace TrajectoryFollowingConst
 
 	const auto MAX_ANGULAR_VELOCITY=3_rad_per_s;
 	const auto MAX_ANGULAR_ACCELETATION=3_rad_per_s_sq;
-	const auto MAX_VELOCITY=2_m / 1_s;
+	const auto MAX_VELOCITY=1_m / 1_s;
+	const auto MAX_ACCELERATION=0.5_m / 1_s / 1_s;
 
 	const frc::TrapezoidProfile<units::radians>::Constraints ROTATION_CONSTRAINTS{MAX_ANGULAR_VELOCITY, MAX_ANGULAR_ACCELETATION};
 };
