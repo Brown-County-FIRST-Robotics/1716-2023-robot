@@ -8,5 +8,5 @@
 
 class DriveForwardThenBalance : public frc2::CommandHelper<frc2::SequentialCommandGroup, DriveForwardThenBalance> {
 public:
-	explicit DriveForwardThenBalance(Drivetrain* drive);
+	explicit DriveForwardThenBalance(Drivetrain* drive, double direction=-1);
 };
