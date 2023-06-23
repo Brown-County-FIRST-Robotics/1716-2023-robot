@@ -167,40 +167,40 @@ namespace AutoConst
 namespace TrajectoryFollowingConst
 {
 	const auto FEEDFORWARD_GAIN = 0_V;
-	const auto FEEDFORWARD_VELCOITY = 1_V * 1_s / 1_m;
+	const auto FEEDFORWARD_VELCOITY = 3_V * 1_s / 1_m;
 	const auto FEEDFORWARD_ACCELERATION = 0.1 * 1_V * 1_s * 1_s / 1_m;
 
-	const double FL_P = 1;
+	const double FL_P = 0;
 	const double FL_I = 0;
 	const double FL_D = 0;
 
-	const double BL_P = 1;
+	const double BL_P = 0;
 	const double BL_I = 0;
 	const double BL_D = 0;
 
-	const double FR_P = 1; // was 0.2
+	const double FR_P = 0; // was 0.2
 	const double FR_I = 0;
 	const double FR_D = 0;
 
-	const double BR_P = 1;
+	const double BR_P = 0;
 	const double BR_I = 0;
 	const double BR_D = 0;
 
-	const double X_P = 0;
+	const double X_P = 0.5;
 	const double X_I = 0;
 	const double X_D = 0;
 
-	const double Y_P = 0;
+	const double Y_P = 0.5;
 	const double Y_I = 0;
 	const double Y_D = 0;
 
-	const double THETA_P = 0;
+	const double THETA_P = 0.5;
 	const double THETA_I = 0;
 	const double THETA_D = 0;
 
 	const auto MAX_ANGULAR_VELOCITY = 3_rad / 1_s;
 	const auto MAX_ANGULAR_ACCELETATION = 3_rad / 1_s / 1_s;
-	const auto MAX_VELOCITY = 0.2_m / 1_s;
+	const auto MAX_VELOCITY = 0.5_m / 1_s;
 	const auto MAX_ACCELERATION = 0.5_m / 1_s / 1_s;
 
 	const frc::TrapezoidProfile<units::radians>::Constraints ROTATION_CONSTRAINTS{MAX_ANGULAR_VELOCITY, MAX_ANGULAR_ACCELETATION};
