@@ -111,6 +111,7 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 
 
 void Drivetrain::DriveVolts(std::vector<units::volt_t> v){
+	std::cout << v[0].value() << "  "<< v[1].value() << "  "<< v[2].value() << "  "<< v[3].value() << "\n";
 	frontLeft.SetVoltage(v[0]);
 	backRight.SetVoltage(v[3]);
 	frontRight.SetVoltage(v[2]);

@@ -5,6 +5,7 @@
 #include <frc2/command/WaitCommand.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/MecanumControllerCommand.h>
+#include "commands/PlaceMobBalance.h"
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -115,41 +116,7 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
-	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(0_m,0_m,0_deg),{frc::Translation2d(1_m,1_m),frc::Translation2d(1_m,0_m)},frc::Pose2d(0_m,1_m,0_deg), conf);
-	auto l=new frc2::MecanumControllerCommand(
-		traj,
-		[this]() { return drivetrain.FetchPos(); },
-		frc::SimpleMotorFeedforward<units::meters>(TrajectoryFollowingConst::FEEDFORWARD_GAIN, TrajectoryFollowingConst::FEEDFORWARD_VELCOITY, TrajectoryFollowingConst::FEEDFORWARD_ACCELERATION),
-		drivetrain.kinematics,
-
-		frc2::PIDController{TrajectoryFollowingConst::X_P, TrajectoryFollowingConst::X_I, TrajectoryFollowingConst::X_D}, // x controller
-		frc2::PIDController{TrajectoryFollowingConst::Y_P, TrajectoryFollowingConst::Y_I, TrajectoryFollowingConst::Y_D}, // y controller
-		frc::ProfiledPIDController<units::radians>(
-			TrajectoryFollowingConst::THETA_P, TrajectoryFollowingConst::THETA_I, TrajectoryFollowingConst::THETA_D,
-			TrajectoryFollowingConst::ROTATION_CONSTRAINTS
-		), // theta controller
-
-		TrajectoryFollowingConst::MAX_VELOCITY, // max velocity
-		[this]() {
-			return frc::MecanumDriveWheelSpeeds{
-				units::meters_per_second_t{drivetrain.GetEncoder()[0]},
-				units::meters_per_second_t{drivetrain.GetEncoder()[1]},
-				units::meters_per_second_t{drivetrain.GetEncoder()[2]},
-				units::meters_per_second_t{drivetrain.GetEncoder()[3]}
-			};
-		},
-		frc2::PIDController{TrajectoryFollowingConst::FL_P, TrajectoryFollowingConst::FL_I, TrajectoryFollowingConst::FL_D},  // FrontLeft
-		frc2::PIDController{TrajectoryFollowingConst::BL_P, TrajectoryFollowingConst::BL_I, TrajectoryFollowingConst::BL_D},  // RearLeft
-		frc2::PIDController{TrajectoryFollowingConst::FR_P, TrajectoryFollowingConst::FR_I, TrajectoryFollowingConst::FR_D},  // FrontRight
-		frc2::PIDController{TrajectoryFollowingConst::BR_P, TrajectoryFollowingConst::BR_I, TrajectoryFollowingConst::BR_D},  // RearRight
-		[this](units::volt_t frontLeft, units::volt_t rearLeft, units::volt_t frontRight, units::volt_t rearRight) {
-			drivetrain.DriveVolts({frontLeft, rearLeft, frontRight, rearRight});
-		},
-		{&drivetrain}
-	);
-	
-	return l;//autonomousChooser.GetSelected();
+	return new PlaceMobBalance(&drivetrain, &arm);
 }
 
 bool Nothing::IsFinished() { return true; }
