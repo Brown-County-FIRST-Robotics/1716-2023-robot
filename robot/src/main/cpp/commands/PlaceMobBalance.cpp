@@ -52,12 +52,7 @@ PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 
 			TrajectoryFollowingConst::MAX_VELOCITY, // max velocity
 			[drive]() {
-				return frc::MecanumDriveWheelSpeeds{
-					units::meters_per_second_t{drive->GetEncoder()[0]},
-					units::meters_per_second_t{drive->GetEncoder()[1]},
-					units::meters_per_second_t{drive->GetEncoder()[2]},
-					units::meters_per_second_t{drive->GetEncoder()[3]}
-				};
+				return drive->GetEncoderSpeeds();
 			},
 			frc2::PIDController{TrajectoryFollowingConst::FL_P, TrajectoryFollowingConst::FL_I, TrajectoryFollowingConst::FL_D},  // FrontLeft
 			frc2::PIDController{TrajectoryFollowingConst::BL_P, TrajectoryFollowingConst::BL_I, TrajectoryFollowingConst::BL_D},  // RearLeft

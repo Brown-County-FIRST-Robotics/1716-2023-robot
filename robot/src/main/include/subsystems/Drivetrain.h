@@ -51,7 +51,7 @@ public:
 	void ToggleSolenoid();
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
-
+	frc::MecanumDriveWheelSpeeds GetEncoderSpeeds();
 	std::vector<double> GetEncoder();
 	void ResetEncoders();
 		frc::MecanumDriveKinematics kinematics{

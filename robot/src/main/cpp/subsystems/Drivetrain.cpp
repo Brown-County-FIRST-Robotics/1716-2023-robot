@@ -211,6 +211,15 @@ std::vector<double> Drivetrain::GetEncoder() {
 		};
 }
 
+frc::MecanumDriveWheelSpeeds Drivetrain::GetEncoderSpeeds() {
+	return frc::MecanumDriveWheelSpeeds{
+		frontLeftEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
+		frontRightEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
+		backLeftEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
+		backRightEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75) 
+	};
+}
+
 void Drivetrain::ResetEncoders() {
 	frontLeftEncoder.SetPosition(0);
 	frontRightEncoder.SetPosition(0);
