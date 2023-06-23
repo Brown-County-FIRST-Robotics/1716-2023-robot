@@ -10,7 +10,7 @@ PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
 	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(14.91_m,1.22_m,0_deg),{frc::Translation2d(14_m,1.22_m),frc::Translation2d(12_m,1.22_m)},frc::Pose2d(12_m,4_m,0_deg), conf);
 	AddCommands(
-		/*frc2::FunctionalCommand(
+		frc2::FunctionalCommand(
 			[arm] {
 				arm->SetElbowGoal(ArmHeightConst::HIGHCUBE[1]);
 				arm->SetShoulderGoal(ArmHeightConst::HIGHCUBE[0]);
@@ -36,7 +36,7 @@ PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 				+fabs(arm->GetShoulderGoal()-arm->GetShoulderPosition())<ArmHeightConst::THRESHOLD;
 				}, // IsFinished
 			{arm} // requirenents
-		),*/
+		),
 		frc2::MecanumControllerCommand(
 			traj,
 			[drive]() { return drive->FetchPos(); },
