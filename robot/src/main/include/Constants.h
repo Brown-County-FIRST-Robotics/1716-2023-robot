@@ -31,7 +31,7 @@ namespace DrivetrainConst {
 	const auto MECH_MODE = frc::DoubleSolenoid::Value::kReverse;
 
 	//should actually change based on which auto is selected
-	const auto INITIAL_POSE = frc::Pose2d(14.91_m,1.22_m,0_deg);
+	const auto INITIAL_POSE = frc::Pose2d(14.91_m,4.4_m,0_deg);
 
 
 	//roughly measured on robot

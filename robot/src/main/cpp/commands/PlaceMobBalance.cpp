@@ -8,7 +8,8 @@
 PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 {
 	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
-	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(14.91_m,1.22_m,0_deg),{frc::Translation2d(14_m,1.22_m),frc::Translation2d(12_m,1.22_m)},frc::Pose2d(12_m,4_m,0_deg), conf);
+	conf.SetEndVelocity(1_m / 1_s);
+	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(14.91_m,4.4_m,0_deg),{frc::Translation2d(14_m,4.4_m),frc::Translation2d(12_m,4.4_m)},frc::Pose2d(12_m,2_m,0_deg), conf);
 	AddCommands(
 		frc2::FunctionalCommand(
 			[arm] {
@@ -63,6 +64,6 @@ PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 			},
 			{drive}
 		),
-		DriveForwardThenBalance(drive, 0.3)
+		DriveForwardThenBalance(drive, 0.35)
 	);
 }
