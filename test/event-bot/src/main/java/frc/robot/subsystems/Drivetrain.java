@@ -46,7 +46,11 @@ public class Drivetrain extends SubsystemBase {
 		}
 
 		//Music playing:
-		
+
+		frontLeft.setSafetyEnabled(false);
+		frontRight.setSafetyEnabled(false);
+		rearLeft.setSafetyEnabled(false);
+		rearRight.setSafetyEnabled(false);
         //orchestra initialization
         ArrayList<TalonFX> instruments = new ArrayList<TalonFX>();
         instruments.add(frontLeft);
@@ -64,10 +68,12 @@ public class Drivetrain extends SubsystemBase {
 	 * @param rot Rotational rate of the robot.
 	 */
 	public void drive(double xSpeed, double ySpeed, double rot) {
-		if (doFieldOriented)
-			mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed,
-				navX.getRotation2d());
-		else
+		if (xSpeed < 0.05 && ySpeed < 0.05 && rot < 0.05 && orchestra.isPlaying())
+			return;
+		// if (doFieldOriented)
+		// 	mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed,
+		// 		navX.getRotation2d());
+		// else
 			mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed);
 	}
 
@@ -94,13 +100,17 @@ public class Drivetrain extends SubsystemBase {
 	}
 
 	public void playSong(String filepath) {
+		if (orchestra.isPlaying()) {
+			orchestra.stop();
+		}
 		orchestra.loadMusic(filepath);
-	}
-	public void pauseSong() {
-		orchestra.pause();
+		orchestra.play();
 	}
 	public void playSong() {
 		orchestra.play();
+	}
+	public void pauseSong() {
+		orchestra.pause();
 	}
 	public void stopSong() {
 		orchestra.stop();

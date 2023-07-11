@@ -19,9 +19,9 @@ public class DriveCartesian extends CommandBase {
     double ySquare;
     double zSquare;
 
-    SlewRateLimiter xAccelerationCap;
-    SlewRateLimiter yAccelerationCap;
-    SlewRateLimiter zAccelerationCap;
+    SlewRateLimiter xAccelerationCap = new SlewRateLimiter(3);
+    SlewRateLimiter yAccelerationCap = new SlewRateLimiter(3);
+    SlewRateLimiter zAccelerationCap = new SlewRateLimiter(3);
 
     BooleanSupplier povLeft; //whether the POV is pressed towards the left
 
