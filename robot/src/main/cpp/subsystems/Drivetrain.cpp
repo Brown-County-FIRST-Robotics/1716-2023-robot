@@ -99,9 +99,8 @@ void Drivetrain::Periodic() {
 			units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 		}
 	);
-	auto april=aprilEntry.Get();
-	if(april.size()==6){ //  TODO: split this up into multiple entries
-		frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
+	if(secondsightTable->GetNumber("field_x", -1)!=-1){
+		frc::Pose2d pose(secondsightTable->GetNumber("field_x",0) * 0.01_m, secondsightTable->GetNumber("field_y",0) * 0.01_m, frc::Rotation2d(secondsightTable->GetNumber("field_ang",0) * 1_deg));
 		odometry.AddVisionMeasurement(pose, frc::Timer::GetFPGATimestamp(),{0.03,0.03,5.0});
 	}
 	auto pos=FetchPos();

@@ -5,11 +5,24 @@
 
 #include "commands/PlaceMobBalance.h"
 
+frc::Pose2d convert(frc::Pose2d pos){
+	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue)
+		return frc::Pose2d(325.61_in-pos.X(),pos.Y(),pos.Rotation());
+	return pos;
+}
+
+frc::Translation2d convert(frc::Translation2d pos){
+	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue)
+		return frc::Translation2d(325.61_in-pos.X(),pos.Y());
+	return pos;
+}
+
 PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
 {
 	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
 	conf.SetEndVelocity(1_m / 1_s);
-	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(frc::Pose2d(14.91_m,4.4_m,0_deg),{frc::Translation2d(14_m,4.4_m),frc::Translation2d(12_m,4.4_m)},frc::Pose2d(12_m,2_m,0_deg), conf);
+
+	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(convert(frc::Pose2d(14.91_m,4.4_m,0_deg)),{convert(frc::Translation2d(14_m,4.4_m)),convert(frc::Translation2d(12_m,4.4_m))},convert(frc::Pose2d(12_m,2_m,0_deg)), conf);
 	AddCommands(
 		frc2::FunctionalCommand(
 			[arm] {
