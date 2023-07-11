@@ -75,11 +75,12 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftBumper(); }));
 
 	//Autonomous:
-	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
-	autonomousChooser.AddOption("Drive Forward", &driveForward);
-	autonomousChooser.AddOption("Nothing", &nothing);
-	autonomousChooser.AddOption("Place And Balance", &placeAndBalance);
-	autonomousChooser.AddOption("Place then leave community", &placeMob);
+	autonomousChooser.SetDefaultOption("Nothing", AutoRoutine::NOTHING);
+	autonomousChooser.AddOption("Place And Balance", AutoRoutine::PLACE_THEN_BALANCE);
+	autonomousChooser.AddOption("Place then leave community", AutoRoutine::PLACE_MOBILITY);
+	autonomousChooser.AddOption("Place, leave community, And Balance", AutoRoutine::PLACE_MOB_BALANCE);
+	autonomousChooser.AddOption("Place, leave community, And Balance (cable bump side)", AutoRoutine::CABLE_PLACE_MOB_BALANCE);
+
 
 	frc::Shuffleboard::GetTab("Pre Match").Add("Autonomous Routine", &autonomousChooser);
 	controllerLogger.Schedule();
@@ -116,7 +117,20 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	return new PlaceMobBalance(&drivetrain, &arm);
+	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue){		
+		drivetrain.SetPose(frc::Pose2d(325.61_in-DrivetrainConst::INITIAL_POSE.X(), DrivetrainConst::INITIAL_POSE.Y(), DrivetrainConst::INITIAL_POSE.Rotation()));
+	}
+	if(autonomousChooser.GetSelected()==AutoRoutine::NOTHING)
+		return &nothing;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_THEN_BALANCE)
+		return &placeAndBalance;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_MOBILITY)
+		return &placeMob;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_MOB_BALANCE)
+		return new PlaceMobBalance(&drivetrain, &arm);
+	else if(autonomousChooser.GetSelected()==AutoRoutine::CABLE_PLACE_MOB_BALANCE)
+		return new PlaceMobBalance(&drivetrain, &arm);
+	return nullptr;
 }
 
 bool Nothing::IsFinished() { return true; }

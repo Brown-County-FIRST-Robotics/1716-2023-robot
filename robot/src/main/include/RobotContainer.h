@@ -30,7 +30,13 @@ class DriveForward : public frc2::CommandHelper<frc2::SequentialCommandGroup, Dr
 public:
 	explicit DriveForward(Drivetrain* drive);
 };
-
+enum AutoRoutine{
+	NOTHING=0,
+	PLACE_THEN_BALANCE=1,
+	PLACE_MOBILITY=2,
+	PLACE_MOB_BALANCE=3,
+	CABLE_PLACE_MOB_BALANCE=4
+};
 
 class RobotContainer {
 public:
@@ -60,7 +66,7 @@ private:
 	nt::NetworkTableInstance networkTableInst;
 
 	//Autonomous
-	frc::SendableChooser<frc2::Command*> autonomousChooser;
+	frc::SendableChooser<int> autonomousChooser;
 	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};

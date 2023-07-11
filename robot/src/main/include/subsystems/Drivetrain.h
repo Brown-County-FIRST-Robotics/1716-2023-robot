@@ -34,6 +34,7 @@ public:
 	*/
 	void Drive(double x, double y, double z, bool headless = false);
 	void DriveVolts(std::vector<units::volt_t> z);
+	void SetPose(frc::Pose2d pose);
 
 
 	void Periodic() override;

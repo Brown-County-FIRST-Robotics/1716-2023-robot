@@ -56,6 +56,18 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
 }
 
+void Drivetrain::SetPose(frc::Pose2d pose){
+	pigeon.Reset();
+		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+		frc::MecanumDriveWheelPositions{
+				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
+				units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
+			},
+			pose);
+}
+
 void Drivetrain::Periodic() {
 	if (waitTicksNeeded == 0) {
 		solenoid.Set(frc::DoubleSolenoid::Value::kOff);
