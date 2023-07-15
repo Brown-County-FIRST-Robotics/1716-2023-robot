@@ -216,7 +216,7 @@ void Arm::SetClaw(frc::DoubleSolenoid::Value value) {
 	claw.Set(value);
 	clawPos = value;
 	
-	clawTicks = SolenoidConst::WAIT_TICKS;
+	clawTicks = SolenoidConst::WAIT_TICKS+5;
 }
 
 frc::DoubleSolenoid::Value Arm::GetClaw() {
