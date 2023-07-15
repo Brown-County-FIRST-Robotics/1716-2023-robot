@@ -53,7 +53,7 @@ private:
 
 	Drivetrain drivetrain{hub};
 	Arm arm{hub};
-	LED led;
+	//LED led;
 
 	void ConfigureButtonBindings();
 
@@ -66,5 +66,5 @@ private:
 	DriveForward driveForward{&drivetrain};
 	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
-	LogController controllerLogger{controller}; // Don't log the second controller for now, because we will ditch it later
+	//LogController controllerLogger{controller}; // Don't log the second controller for now, because we will ditch it later
 };

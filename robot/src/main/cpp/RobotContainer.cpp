@@ -81,7 +81,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Place then leave community", &placeMob);
 
 	frc::Shuffleboard::GetTab("Pre Match").Add("Autonomous Routine", &autonomousChooser);
-	controllerLogger.Schedule();
+	//controllerLogger.Schedule();
 }
 
 void RobotContainer::Init(){
@@ -95,14 +95,14 @@ green: tank
 blue: auto
 */
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); led.SetDrivetrainMode(drivetrain.GetSolenoid());}, {&drivetrain, &led}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); }, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
 	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
 	
-	for(int row=0;row<3;row++){
-		for(int col=0;col<10;col++){
+	/*for(int row=0;row<3;row++){
+		for(int col=0;col<10;col++){    
 			frc2::Trigger([this, row, col] { return placePos[row][col]->GetBoolean(false); }).OnTrue(
 				frc2::SequentialCommandGroup(
 					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(true); }, {}),
@@ -110,7 +110,7 @@ void RobotContainer::ConfigureButtonBindings() {
 				).ToPtr()
 			);
 		}
-	}
+	}*/
 
 }
 
