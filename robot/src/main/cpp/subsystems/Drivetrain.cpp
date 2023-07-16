@@ -54,6 +54,11 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.GetEntry();
 
 	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
+	flTemp = frc::Shuffleboard::GetTab("Drivetrain Log").Add("fl temp(c)", frontLeft.GetMotorTemperature()).GetEntry();
+	frTemp = frc::Shuffleboard::GetTab("Drivetrain Log").Add("fr temp(c)", frontRight.GetMotorTemperature()).GetEntry();
+	blTemp = frc::Shuffleboard::GetTab("Drivetrain Log").Add("bl temp(c)", backLeft.GetMotorTemperature()).GetEntry();
+	brTemp = frc::Shuffleboard::GetTab("Drivetrain Log").Add("br temp(c)", backRight.GetMotorTemperature()).GetEntry();
+
 }
 
 void Drivetrain::Periodic() {
@@ -94,6 +99,12 @@ void Drivetrain::Periodic() {
 	}
 	auto pos=FetchPos();
 	poseSender.SetRobotPose(pos);
+
+	flTemp->SetDouble(frontLeft.GetMotorTemperature());
+	frTemp->SetDouble(frontRight.GetMotorTemperature());
+	blTemp->SetDouble(backLeft.GetMotorTemperature());
+	brTemp->SetDouble(backRight.GetMotorTemperature());
+	
 }
 
 void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented

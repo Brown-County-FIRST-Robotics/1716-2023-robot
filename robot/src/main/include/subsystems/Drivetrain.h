@@ -82,6 +82,11 @@ private:
 
 	nt::GenericEntry* resetPigeonPos;
 
+	nt::GenericEntry* brTemp;
+	nt::GenericEntry* blTemp;
+	nt::GenericEntry* frTemp;
+	nt::GenericEntry* flTemp;
+
 	// Creating kinematics object using the wheel locations.
 	frc::MecanumDriveKinematics m_kinematics{
 		DrivetrainConst::WHEEL_POS_FL_MECANUM,
