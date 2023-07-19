@@ -6,6 +6,8 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/MecanumControllerCommand.h>
 #include "commands/PlaceMobBalance.h"
+#include <frc/DriverStation.h>
+
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -81,8 +83,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Place, leave community, And Balance", AutoRoutine::PLACE_MOB_BALANCE);
 	autonomousChooser.AddOption("Place, leave community, And Balance (cable bump side)", AutoRoutine::CABLE_PLACE_MOB_BALANCE);
 
-
-	frc::Shuffleboard::GetTab("Pre Match").Add("Autonomous Routine", &autonomousChooser);
+	frc::SmartDashboard::PutData("auton", &autonomousChooser);
 	controllerLogger.Schedule();
 }
 
@@ -118,7 +119,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
 	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue){		
-		drivetrain.SetPose(frc::Pose2d(325.61_in-DrivetrainConst::INITIAL_POSE.X(), DrivetrainConst::INITIAL_POSE.Y(), DrivetrainConst::INITIAL_POSE.Rotation()));
+		drivetrain.SetPose(frc::Pose2d(325.61_in-DrivetrainConst::INITIAL_POSE.X(), DrivetrainConst::INITIAL_POSE.Y(), 180_deg-DrivetrainConst::INITIAL_POSE.Rotation().Degrees()));
 	}
 	if(autonomousChooser.GetSelected()==AutoRoutine::NOTHING)
 		return &nothing;

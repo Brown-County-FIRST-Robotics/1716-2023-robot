@@ -2,12 +2,13 @@
 #include <frc2/command/ParallelDeadlineGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/StartEndCommand.h>
+#include <frc/DriverStation.h>
 
 #include "commands/PlaceMobBalance.h"
 
 frc::Pose2d convert(frc::Pose2d pos){
 	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue)
-		return frc::Pose2d(325.61_in-pos.X(),pos.Y(),pos.Rotation());
+		return frc::Pose2d(325.61_in-pos.X(),pos.Y(),180_deg-pos.Rotation().Degrees());
 	return pos;
 }
 
