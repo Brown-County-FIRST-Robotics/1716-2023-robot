@@ -14,5 +14,5 @@
 
 class PlaceMobBalance : public frc2::CommandHelper<frc2::SequentialCommandGroup, PlaceMobBalance> {
 public:
-	explicit PlaceMobBalance(Drivetrain* drive, Arm* arm);
+	explicit PlaceMobBalance(Drivetrain* drive, Arm* arm, bool cable_bump=false);
 };

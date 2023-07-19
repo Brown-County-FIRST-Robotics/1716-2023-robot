@@ -18,12 +18,12 @@ frc::Translation2d convert(frc::Translation2d pos){
 	return pos;
 }
 
-PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm)
+PlaceMobBalance::PlaceMobBalance(Drivetrain* drive, Arm* arm,bool cable_bump)
 {
 	frc::TrajectoryConfig conf{TrajectoryFollowingConst::MAX_VELOCITY, TrajectoryFollowingConst::MAX_ACCELERATION};
 	conf.SetEndVelocity(1_m / 1_s);
 
-	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(convert(frc::Pose2d(14.91_m,4.4_m,0_deg)),{convert(frc::Translation2d(14_m,4.4_m)),convert(frc::Translation2d(12_m,4.4_m))},convert(frc::Pose2d(12_m,2_m,0_deg)), conf);
+	frc::Trajectory traj=frc::TrajectoryGenerator::GenerateTrajectory(convert(frc::Pose2d(14.91_m,cable_bump?1.22_m:4.4_m,0_deg)),{convert(frc::Translation2d(14_m,cable_bump?1.22_m:4.4_m)),convert(frc::Translation2d(12_m,cable_bump?1.22_m:4.4_m))},convert(frc::Pose2d(12_m,cable_bump?3_m:2_m,0_deg)), conf);
 	AddCommands(
 		frc2::FunctionalCommand(
 			[arm] {

@@ -118,8 +118,15 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue){		
-		drivetrain.SetPose(frc::Pose2d(325.61_in-DrivetrainConst::INITIAL_POSE.X(), DrivetrainConst::INITIAL_POSE.Y(), 180_deg-DrivetrainConst::INITIAL_POSE.Rotation().Degrees()));
+	frc::Pose2d initpose;
+	if(autonomousChooser.GetSelected()==AutoRoutine::CABLE_PLACE_MOB_BALANCE){
+		initpose=frc::Pose2d(14.91_m,1.22_m,0_deg);
+	}else{
+		initpose=DrivetrainConst::INITIAL_POSE;
+	}
+
+	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue){
+		drivetrain.SetPose(frc::Pose2d(325.61_in-initpose.X(), initpose.Y(), 180_deg-initpose.Rotation().Degrees()));
 	}
 	if(autonomousChooser.GetSelected()==AutoRoutine::NOTHING)
 		return &nothing;
@@ -130,7 +137,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently sele
 	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_MOB_BALANCE)
 		return new PlaceMobBalance(&drivetrain, &arm);
 	else if(autonomousChooser.GetSelected()==AutoRoutine::CABLE_PLACE_MOB_BALANCE)
-		return new PlaceMobBalance(&drivetrain, &arm);
+		return new PlaceMobBalance(&drivetrain, &arm, true);
 	return nullptr;
 }
 
