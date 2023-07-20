@@ -136,4 +136,28 @@ namespace LEDConst
 	const int ID = 9;
 	const int UPDATE_SPEED = 2;
 	const int NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS = 7;
+	const int OSCILATION_SPEED = 20;
+};
+
+namespace AutoConst
+{
+	const double DIST_PID[3] = {0.15,0.001,0}; // TODO: add real values
+	const double THETA_PID[3] = {0.001,0.0001,0}; // TODO: add real values
+	const double DIST_TOL = 0; // TODO: add real values(meters)
+	const double THETA_TOL = 0; // TODO: add real values(degrees)
+	// x and y are meters, theta is degrees
+	//   X  Y  Theta
+	const double POSES[9][3] = {
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		
+	};
+	 // TODO: add real values
 };

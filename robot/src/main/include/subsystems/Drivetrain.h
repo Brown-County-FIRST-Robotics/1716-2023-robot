@@ -16,6 +16,8 @@
 #include <frc/PneumaticHub.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/estimator/MecanumDrivePoseEstimator.h>
+#include <networktables/DoubleArrayTopic.h>
+#include <frc/smartdashboard/Field2d.h>
 
 
 #include "Constants.h"
@@ -48,7 +50,7 @@ public:
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
 	frc::DoubleSolenoid::Value GetSolenoid();
 
-	double GetEncoder(int motorID);
+	std::vector<double> GetEncoder();
 	void ResetEncoders();
 
 private:
@@ -75,21 +77,8 @@ private:
 
 	//Networktables:
 	nt::NetworkTableInstance networkTableInst;
-
-	std::shared_ptr<nt::NetworkTable> driveTable;
-	std::shared_ptr<nt::NetworkTable> encoderTable;
-	std::shared_ptr<nt::NetworkTable> pigeonTable;
-	std::shared_ptr<nt::NetworkTable> motorTable;
-
-	nt::FloatPublisher flEncoder;
-	nt::FloatPublisher blEncoder;
-	nt::FloatPublisher frEncoder;
-	nt::FloatPublisher brEncoder;
-	nt::BooleanEntry resetEncodersEntry;
-
-	nt::FloatPublisher yaw;
-	nt::FloatPublisher xAccel;
-	nt::FloatPublisher yAccel;
+	std::shared_ptr<nt::NetworkTable> secondsightTable;
+	nt::DoubleArraySubscriber aprilEntry;
 
 	nt::GenericEntry* resetPigeonPos;
 
@@ -113,10 +102,7 @@ private:
 		units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 	},
 	DrivetrainConst::INITIAL_POSE};
-
-
-
-
+	frc::Field2d poseSender;
 
 
 };

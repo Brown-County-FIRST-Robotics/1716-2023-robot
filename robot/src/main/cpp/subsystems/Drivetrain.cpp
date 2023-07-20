@@ -17,24 +17,17 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 
 	//networktables value updates
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
+	secondsightTable = networkTableInst.GetTable("SecondSight")->GetSubTable("Apriltags");
+	/*
+	This entry has not yet been created in SecondSight
+	{x,y,r,x_std,y_std,r_std, timestamp}
+	x,y,x_std,y_std: cm
+	r,r_std: degrees
+	timestamp: seconds
+	*/
+	aprilEntry = secondsightTable->GetDoubleArrayTopic("field_position").Subscribe({});
 
-	driveTable = networkTableInst.GetTable("1716Drive");
-	encoderTable = networkTableInst.GetTable("1716Encoder");	
-	pigeonTable = networkTableInst.GetTable("1716Pigeon");
-
-	motorTable = networkTableInst.GetTable("1716Motors");
-
-	flEncoder = encoderTable->GetFloatTopic("frontLeftEncoder").Publish();
-	frEncoder = encoderTable->GetFloatTopic("frontRightEncoder").Publish();
-	blEncoder = encoderTable->GetFloatTopic("backLeftEncoder").Publish();
-	brEncoder = encoderTable->GetFloatTopic("backRightEncoder").Publish();
-	resetEncodersEntry = encoderTable->GetBooleanTopic("resetEncoder").GetEntry(false);
-	
-	xAccel = pigeonTable->GetFloatTopic("xAccel").Publish();
-	yAccel = pigeonTable->GetFloatTopic("yAccel").Publish();
-	yaw = pigeonTable->GetFloatTopic("yaw").Publish();
-
-	solenoidIndicator = frc::Shuffleboard::GetTab("Drive")
+	solenoidIndicator = frc::Shuffleboard::GetTab("Teleop")
 		.Add("Drive Solenoid", false)
 		.WithSize(2, 2)
 		.WithProperties({
@@ -53,7 +46,7 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	},
 	DrivetrainConst::INITIAL_POSE);
 
-
+	frc::Shuffleboard::GetTab("Pre Match").Add("Robot Position", poseSender);
 	resetPigeonPos = frc::Shuffleboard::GetTab("Debugging")
 		.Add("Reset Pigeon Position", false)
 		.WithWidget(frc::BuiltInWidgets::kToggleButton)
@@ -70,21 +63,7 @@ void Drivetrain::Periodic() {
 	waitTicksNeeded--;
 
 	//Networktables
-	if (resetEncodersEntry.Get()) {
-		ResetEncoders();
-		resetEncodersEntry.Set(false);
-	}
-
-	flEncoder.Set(GetEncoder(DrivetrainConst::FRONT_LEFT_ID)/0.44);
-	frEncoder.Set(GetEncoder(DrivetrainConst::FRONT_RIGHT_ID)/0.44);
-	blEncoder.Set(GetEncoder(DrivetrainConst::BACK_LEFT_ID)/0.44);
-	brEncoder.Set(GetEncoder(DrivetrainConst::BACK_RIGHT_ID)/0.44);
-
-	xAccel.Set(resetEncodersEntry.GetAtomic().serverTime);
-	yAccel.Set(GetY());
 	
-	yaw.Set(GetYaw());
-
 	if (resetPigeonPos->GetBoolean(false)) {
 		pigeon.Reset();
 		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
@@ -108,8 +87,13 @@ void Drivetrain::Periodic() {
 			units::meter_t{backRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM}
 		}
 	);
+	auto april=aprilEntry.Get();
+	if(april.size()==6){ //  TODO: split this up into multiple entries
+		frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
+		odometry.AddVisionMeasurement(pose, frc::Timer::GetFPGATimestamp(),{0.03,0.03,5});
+	}
 	auto pos=FetchPos();
-	std::cout << "x:" << pos.X().value() << "\ty:" << pos.Y().value() << "\tr:" << pos.Rotation().Degrees().value()  << '\n';
+	poseSender.SetRobotPose(pos);
 }
 
 void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless means field-oriented
@@ -118,7 +102,7 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
-				FetchPos().Rotation().operator*(-1));
+				-FetchPos().Rotation());
 	}
 	else { //don't strafe in traction mode
 		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
@@ -209,22 +193,13 @@ frc::DoubleSolenoid::Value Drivetrain::GetSolenoid() {
 	return solenoidPos;
 }
 
-double Drivetrain::GetEncoder(int motorID) {
-	if (motorID == DrivetrainConst::FRONT_LEFT_ID) {
-		return frontLeftEncoder.GetPosition() / 42.0;
-	}
-	else if (motorID == DrivetrainConst::FRONT_RIGHT_ID) {
-		return frontRightEncoder.GetPosition() / 42.0;
-	}
-	else if (motorID == DrivetrainConst::BACK_LEFT_ID) {
-		return backLeftEncoder.GetPosition() / 42.0;
-	}
-	else if (motorID == DrivetrainConst::BACK_RIGHT_ID) {
-		return backRightEncoder.GetPosition() / 42.0;
-	}
-	else {
-		return 0;
-	}
+std::vector<double> Drivetrain::GetEncoder() {
+	return {
+			frontLeftEncoder.GetPosition() / 42.0,
+			frontRightEncoder.GetPosition() / 42.0,
+			backLeftEncoder.GetPosition() / 42.0,
+			backRightEncoder.GetPosition() / 42.0
+		};
 }
 
 void Drivetrain::ResetEncoders() {
@@ -233,7 +208,6 @@ void Drivetrain::ResetEncoders() {
 	backLeftEncoder.SetPosition(0);
 	backRightEncoder.SetPosition(0);
 }
-
 
 
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-ArmTeleopControl::ArmTeleopControl(Arm* subsystem, 
+ArmTeleopControl::ArmTeleopControl(Arm* arm, 
 	std::function<int()> elbowPov,
 	std::function<bool()> clawBool,
 	std::function<bool()> floorBool,
@@ -12,11 +12,11 @@ ArmTeleopControl::ArmTeleopControl(Arm* subsystem,
 	std::function<bool()> highBool,
 	std::function<bool()> driveBool,
 	std::function<bool()> portalBool)
-	: arm(subsystem), elbow(std::move(elbowPov)), claw(std::move(clawBool)), 
+	: arm(arm), elbow(std::move(elbowPov)), claw(std::move(clawBool)), 
 	floorButton(std::move(floorBool)), mediumButton(std::move(mediumBool)), highButton(std::move(highBool)), 
 	driveButton(std::move(driveBool)), portalButton(std::move(portalBool))
 {
-	AddRequirements(subsystem);
+	AddRequirements(arm);
 
 	//presets
 //TEMP CODE: SHUFFLEBOARD PRESETS

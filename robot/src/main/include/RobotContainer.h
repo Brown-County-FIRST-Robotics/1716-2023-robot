@@ -9,12 +9,15 @@
 #include <networktables/BooleanTopic.h>
 #include <frc/PneumaticHub.h>
 
+#include "subsystems/LED.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveForwardThenBalance.h"
 #include "commands/PlaceAndDriveBack.h"
-#include "commands/RasPiDrive.h"
 #include "commands/PlaceThenMobility.h"
+#include "commands/LogController.h"
+#include "commands/PlacePiece.h"
+
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
 public:
@@ -26,18 +29,21 @@ public:
 	explicit DriveForward(Drivetrain* drive);
 };
 
-class RasPiAutonomous : public frc2::CommandHelper<frc2::SequentialCommandGroup, RasPiAutonomous> {
-public:
-	explicit RasPiAutonomous(Drivetrain* drive, Arm* arm);
-};
 
 class RobotContainer {
 public:
 	RobotContainer();
 	frc2::Command* GetAutonomousCommand();
-	void UpdateControllerLogging();
 	void Init();
 private:
+	nt::GenericEntry* placePos[3][9];
+
+	nt::GenericEntry* floorCube;
+	nt::GenericEntry* floorCone;
+	nt::GenericEntry* dsCone;
+	nt::GenericEntry* dsCube;
+
+
 	frc2::CommandXboxController controller{0};
 	frc2::CommandXboxController controller2{1};
 	
@@ -45,40 +51,18 @@ private:
 
 	Drivetrain drivetrain{hub};
 	Arm arm{hub};
+	LED led;
 
 	void ConfigureButtonBindings();
 
 	nt::NetworkTableInstance networkTableInst;
-	std::shared_ptr<nt::NetworkTable> driveTable;
-	nt::BooleanEntry startAutoBalance;
-
-	void InitControllerLogging();
 
 	//Autonomous
 	frc::SendableChooser<frc2::Command*> autonomousChooser;
 	DriveForwardThenBalance driveForwardThenBalance{&drivetrain};
 	Nothing nothing;
 	DriveForward driveForward{&drivetrain};
-	RasPiAutonomous rasPiAutonomous{&drivetrain, &arm};
 	PlaceAndDriveBack placeAndBalance{&drivetrain, &arm};
 	PlaceThenMobility placeMob{&drivetrain, &arm};
-
-	//Controller logging
-	nt::GenericEntry* a;
-	nt::GenericEntry* b;
-	nt::GenericEntry* x;
-	nt::GenericEntry* y;
-	nt::GenericEntry* lb;
-	nt::GenericEntry* rb;
-	nt::GenericEntry* lt;
-	nt::GenericEntry* rt;
-	nt::GenericEntry* pov;
-	nt::GenericEntry* back;
-	nt::GenericEntry* start;
-	nt::GenericEntry* lx;
-	nt::GenericEntry* ly;
-	nt::GenericEntry* rx;
-	nt::GenericEntry* ry;
-	nt::GenericEntry* ls;
-	nt::GenericEntry* rs;
+	LogController controllerLogger{controller}; // Don't log the second controller for now, because we will ditch it later
 };
