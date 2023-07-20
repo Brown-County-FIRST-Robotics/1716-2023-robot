@@ -8,6 +8,9 @@
 
 #include <frc/TimedRobot.h>
 
+#include <AHRS.h>
+
+
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
@@ -21,5 +24,6 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TeleopExit() override;
+  AHRS ah;
 
 };

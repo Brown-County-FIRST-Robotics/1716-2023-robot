@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.h"
-
+#include <iostream>
 
 void Robot::RobotInit() {}
 
@@ -26,7 +26,9 @@ void Robot::AutonomousExit() {}
 void Robot::TeleopInit() {
 }
 
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+  std::cout << ah.GetAngle() << "\n";
+}
 
 void Robot::TeleopExit() {}
 
