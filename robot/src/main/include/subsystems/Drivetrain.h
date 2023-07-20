@@ -54,6 +54,8 @@ public:
 	void ResetEncoders();
 
 private:
+	void Log();
+
 	rev::CANSparkMax frontLeft{DrivetrainConst::FRONT_LEFT_ID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax frontRight{DrivetrainConst::FRONT_RIGHT_ID, rev::CANSparkMax::MotorType::kBrushless};
 	rev::CANSparkMax backLeft{DrivetrainConst::BACK_LEFT_ID, rev::CANSparkMax::MotorType::kBrushless};

@@ -97,13 +97,7 @@ void Drivetrain::Periodic() {
 		frc::Pose2d pose(april[0] * 0.01_m, april[1] * 0.01_m, frc::Rotation2d(april[2] * 1_deg));
 		odometry.AddVisionMeasurement(pose, frc::Timer::GetFPGATimestamp(),{0.03,0.03,5});
 	}
-	auto pos=FetchPos();
-	poseSender.SetRobotPose(pos);
-
-	flTemp->SetDouble(frontLeft.GetMotorTemperature());
-	frTemp->SetDouble(frontRight.GetMotorTemperature());
-	blTemp->SetDouble(backLeft.GetMotorTemperature());
-	brTemp->SetDouble(backRight.GetMotorTemperature());
+	Log();
 	
 }
 
@@ -224,4 +218,13 @@ void Drivetrain::ResetEncoders() {
 
 frc::Pose2d Drivetrain::FetchPos(){
 	return odometry.GetEstimatedPosition();
+}
+
+void Drivetrain::Log(){
+	poseSender.SetRobotPose(FetchPos());
+
+	flTemp->SetDouble(frontLeft.GetMotorTemperature());
+	frTemp->SetDouble(frontRight.GetMotorTemperature());
+	blTemp->SetDouble(backLeft.GetMotorTemperature());
+	brTemp->SetDouble(backRight.GetMotorTemperature());
 }
