@@ -18,6 +18,7 @@
 #include <frc/estimator/MecanumDrivePoseEstimator.h>
 #include <networktables/DoubleArrayTopic.h>
 #include <frc/smartdashboard/Field2d.h>
+#include "AHRS.h"
 
 
 #include "Constants.h"
@@ -42,9 +43,9 @@ public:
 	double GetRoll();
 	double GetPitch();
 	int GetYaw();
-	int16_t GetX();
-	int16_t GetY();
-	int16_t GetZ();
+	float GetX();
+	float GetY();
+	float GetZ();
 
 	void ToggleSolenoid();
 	void SetSolenoid(frc::DoubleSolenoid::Value position);
@@ -66,7 +67,7 @@ private:
 
 	frc::MecanumDrive robotDrive{frontLeft, backLeft, frontRight, backRight};
 
-	WPI_Pigeon2 pigeon{DrivetrainConst::PIGEON_ID};
+	AHRS navx{frc::SPI::Port::kMXP};
 
 	frc::PneumaticHub& hub;
 	frc::DoubleSolenoid solenoid = hub.MakeDoubleSolenoid(DrivetrainConst::SOLENOID_ID[0], DrivetrainConst::SOLENOID_ID[1]);
@@ -94,7 +95,7 @@ private:
 	// center of the field along the short end, facing forward.
 	frc::MecanumDrivePoseEstimator odometry{
 	m_kinematics,
-	frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	frc::Rotation2d(navx.GetAngle()*1_deg),
 	frc::MecanumDriveWheelPositions{
 		units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
 		units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},	
