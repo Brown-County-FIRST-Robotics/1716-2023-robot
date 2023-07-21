@@ -24,6 +24,6 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TeleopExit() override;
-  AHRS ah;
+  AHRS ah{frc::SPI::Port::kMXP};
 
 };

@@ -101,7 +101,7 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
-				-FetchPos().Rotation());
+				FetchPos().Rotation());
 	}
 	else { //don't strafe in traction mode
 		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
