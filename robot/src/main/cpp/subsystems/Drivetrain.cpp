@@ -53,6 +53,11 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.GetEntry();
 
 	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
+	frontLeft.BurnFlash();
+	frontRight.BurnFlash();
+	backLeft.BurnFlash();
+	backRight.BurnFlash();
+
 }
 
 void Drivetrain::Periodic() {
