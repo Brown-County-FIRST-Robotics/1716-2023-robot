@@ -83,7 +83,7 @@ RobotContainer::RobotContainer() {
 	autonomousChooser.AddOption("Place, leave community, And Balance", AutoRoutine::PLACE_MOB_BALANCE);
 	autonomousChooser.AddOption("Place, leave community, And Balance (cable bump side)", AutoRoutine::CABLE_PLACE_MOB_BALANCE);
 
-	frc::SmartDashboard::PutData("auton", &autonomousChooser);
+	frc::Shuffleboard::GetTab("Pre Match").Add("auto routine", autonomousChooser);
 	controllerLogger.Schedule();
 }
 
