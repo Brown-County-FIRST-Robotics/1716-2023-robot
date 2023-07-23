@@ -35,9 +35,8 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 			{"Color when false", nt::Value::MakeString("Cyan")}})
 		.GetEntry();
 
-	pigeon.Reset();
-	pigeon.ConfigMountPose(ctre::phoenix::sensors::AxisDirection::PositiveX, ctre::phoenix::sensors::AxisDirection::PositiveZ);
-	odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	navx.Reset();
+	odometry.ResetPosition(frc::Rotation2d(navx.GetAngle()*1_deg),
 	frc::MecanumDriveWheelPositions{
 				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
 				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
@@ -54,11 +53,16 @@ Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 		.GetEntry();
 
 	SetSolenoid(frc::DoubleSolenoid::Value::kReverse);
+	frontLeft.BurnFlash();
+	frontRight.BurnFlash();
+	backLeft.BurnFlash();
+	backRight.BurnFlash();
+
 }
 
 void Drivetrain::SetPose(frc::Pose2d pose){
-	pigeon.Reset();
-		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+	navx.Reset();
+	odometry.ResetPosition(frc::Rotation2d(navx.GetAngle()*1_deg),
 		frc::MecanumDriveWheelPositions{
 				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
 				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
@@ -77,8 +81,8 @@ void Drivetrain::Periodic() {
 	//Networktables
 	
 	if (resetPigeonPos->GetBoolean(false)) {
-		pigeon.Reset();
-		odometry.ResetPosition(frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+		navx.Reset();
+		odometry.ResetPosition(frc::Rotation2d(navx.GetAngle()*1_deg),
 		frc::MecanumDriveWheelPositions{
 				units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
 				units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
@@ -91,7 +95,7 @@ void Drivetrain::Periodic() {
 	}
 
 	odometry.Update(
-		frc::Rotation2d(units::degree_t(pigeon.GetYaw())),
+		frc::Rotation2d(navx.GetAngle()*1_deg),
 		frc::MecanumDriveWheelPositions{
 			units::meter_t{frontLeftEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
 			units::meter_t{frontRightEncoder.GetPosition() * DrivetrainConst::WHEEL_EFFECTIVE_DIAMETER_MECANUM},
@@ -113,7 +117,7 @@ void Drivetrain::Drive(double x, double y, double z, bool headless) { //headless
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6);
 		else
 			robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, y * DrivetrainConst::MAX_SPEED, z * DrivetrainConst::MAX_SPEED * 0.6, 
-				-FetchPos().Rotation());
+				FetchPos().Rotation());
 	}
 	else { //don't strafe in traction mode
 		robotDrive.DriveCartesian(x * DrivetrainConst::MAX_SPEED, 0, z * DrivetrainConst::MAX_SPEED * 0.6);
@@ -145,41 +149,32 @@ void Drivetrain::ActivateBreakMode(bool doBrakeMode) {
 }
 
 double Drivetrain::GetRoll() {
-	return pigeon.GetRoll();
+	return navx.GetRoll();
 }
 
 double Drivetrain::GetPitch() {
-	return pigeon.GetPitch();
+	return navx.GetPitch();
 }
 
 int Drivetrain::GetYaw() {
-	if ((int)pigeon.GetYaw() % 360 >= 0) { //make it between 0 and 359
-		return (int)pigeon.GetYaw() % 360;
+	if ((int)navx.GetAngle() % 360 >= 0) { //make it between 0 and 359
+		return (int)navx.GetAngle() % 360;
 	}
 	else {
-		return ((int)pigeon.GetYaw() % 360) + 360;
+		return ((int)navx.GetAngle() % 360) + 360;
 	}
 }
 
-int16_t Drivetrain::GetX() {
-	int16_t accelerometer[3];
-	pigeon.GetBiasedAccelerometer(accelerometer);
-
-	return accelerometer[0];
+float Drivetrain::GetX() {
+	return navx.GetRawAccelX();
 }
 
-int16_t Drivetrain::GetY() {
-	int16_t accelerometer[3];
-	pigeon.GetBiasedAccelerometer(accelerometer);
-
-	return accelerometer[1];
+float Drivetrain::GetY() {
+	return navx.GetRawAccelY();
 }
 
-int16_t Drivetrain::GetZ() {
-	int16_t accelerometer[3];
-	pigeon.GetBiasedAccelerometer(accelerometer);
-
-	return accelerometer[2];
+float Drivetrain::GetZ() {
+	return navx.GetRawAccelZ();
 }
 
 void Drivetrain::ToggleSolenoid() {
