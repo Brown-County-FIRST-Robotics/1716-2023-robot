@@ -4,6 +4,10 @@
 #include <frc2/command/ParallelDeadlineGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc2/command/MecanumControllerCommand.h>
+#include "commands/PlaceMobBalance.h"
+#include <frc/DriverStation.h>
+
 
 #include "RobotContainer.h"
 #include "Constants.h"
@@ -16,11 +20,42 @@ using frc::XboxController;
 using namespace frc2;
 
 RobotContainer::RobotContainer() {
-	InitControllerLogging();
-
 	networkTableInst = nt::NetworkTableInstance::GetDefault();
-	driveTable = networkTableInst.GetTable("1716Drive");
-	startAutoBalance = driveTable->GetBooleanTopic("startAutoBalance").GetEntry(false);
+
+	floorCone = frc::Shuffleboard::GetTab("Teleop").Add("<floor>", false).WithPosition(10,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	floorCube = frc::Shuffleboard::GetTab("Teleop").Add("[floor]", false).WithPosition(9,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCone = frc::Shuffleboard::GetTab("Teleop").Add("<ds>", false).WithPosition(10,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	dsCube = frc::Shuffleboard::GetTab("Teleop").Add("[ds]", false).WithPosition(9,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+	placePos[0][0] = frc::Shuffleboard::GetTab("Teleop").Add("(1)", false).WithPosition(0,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][1] = frc::Shuffleboard::GetTab("Teleop").Add("(2)", false).WithPosition(1,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][2] = frc::Shuffleboard::GetTab("Teleop").Add("(3)", false).WithPosition(2,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][3] = frc::Shuffleboard::GetTab("Teleop").Add("(4)", false).WithPosition(3,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][4] = frc::Shuffleboard::GetTab("Teleop").Add("(5)", false).WithPosition(4,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][5] = frc::Shuffleboard::GetTab("Teleop").Add("(6)", false).WithPosition(5,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][6] = frc::Shuffleboard::GetTab("Teleop").Add("(7)", false).WithPosition(6,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][7] = frc::Shuffleboard::GetTab("Teleop").Add("(8)", false).WithPosition(7,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[0][8] = frc::Shuffleboard::GetTab("Teleop").Add("(9)", false).WithPosition(8,2).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+	placePos[1][0] = frc::Shuffleboard::GetTab("Teleop").Add("<1>", false).WithPosition(0,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][1] = frc::Shuffleboard::GetTab("Teleop").Add("[1]", false).WithPosition(1,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][2] = frc::Shuffleboard::GetTab("Teleop").Add("<2>", false).WithPosition(2,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][3] = frc::Shuffleboard::GetTab("Teleop").Add("<3>", false).WithPosition(3,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][4] = frc::Shuffleboard::GetTab("Teleop").Add("[2]", false).WithPosition(4,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][5] = frc::Shuffleboard::GetTab("Teleop").Add("<4>", false).WithPosition(5,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][6] = frc::Shuffleboard::GetTab("Teleop").Add("<5>", false).WithPosition(6,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][7] = frc::Shuffleboard::GetTab("Teleop").Add("[3]", false).WithPosition(7,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[1][8] = frc::Shuffleboard::GetTab("Teleop").Add("<6>", false).WithPosition(8,1).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+
+	placePos[2][0] = frc::Shuffleboard::GetTab("Teleop").Add("<7>", false).WithPosition(0,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][1] = frc::Shuffleboard::GetTab("Teleop").Add("[4]", false).WithPosition(1,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][2] = frc::Shuffleboard::GetTab("Teleop").Add("<8>", false).WithPosition(2,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][3] = frc::Shuffleboard::GetTab("Teleop").Add("<9>", false).WithPosition(3,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][4] = frc::Shuffleboard::GetTab("Teleop").Add("[5]", false).WithPosition(4,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][5] = frc::Shuffleboard::GetTab("Teleop").Add("<10>", false).WithPosition(5,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][6] = frc::Shuffleboard::GetTab("Teleop").Add("<11>", false).WithPosition(6,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][7] = frc::Shuffleboard::GetTab("Teleop").Add("[6]", false).WithPosition(7,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
+	placePos[2][8] = frc::Shuffleboard::GetTab("Teleop").Add("<12>", false).WithPosition(8,0).WithWidget(frc::BuiltInWidgets::kToggleButton).GetEntry();
 
 	ConfigureButtonBindings();
 	
@@ -42,92 +77,78 @@ RobotContainer::RobotContainer() {
 		[this] { return controller.GetLeftBumper(); }));
 
 	//Autonomous:
-	autonomousChooser.SetDefaultOption("Drive Forward and Auto-level", &driveForwardThenBalance);
-	autonomousChooser.AddOption("Drive Forward", &driveForward);
-	autonomousChooser.AddOption("Raspberry Pie Control", &rasPiAutonomous);
-	autonomousChooser.AddOption("Nothing", &nothing);
-	autonomousChooser.AddOption("Place And Balance", &placeAndBalance);
-	autonomousChooser.AddOption("Place then leave community", &placeMob);
+	autonomousChooser.SetDefaultOption("Nothing", AutoRoutine::NOTHING);
+	autonomousChooser.AddOption("Place And Balance", AutoRoutine::PLACE_THEN_BALANCE);
+	autonomousChooser.AddOption("Place then leave community", AutoRoutine::PLACE_MOBILITY);
+	autonomousChooser.AddOption("Place, leave community, And Balance", AutoRoutine::PLACE_MOB_BALANCE);
+	autonomousChooser.AddOption("Place, leave community, And Balance (cable bump side)", AutoRoutine::CABLE_PLACE_MOB_BALANCE);
 
-	frc::SmartDashboard::PutData("Autonomous Routine", &autonomousChooser);
+	frc::Shuffleboard::GetTab("Pre Match").Add("auto routine", autonomousChooser);
+	controllerLogger.Schedule();
 }
 
 void RobotContainer::Init(){
 	drivetrain.SetSolenoid(DrivetrainConst::MECH_MODE);
 }
-
+/*
+purple: cube
+yellow: cone
+red: mech
+green: tank
+blue: auto
+*/
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); led.SetDrivetrainMode(drivetrain.GetSolenoid());}, {&drivetrain, &led}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
 	controller.Back().ToggleOnTrue(AutoBalance(&drivetrain).ToPtr());
-	 	//Auto balancing
+	
+	for(int row=0;row<3;row++){
+		for(int col=0;col<10;col++){
+			frc2::Trigger([this, row, col] { return placePos[row][col]->GetBoolean(false); }).OnTrue(
+				frc2::SequentialCommandGroup(
+					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(true); }, {}),
+					PlacePiece(&drivetrain, &arm, &led, row, col)
+				).ToPtr()
+			);
+		}
+	}
 
-	frc2::Trigger([this] { return startAutoBalance.Get(); }) //start auto balance remotely
-		.OnTrue(AutoBalance(&drivetrain)
-	 	.Until([this] { return !startAutoBalance.Get() || controller.GetBackButtonPressed(); }));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { //get the currently selected autonomous command
-	return autonomousChooser.GetSelected();
-}
+	frc::Pose2d initpose;
+	if(autonomousChooser.GetSelected()==AutoRoutine::CABLE_PLACE_MOB_BALANCE){
+		initpose=frc::Pose2d(14.91_m,1.22_m,0_deg);
+	}else{
+		initpose=DrivetrainConst::INITIAL_POSE;
+	}
 
-void RobotContainer::InitControllerLogging() {
-	a = frc::Shuffleboard::GetTab("Controller").Add("A", controller.GetAButton()).GetEntry();
-	b = frc::Shuffleboard::GetTab("Controller").Add("B", controller.GetBButton()).GetEntry();
-	x = frc::Shuffleboard::GetTab("Controller").Add("X", controller.GetXButton()).GetEntry();
-	y = frc::Shuffleboard::GetTab("Controller").Add("Y", controller.GetYButton()).GetEntry();
-	lb = frc::Shuffleboard::GetTab("Controller").Add("Left Bumper", controller.GetLeftBumper()).GetEntry();
-	rb = frc::Shuffleboard::GetTab("Controller").Add("Right Bumper", controller.GetRightBumper()).GetEntry();
-	lt = frc::Shuffleboard::GetTab("Controller").Add("Left Trigger", controller.GetLeftTriggerAxis()).GetEntry();
-	rt = frc::Shuffleboard::GetTab("Controller").Add("Right Trigger", controller.GetRightTriggerAxis()).GetEntry();
-	pov = frc::Shuffleboard::GetTab("Controller").Add("POV", controller.GetPOV()).GetEntry();
-	back = frc::Shuffleboard::GetTab("Controller").Add("Back", controller.GetBackButton()).GetEntry();
-	start = frc::Shuffleboard::GetTab("Controller").Add("Start", controller.GetStartButton()).GetEntry();
-	lx = frc::Shuffleboard::GetTab("Controller").Add("Left X", controller.GetLeftX()).GetEntry();
-	ly = frc::Shuffleboard::GetTab("Controller").Add("Left Y", -controller.GetLeftY()).GetEntry();
-	rx = frc::Shuffleboard::GetTab("Controller").Add("Right X", controller.GetRightX()).GetEntry();
-	ry = frc::Shuffleboard::GetTab("Controller").Add("Right Y", -controller.GetRightY()).GetEntry();
-	ls = frc::Shuffleboard::GetTab("Controller").Add("Left Stick Button", controller.GetLeftStickButton()).GetEntry();
-	rs = frc::Shuffleboard::GetTab("Controller").Add("Right Stick Button", controller.GetRightStickButton()).GetEntry();
-}
-
-void RobotContainer::UpdateControllerLogging() {
-	a->SetBoolean(controller.GetAButton());
-	b->SetBoolean(controller.GetBButton());
-	x->SetBoolean(controller.GetXButton());
-	y->SetBoolean(controller.GetYButton());
-	lb->SetBoolean(controller.GetLeftBumper());
-	rb->SetBoolean(controller.GetRightBumper());
-	lt->SetDouble(controller.GetLeftTriggerAxis());
-	rt->SetDouble(controller.GetRightTriggerAxis());
-	pov->SetInteger(controller.GetPOV());
-	back->SetBoolean(controller.GetBackButton());
-	start->SetBoolean(controller.GetStartButton());
-	lx->SetDouble(controller.GetLeftX());
-	ly->SetDouble(-controller.GetLeftY());
-	rx->SetDouble(controller.GetRightX());
-	ry->SetDouble(-controller.GetRightY());
-	ls->SetBoolean(controller.GetLeftStickButton());
-	rs->SetBoolean(controller.GetRightStickButton());
+	if(frc::DriverStation::GetAlliance()==frc::DriverStation::Alliance::kBlue){
+		drivetrain.SetPose(frc::Pose2d(325.61_in-initpose.X(), initpose.Y(), 180_deg-initpose.Rotation().Degrees()));
+	}
+	if(autonomousChooser.GetSelected()==AutoRoutine::NOTHING)
+		return &nothing;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_THEN_BALANCE)
+		return &placeAndBalance;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_MOBILITY)
+		return &placeMob;
+	else if(autonomousChooser.GetSelected()==AutoRoutine::PLACE_MOB_BALANCE)
+		return new PlaceMobBalance(&drivetrain, &arm);
+	else if(autonomousChooser.GetSelected()==AutoRoutine::CABLE_PLACE_MOB_BALANCE)
+		return new PlaceMobBalance(&drivetrain, &arm, true);
+	return nullptr;
 }
 
 bool Nothing::IsFinished() { return true; }
 
-DriveForward::DriveForward(Drivetrain* subsystem)
+DriveForward::DriveForward(Drivetrain* drive)
 {
 	AddCommands(
 		frc2::ParallelDeadlineGroup(
 			frc2::WaitCommand(5_s),
-			frc2::StartEndCommand([subsystem] {subsystem->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); subsystem->Drive(0.2, 0, 0);}, 
-				[subsystem] { subsystem->Drive(0, 0, 0); }, {subsystem}) //command that backs up
+			frc2::StartEndCommand([drive] {drive->SetSolenoid(frc::DoubleSolenoid::Value::kReverse); drive->Drive(0.2, 0, 0);}, 
+				[drive] { drive->Drive(0, 0, 0); }, {drive}) //command that backs up
 		));
-}
-
-RasPiAutonomous::RasPiAutonomous(Drivetrain* subsystem, Arm* arm)
-{
-	AddCommands(
-		RasPiDrive(subsystem, arm, true)
-	);
 }

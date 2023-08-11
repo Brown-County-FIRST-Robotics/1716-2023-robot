@@ -7,7 +7,7 @@
 
 class TeleopDrive : public frc2::CommandHelper<frc2::CommandBase, TeleopDrive> {
 public:
-	explicit TeleopDrive(Drivetrain* subsystem, 
+	explicit TeleopDrive(Drivetrain* drive, 
 		std::function<double()> forward, 
 		std::function<double()> right, 
 		std::function<double()> rotation, 

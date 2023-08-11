@@ -7,7 +7,7 @@
 
 class ArmTeleopControl : public frc2::CommandHelper<frc2::CommandBase, ArmTeleopControl> {
 public:
-	explicit ArmTeleopControl(Arm* subsystem,
+	explicit ArmTeleopControl(Arm* arm,
 		std::function<int()> elbowPov, //takes a DPad
 		std::function<bool()> clawBool,
 		std::function<bool()> floorBool,

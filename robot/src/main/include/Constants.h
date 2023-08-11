@@ -1,9 +1,11 @@
 #pragma once
-// #include <units/time.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <networktables/NetworkTableValue.h>
 #include <frc/TimedRobot.h> //units::scalar
 #include <frc/DoubleSolenoid.h>
 #include <frc/geometry/Pose2d.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
 
 namespace SolenoidConst {
 	const units::second_t SET_LENGTH = 3_ms;
@@ -29,7 +31,7 @@ namespace DrivetrainConst {
 	const auto MECH_MODE = frc::DoubleSolenoid::Value::kReverse;
 
 	//should actually change based on which auto is selected
-	const auto INITIAL_POSE = frc::Pose2d(0_m, 0_m, 180_deg);
+	const auto INITIAL_POSE = frc::Pose2d(14.91_m,4.4_m,0_deg);
 
 
 	//roughly measured on robot
@@ -136,4 +138,77 @@ namespace LEDConst
 	const int ID = 9;
 	const int UPDATE_SPEED = 2;
 	const int NUM_OF_NIGHT_RIDER_TRAILING_LIGHTS = 7;
+	const int OSCILATION_SPEED = 20;
 };
+
+namespace AutoConst
+{
+	const double DIST_PID[3] = {0.15,0.001,0}; // TODO: add real values
+	const double THETA_PID[3] = {0.001,0.0001,0}; // TODO: add real values
+	const double DIST_TOL = 0; // TODO: add real values(meters)
+	const double THETA_TOL = 0; // TODO: add real values(degrees)
+	// x and y are meters, theta is degrees
+	//   X  Y  Theta
+	const double POSES[9][3] = {
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		{610*30/1200, 42*30/1200, 0},
+		
+	};
+	 // TODO: add real values
+};
+
+namespace TrajectoryFollowingConst
+{
+	const auto FEEDFORWARD_GAIN = 0_V;
+	const auto FEEDFORWARD_VELCOITY = 3_V * 1_s / 1_m;
+	const auto FEEDFORWARD_ACCELERATION = 0.7 * 1_V * 1_s * 1_s / 1_m;
+
+	const double FL_P = 0;
+	const double FL_I = 0;
+	const double FL_D = 0;
+
+	const double BL_P = 0;
+	const double BL_I = 0;
+	const double BL_D = 0;
+
+	const double FR_P = 0; // was 0.2
+	const double FR_I = 0;
+	const double FR_D = 0;
+
+	const double BR_P = 0;
+	const double BR_I = 0;
+	const double BR_D = 0;
+
+	const double X_P = 2;
+	const double X_I = 0;
+	const double X_D = 0;
+
+	const double Y_P = 2;
+	const double Y_I = 0;
+	const double Y_D = 0;
+
+	const double THETA_P = 0.5;
+	const double THETA_I = 0;
+	const double THETA_D = 0;
+
+	const auto MAX_ANGULAR_VELOCITY = 3_rad / 1_s;
+	const auto MAX_ANGULAR_ACCELETATION = 3_rad / 1_s / 1_s;
+	const auto MAX_VELOCITY = 3_m / 1_s;
+	const auto MAX_ACCELERATION = 1_m / 1_s / 1_s;
+
+	const frc::TrapezoidProfile<units::radians>::Constraints ROTATION_CONSTRAINTS{MAX_ANGULAR_VELOCITY, MAX_ANGULAR_ACCELETATION};
+};
+/*
+x			y
+74.94		59.39
+147.065		59.39
+74.94		156.64
+147.065		156.64
+*/
