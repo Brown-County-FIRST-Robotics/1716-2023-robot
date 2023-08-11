@@ -49,7 +49,7 @@ public class DriveCartesian extends CommandBase {
         if (Math.abs(x.getAsDouble()) > DrivetrainConst.JoystickDeadzone || Math.abs(y.getAsDouble()) > DrivetrainConst.JoystickDeadzone || Math.abs(z.getAsDouble()) > DrivetrainConst.JoystickDeadzone) {
             drivetrain.drive(closerToZero(xSquare, xAccelerationCap.calculate(xSquare)), 
                 closerToZero(ySquare, yAccelerationCap.calculate(ySquare)), 
-                closerToZero(zSquare, zAccelerationCap.calculate(zSquare)));
+                -closerToZero(zSquare, zAccelerationCap.calculate(zSquare)));
         }
         else
             drivetrain.drive(0, 0, 0);
@@ -61,6 +61,9 @@ public class DriveCartesian extends CommandBase {
     }
 
     private double closerToZero(double value1, double value2) {
-        return Math.min(Math.abs(value1), Math.abs(value2));
+        if (Math.min(Math.abs(value1), Math.abs(value2)) == Math.abs(value1))
+            return value1;
+        else
+            return value2;
     }
 }

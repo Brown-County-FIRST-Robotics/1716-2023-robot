@@ -16,7 +16,7 @@ public class RobotContainer {
 	XboxController controller = new XboxController(IOConstants.DriverControllerPort);
 	CommandXboxController triggerController = new CommandXboxController(IOConstants.DriverControllerPort);
 	
-	String[] songs = { "MrRoboto.chrp", "Sandstorm.chrp", "TheDuckSong.chrp", "GandalfSaxGuy.chrp" };
+	String[] songs = { "MrRoboto.chrp", "Megalovania.chrp", "Animusic.chrp", "GandalfSaxGuy.chrp" };
 
 	public RobotContainer() {
 		configureButtonBindings();
