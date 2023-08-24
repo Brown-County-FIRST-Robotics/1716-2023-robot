@@ -7,9 +7,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 
-public class Drivetrain {
+public class Drivetrain extends SubsystemBase {
   WPI_TalonFX fl_drive = new WPI_TalonFX(Constants.IO.FL_DRIVE_ID);
   WPI_TalonFX fr_drive = new WPI_TalonFX(Constants.IO.FR_DRIVE_ID);
   WPI_TalonFX bl_drive = new WPI_TalonFX(Constants.IO.BL_DRIVE_ID);
@@ -18,15 +21,16 @@ public class Drivetrain {
   CANSparkMax fr_steer = new CANSparkMax(Constants.IO.FR_STEER_ID, MotorType.kBrushless);
   CANSparkMax bl_steer = new CANSparkMax(Constants.IO.BL_STEER_ID, MotorType.kBrushless);
   CANSparkMax br_steer = new CANSparkMax(Constants.IO.BR_STEER_ID, MotorType.kBrushless);
+  SparkMaxPIDController fl_steer_pid = fl_steer.getPIDController();
+  SparkMaxPIDController fr_steer_pid = fr_steer.getPIDController();
+  SparkMaxPIDController bl_steer_pid = bl_steer.getPIDController();
+  SparkMaxPIDController br_steer_pid = br_steer.getPIDController();
 
   AHRS navx = new AHRS(SPI.Port.kMXP);
 
-  public void configure() {
-    SparkMaxPIDController fl_steer_pid = fl_steer.getPIDController();
-    SparkMaxPIDController fr_steer_pid = fr_steer.getPIDController();
-    SparkMaxPIDController bl_steer_pid = bl_steer.getPIDController();
-    SparkMaxPIDController br_steer_pid = br_steer.getPIDController();
 
+
+  public void configure() {
     fl_steer_pid.setP(Constants.Drivetrain.FL_STEER_P);
     fl_steer_pid.setI(Constants.Drivetrain.FL_STEER_I);
     fl_steer_pid.setD(Constants.Drivetrain.FL_STEER_D);
