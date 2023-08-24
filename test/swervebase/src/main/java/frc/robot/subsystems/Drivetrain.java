@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -86,5 +87,29 @@ public class Drivetrain extends SubsystemBase {
   public Drivetrain() {
     navx.reset();
     configure();
+  }
+
+  public void setModuleStates(SwerveModuleState[] states) {
+    fl_steer_pid.setReference(
+        states[0].angle.getDegrees() / 360, CANSparkMax.ControlType.kPosition);
+    fr_steer_pid.setReference(
+        states[1].angle.getDegrees() / 360, CANSparkMax.ControlType.kPosition);
+    bl_steer_pid.setReference(
+        states[2].angle.getDegrees() / 360, CANSparkMax.ControlType.kPosition);
+    br_steer_pid.setReference(
+        states[3].angle.getDegrees() / 360, CANSparkMax.ControlType.kPosition);
+
+    fl_drive.set(
+        TalonFXControlMode.Velocity,
+        states[0].speedMetersPerSecond / Constants.Drivetrain.EFFECTIVE_WHEEL_DIAMETER);
+    fr_drive.set(
+        TalonFXControlMode.Velocity,
+        states[1].speedMetersPerSecond / Constants.Drivetrain.EFFECTIVE_WHEEL_DIAMETER);
+    bl_drive.set(
+        TalonFXControlMode.Velocity,
+        states[2].speedMetersPerSecond / Constants.Drivetrain.EFFECTIVE_WHEEL_DIAMETER);
+    br_drive.set(
+        TalonFXControlMode.Velocity,
+        states[3].speedMetersPerSecond / Constants.Drivetrain.EFFECTIVE_WHEEL_DIAMETER);
   }
 }

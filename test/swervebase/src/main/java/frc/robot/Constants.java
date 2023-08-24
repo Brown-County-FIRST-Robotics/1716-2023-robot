@@ -2,6 +2,7 @@ package frc.robot;
 
 public class Constants {
   public static final class IO {
+    // TODO: add real values
     public static final int FL_STEER_ID = 0;
     public static final int FR_STEER_ID = 2;
     public static final int BL_STEER_ID = 1;
@@ -13,6 +14,7 @@ public class Constants {
   }
 
   public static final class Drivetrain {
+    // TODO: add real values
     public static final double FL_STEER_P = 0;
     public static final double FL_STEER_I = 0;
     public static final double FL_STEER_D = 0;
@@ -49,5 +51,7 @@ public class Constants {
     public static final double BR_DRIVE_I = 0;
     public static final double BR_DRIVE_D = 0;
     public static final double BR_DRIVE_FF = 1;
+
+    public static final double EFFECTIVE_WHEEL_DIAMETER=1; // TODO: add real values
   }
 }
