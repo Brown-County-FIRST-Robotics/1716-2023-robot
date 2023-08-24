@@ -1,16 +1,19 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
@@ -22,6 +25,11 @@ public class Drivetrain extends SubsystemBase {
   CANSparkMax fr_steer = new CANSparkMax(Constants.IO.FR_STEER_ID, MotorType.kBrushless);
   CANSparkMax bl_steer = new CANSparkMax(Constants.IO.BL_STEER_ID, MotorType.kBrushless);
   CANSparkMax br_steer = new CANSparkMax(Constants.IO.BR_STEER_ID, MotorType.kBrushless);
+  RelativeEncoder fl_encoder = fl_steer.getEncoder();
+  RelativeEncoder fr_encoder = fr_steer.getEncoder();
+  RelativeEncoder bl_encoder = bl_steer.getEncoder();
+  RelativeEncoder br_encoder = br_steer.getEncoder();
+
   SparkMaxPIDController fl_steer_pid = fl_steer.getPIDController();
   SparkMaxPIDController fr_steer_pid = fr_steer.getPIDController();
   SparkMaxPIDController bl_steer_pid = bl_steer.getPIDController();
@@ -82,6 +90,23 @@ public class Drivetrain extends SubsystemBase {
     br_drive.config_kI(0, Constants.Drivetrain.BR_DRIVE_I, 20);
     br_drive.config_kD(0, Constants.Drivetrain.BR_DRIVE_D, 20);
     br_drive.config_kF(0, Constants.Drivetrain.BR_DRIVE_FF, 20);
+  }
+
+  public SwerveModulePosition[] getPosition() {
+    return new SwerveModulePosition[] {
+      new SwerveModulePosition(
+          fl_drive.getSelectedSensorPosition(),
+          new Rotation2d(2 * Math.PI * fl_encoder.getPosition())),
+      new SwerveModulePosition(
+          fr_drive.getSelectedSensorPosition(),
+          new Rotation2d(2 * Math.PI * fr_encoder.getPosition())),
+      new SwerveModulePosition(
+          bl_drive.getSelectedSensorPosition(),
+          new Rotation2d(2 * Math.PI * bl_encoder.getPosition())),
+      new SwerveModulePosition(
+          br_drive.getSelectedSensorPosition(),
+          new Rotation2d(2 * Math.PI * br_encoder.getPosition()))
+    };
   }
 
   public Drivetrain() {
