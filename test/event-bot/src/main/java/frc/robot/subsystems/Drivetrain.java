@@ -17,10 +17,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.DrivetrainConst;
 
 public class Drivetrain extends SubsystemBase {
+	private double maxSpeed = 0.3;
+
 	private final WPI_TalonFX frontLeft = new WPI_TalonFX(DrivetrainConst.FrontLeftMotorPort);
-	private final WPI_TalonFX backLeft = new WPI_TalonFX(DrivetrainConst.RearLeftMotorPort);
+	private final WPI_TalonFX backLeft = new WPI_TalonFX(DrivetrainConst.BackLeftMotorPort);
 	private final WPI_TalonFX frontRight = new WPI_TalonFX(DrivetrainConst.FrontRightMotorPort);
-	private final WPI_TalonFX backRight = new WPI_TalonFX(DrivetrainConst.RearRightMotorPort);
+	private final WPI_TalonFX backRight = new WPI_TalonFX(DrivetrainConst.BackRightMotorPort);
 
 	private final MecanumDrive mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 
@@ -31,19 +33,15 @@ public class Drivetrain extends SubsystemBase {
 
 	//music playing:
 	Orchestra orchestra;
-	// Orchestra frontLeftOrchestra;
-	// Orchestra frontRightOrchestra;
-	// Orchestra backLeftOrchestra;
-	// Orchestra backRightOrchestra;
-
 
 	public Drivetrain() {
 		frontRight.setInverted(true);
-		frontLeft.setInverted(true);
-		backRight.setInverted(false);
+		frontLeft.setInverted(false);
+		backRight.setInverted(true);
 		backLeft.setInverted(false);
 
-		setNeutralMode(NeutralMode.Coast);
+		neutralMode = NeutralMode.Brake;
+		toggleNeutralMode();
 
 		try {
 			navX = new AHRS(SPI.Port.kMXP);
@@ -65,21 +63,6 @@ public class Drivetrain extends SubsystemBase {
 		instruments.add(backLeft);
 		instruments.add(backRight);
         orchestra = new Orchestra(instruments);
-		// ArrayList<TalonFX> frontLeftInstrument = new ArrayList<TalonFX>();
-		// frontLeftInstrument.add(frontLeft);
-		// frontLeftOrchestra = new Orchestra(frontLeftInstrument);
-
-		// ArrayList<TalonFX> frontRightInstrument = new ArrayList<TalonFX>();
-		// frontRightInstrument.add(frontRight);
-		// frontRightOrchestra = new Orchestra(frontRightInstrument);
-
-		// ArrayList<TalonFX> backLeftInstrument = new ArrayList<TalonFX>();
-		// backLeftInstrument.add(backLeft);
-		// backLeftOrchestra = new Orchestra(backLeftInstrument);
-
-		// ArrayList<TalonFX> backRightInstrument = new ArrayList<TalonFX>();
-		// backRightInstrument.add(backRight);
-		// backRightOrchestra = new Orchestra(backRightInstrument);
 	}
 
 	/**
@@ -90,32 +73,53 @@ public class Drivetrain extends SubsystemBase {
 	 * @param rot Rotational rate of the robot.
 	 */
 	public void drive(double xSpeed, double ySpeed, double rot) {
-		if (xSpeed < 0.05 && ySpeed < 0.05 && rot < 0.05 && orchestra.isPlaying())
-		// if (xSpeed < 0.05 && ySpeed < 0.05 && rot < 0.05 && frontLeftOrchestra.isPlaying())
+		if (xSpeed == 0 && ySpeed == 0 && rot == 0)
 			return;
+		if (orchestra.isPlaying())
+			stopSong();
 		if (doFieldOriented)
-			mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed,
-				navX.getRotation2d());
+			mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed,
+				navX.getRotation2d().times(-1));
 		else
-			mecanumDrive.driveCartesian(xSpeed * DrivetrainConst.MotorMaxSpeed, ySpeed * DrivetrainConst.MotorMaxSpeed, rot * DrivetrainConst.MotorMaxSpeed);
+			mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed);
 	}
 
-	public void setNeutralMode(NeutralMode neutralMode_p) { //brake/coast mode
-		frontLeft.setNeutralMode(neutralMode_p);
-		frontRight.setNeutralMode(neutralMode_p);
-		backLeft.setNeutralMode(neutralMode_p);
-		backRight.setNeutralMode(neutralMode_p);
-		neutralMode = neutralMode_p;
+	public void incrementMaxSpeed() {
+		maxSpeed += 0.1;
+		if (maxSpeed >= 1) {
+			maxSpeed = 1;
+		}
+	}
+
+	public void decrementMaxSpeed() {
+		maxSpeed -= 0.1;
+		if (maxSpeed <= 0) {
+			maxSpeed = 0;
+		}
+	}
+
+	public void toggleNeutralMode() {
+		if (neutralMode == NeutralMode.Brake) {
+			frontLeft.setNeutralMode(NeutralMode.Coast);
+			frontRight.setNeutralMode(NeutralMode.Coast);
+			backLeft.setNeutralMode(NeutralMode.Coast);
+			backRight.setNeutralMode(NeutralMode.Coast);
+			neutralMode = NeutralMode.Coast;
+		}
+		else {
+			frontLeft.setNeutralMode(NeutralMode.Brake);
+			frontRight.setNeutralMode(NeutralMode.Brake);
+			backLeft.setNeutralMode(NeutralMode.Brake);
+			backRight.setNeutralMode(NeutralMode.Brake);
+			neutralMode = NeutralMode.Brake;
+		}
 	}
 	public NeutralMode getNeutralMode() {
 		return neutralMode;
 	}
 
-	public void setFieldOriented(boolean activateFieldOriented) {
-		doFieldOriented = activateFieldOriented;
-	}
-	public boolean getFieldOriented() {
-		return doFieldOriented;
+	public void toggleFieldOriented() {
+		doFieldOriented = !doFieldOriented;
 	}
 
 	public void resetGyroscope() {
@@ -128,41 +132,14 @@ public class Drivetrain extends SubsystemBase {
 		}
 		orchestra.loadMusic(filepath);
 		orchestra.play();
-		// if (frontLeftOrchestra.isPlaying()) {
-		// 	frontLeftOrchestra.stop();
-		// 	frontRightOrchestra.stop();
-		// 	backLeftOrchestra.stop();
-		// 	backRightOrchestra.stop();
-		// }
-		// frontLeftOrchestra.loadMusic(filepath);
-		// frontRightOrchestra.loadMusic(filepath);
-		// backLeftOrchestra.loadMusic(filepath);
-		// backRightOrchestra.loadMusic(filepath);
-
-		// frontLeftOrchestra.play();
-		// frontRightOrchestra.play();
-		// backLeftOrchestra.play();
-		// backRightOrchestra.play();
 	}
 	public void playSong() {
 		orchestra.play();
-		// frontLeftOrchestra.play();
-		// frontRightOrchestra.play();
-		// backLeftOrchestra.play();
-		// backRightOrchestra.play();
 	}
 	public void pauseSong() {
 		orchestra.pause();
-		// frontLeftOrchestra.pause();
-		// frontRightOrchestra.pause();
-		// backLeftOrchestra.pause();
-		// backRightOrchestra.pause();
 	}
 	public void stopSong() {
 		orchestra.stop();
-		// frontLeftOrchestra.stop();
-		// frontRightOrchestra.stop();
-		// backLeftOrchestra.stop();
-		// backRightOrchestra.stop();
 	}
 }

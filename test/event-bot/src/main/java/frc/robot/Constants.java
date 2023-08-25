@@ -3,12 +3,10 @@ package frc.robot;
 public final class Constants {
 	public static final class DrivetrainConst {
 		public static final int FrontLeftMotorPort = 0;
-		public static final int RearLeftMotorPort = 1;
+		public static final int BackLeftMotorPort = 1;
 		public static final int FrontRightMotorPort = 2;
-		public static final int RearRightMotorPort = 3;
-
-		public static final double MotorMaxSpeed = 0.4;
-
+		public static final int BackRightMotorPort = 3;
+		
 		public static final double JoystickDeadzone = 0.07;
 	}
 

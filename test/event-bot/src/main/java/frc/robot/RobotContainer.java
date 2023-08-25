@@ -16,7 +16,7 @@ public class RobotContainer {
 	XboxController controller = new XboxController(IOConstants.DriverControllerPort);
 	CommandXboxController triggerController = new CommandXboxController(IOConstants.DriverControllerPort);
 	
-	String[] songs = { "MrRoboto.chrp", "Megalovania.chrp", "Animusic.chrp", "GandalfSaxGuy.chrp" };
+	String[] songs = { "MrRoboto.chrp", "Megalovania.chrp", "RickRoll.chrp", "GandalfSaxGuy.chrp" };
 
 	public RobotContainer() {
 		configureButtonBindings();
@@ -31,17 +31,10 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		//down on D-pad, controls drivetrain settings
 		triggerController.pov(180).and(triggerController.a())
-			.onTrue(new InstantCommand(() -> { drivetrain.setFieldOriented(!drivetrain.getFieldOriented()); }, drivetrain));
+			.onTrue(new InstantCommand(() -> { drivetrain.toggleFieldOriented(); }, drivetrain));
 
 		triggerController.pov(180).and(triggerController.b())
-			.onTrue(new InstantCommand(() -> { 
-				if (drivetrain.getNeutralMode() == NeutralMode.Coast) {
-					drivetrain.setNeutralMode(NeutralMode.Brake);
-				}
-				else if (drivetrain.getNeutralMode() == NeutralMode.Brake) {
-					drivetrain.setNeutralMode(NeutralMode.Coast);
-				}
-			}, drivetrain));
+			.onTrue(new InstantCommand(() -> { drivetrain.toggleNeutralMode(); }, drivetrain));
 
 		triggerController.pov(180).and(triggerController.y())
 			.onTrue(new InstantCommand(() -> { drivetrain.resetGyroscope(); }, drivetrain));
@@ -55,5 +48,15 @@ public class RobotContainer {
 			.onTrue(new InstantCommand(() -> { drivetrain.playSong(songs[2]); System.out.println("playing song 2");}));
 		triggerController.pov(270).and(triggerController.y())
 			.onTrue(new InstantCommand(() -> { drivetrain.playSong(songs[3]); System.out.println("playing song 3"); }));
+		
+		//Change max speed
+		triggerController.back()
+			.and(triggerController.start()
+			.and(triggerController.leftBumper()))
+			.onTrue(new InstantCommand(() -> { drivetrain.decrementMaxSpeed(); }, drivetrain));
+		triggerController.back()
+			.and(triggerController.start()
+			.and(triggerController.rightBumper()))
+			.onTrue(new InstantCommand(() -> { drivetrain.incrementMaxSpeed(); }, drivetrain));
 	}
 }
