@@ -11,6 +11,7 @@ import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
@@ -129,6 +130,13 @@ public class Drivetrain extends SubsystemBase {
 
   public Rotation2d getRotation() {
     return navx.getRotation2d();
+  }
+
+  // Field-oriented drive (units are meters/second)
+  public void drive(double x, double y, double theta) {
+    setModuleStates(
+        Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(
+            ChassisSpeeds.fromFieldRelativeSpeeds(x, y, theta, getRotation())));
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
