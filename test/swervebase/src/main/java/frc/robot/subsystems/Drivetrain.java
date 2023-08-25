@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -37,7 +38,7 @@ public class Drivetrain extends SubsystemBase {
 
   AHRS navx = new AHRS(SPI.Port.kMXP);
 
-
+  SwerveDrivePoseEstimator poseEstimator;
 
   public void configure() {
     fl_steer_pid.setP(Constants.Drivetrain.FL_STEER_P);
@@ -92,7 +93,7 @@ public class Drivetrain extends SubsystemBase {
     br_drive.config_kF(0, Constants.Drivetrain.BR_DRIVE_FF, 20);
   }
 
-  public SwerveModulePosition[] getPosition() {
+  public SwerveModulePosition[] getPositions() {
     return new SwerveModulePosition[] {
       new SwerveModulePosition(
           fl_drive.getSelectedSensorPosition(),
@@ -112,6 +113,22 @@ public class Drivetrain extends SubsystemBase {
   public Drivetrain() {
     navx.reset();
     configure();
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            Constants.Drivetrain.KINEMATICS, getRotation(), getPositions(), Constants.INIT_POSE);
+  }
+
+  @Override
+  public void periodic() {
+    poseEstimator.update(getRotation(), getPositions());
+  }
+
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public Rotation2d getRotation() {
+    return navx.getRotation2d();
   }
 
   public void setModuleStates(SwerveModuleState[] states) {

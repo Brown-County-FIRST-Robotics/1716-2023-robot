@@ -1,5 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+
 public class Constants {
   public static final class IO {
     // TODO: add real values
@@ -52,6 +57,14 @@ public class Constants {
     public static final double BR_DRIVE_D = 0;
     public static final double BR_DRIVE_FF = 1;
 
-    public static final double EFFECTIVE_WHEEL_DIAMETER=1; // TODO: add real values
+    public static final double EFFECTIVE_WHEEL_DIAMETER = 1; // TODO: add real values
+    public static final SwerveDriveKinematics KINEMATICS =
+        new SwerveDriveKinematics(
+            new Translation2d(-1, 1),
+            new Translation2d(1, 1),
+            new Translation2d(-1, -1),
+            new Translation2d(1, -1));
   }
+
+  public static final Pose2d INIT_POSE = new Pose2d(0, 0, new Rotation2d(0));
 }
