@@ -66,5 +66,24 @@ public class Constants {
             new Translation2d(1, -1));
   }
 
+  public static final class Auto {
+    public static final double X_P = 0;
+    public static final double X_I = 0;
+    public static final double X_D = 0;
+
+    public static final double Y_P = 0;
+    public static final double Y_I = 0;
+    public static final double Y_D = 0;
+
+    public static final double THETA_P = 0;
+    public static final double THETA_I = 0;
+    public static final double THETA_D = 0;
+
+    public static final double MAX_ANGULAR_VELOCITY = 0;
+    public static final double MAX_ANGULAR_ACCELERATION = 0;
+    public static final double MAX_VELOCITY = 0;
+    public static final double MAX_ACCELERATION = 0;
+  }
+
   public static final Pose2d INIT_POSE = new Pose2d(0, 0, new Rotation2d(0));
 }
