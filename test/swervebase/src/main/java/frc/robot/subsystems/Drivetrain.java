@@ -17,12 +17,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
+import java.util.List;
 
 public class Drivetrain extends SubsystemBase {
   WPI_TalonFX fl_drive = new WPI_TalonFX(Constants.IO.FL_DRIVE_ID);
@@ -179,5 +182,13 @@ public class Drivetrain extends SubsystemBase {
         new ProfiledPIDController(1, 1, 1, new TrapezoidProfile.Constraints(1, 1)),
         this::setModuleStates,
         this);
+  }
+
+  public Command makePositionCommand(Pose2d dest) {
+    TrajectoryConfig conf =
+        new TrajectoryConfig(Constants.Auto.MAX_VELOCITY, Constants.Auto.MAX_ACCELERATION);
+    Trajectory trajectory =
+        TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
+    return makeTrajectoryCommand(trajectory);
   }
 }
