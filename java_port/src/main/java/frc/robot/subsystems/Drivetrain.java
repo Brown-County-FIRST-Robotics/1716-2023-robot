@@ -33,6 +33,15 @@ public class Drivetrain extends SubsystemBase {
 
   public Drivetrain() {
     navx.reset();
+    fl.setInverted(false);
+    fr.setInverted(true);
+    bl.setInverted(false);
+    br.setInverted(true);
+
+    fl.burnFlash();
+    fr.burnFlash();
+    bl.burnFlash();
+    br.burnFlash();
   }
 
   public void Periodic() {
