@@ -6,10 +6,12 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -23,6 +25,7 @@ public class Drivetrain extends SubsystemBase {
   RelativeEncoder frEncoder = fr.getEncoder();
   RelativeEncoder blEncoder = bl.getEncoder();
   RelativeEncoder brEncoder = br.getEncoder();
+  MecanumDrive drive = new MecanumDrive(fl, bl, fr, br);
 
   int waitTicksNeeded = -1;
   DoubleSolenoid solenoid;
@@ -44,6 +47,8 @@ public class Drivetrain extends SubsystemBase {
     bl.setInverted(false);
     br.setInverted(true);
 
+    drive.setSafetyEnabled(false); // We probably aren't supposed to do this
+
     fl.burnFlash();
     fr.burnFlash();
     bl.burnFlash();
@@ -59,6 +64,15 @@ public class Drivetrain extends SubsystemBase {
     waitTicksNeeded = Constants.DRIVETRAIN.SOLENOID_WAIT_TICKS;
   }
 
+  // x:forward/backward  y: sideways
+  public void humanDrive(double x, double y, double rotation) {
+    if (getSolenoidPos() == Constants.DRIVETRAIN.MECANUN_MODE_VALUE) {
+      drive.driveCartesian(x, y, rotation, getRotation().times(-1));
+    } else {
+      drive.driveCartesian(x, 0, rotation);
+    }
+  }
+
   public void toggleSolenoidPos() {
     if (solenoidPos == DoubleSolenoid.Value.kReverse) {
       setSolenoidPos(DoubleSolenoid.Value.kForward);
@@ -69,6 +83,10 @@ public class Drivetrain extends SubsystemBase {
 
   public DoubleSolenoid.Value getSolenoidPos() {
     return solenoidPos;
+  }
+
+  public Rotation2d getRotation() {
+    return getPose().getRotation();
   }
 
   public void Periodic() {
