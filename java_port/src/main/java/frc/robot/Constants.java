@@ -14,6 +14,7 @@ public class Constants {
     public static final int BR_ID = 4;
 
     public static final int[] DRIVETRAIN_SOLENOID_ID = {1, 1};
+    public static final int HUB_ID = 0;
   }
 
   public static final class DRIVETRAIN {
