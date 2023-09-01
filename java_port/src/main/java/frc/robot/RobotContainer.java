@@ -9,15 +9,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 
 public class RobotContainer {
   CommandXboxController controller = new CommandXboxController(0);
   PneumaticHub hub = new PneumaticHub(Constants.IO.HUB_ID);
   Drivetrain drivetrain = new Drivetrain(hub);
+  TeleopDrive teleopDrive = new TeleopDrive(drivetrain, controller);
 
   public RobotContainer() {
     configureBindings();
+    setDefaultCommands();
+  }
+
+  private void setDefaultCommands() {
+    drivetrain.setDefaultCommand(teleopDrive);
   }
 
   private void configureBindings() {
