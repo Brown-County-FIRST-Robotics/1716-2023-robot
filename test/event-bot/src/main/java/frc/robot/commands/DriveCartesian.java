@@ -46,7 +46,7 @@ public class DriveCartesian extends CommandBase {
         ySquare = y.getAsDouble() * Math.abs(y.getAsDouble());
         zSquare = z.getAsDouble() * Math.abs(z.getAsDouble());
 
-        if (Math.abs(x.getAsDouble()) > DrivetrainConst.JoystickDeadzone || Math.abs(y.getAsDouble()) > DrivetrainConst.JoystickDeadzone || Math.abs(z.getAsDouble()) > DrivetrainConst.JoystickDeadzone) {
+        if (Math.abs(xSquare) > DrivetrainConst.JoystickDeadzone || Math.abs(ySquare) > DrivetrainConst.JoystickDeadzone || Math.abs(zSquare) > DrivetrainConst.JoystickDeadzone) {
             drivetrain.drive(closerToZero(xSquare, xAccelerationCap.calculate(xSquare)), 
                 closerToZero(ySquare, yAccelerationCap.calculate(ySquare)), 
                 closerToZero(zSquare, zAccelerationCap.calculate(zSquare)));

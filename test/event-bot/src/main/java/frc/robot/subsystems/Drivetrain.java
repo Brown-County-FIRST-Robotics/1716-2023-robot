@@ -29,6 +29,7 @@ public class Drivetrain extends SubsystemBase {
 	AHRS navX;
 
 	boolean doFieldOriented = false;
+	boolean wheelsRunning = false;
 	NeutralMode neutralMode = NeutralMode.Coast;
 
 	//music playing:
@@ -73,15 +74,25 @@ public class Drivetrain extends SubsystemBase {
 	 * @param rot Rotational rate of the robot.
 	 */
 	public void drive(double xSpeed, double ySpeed, double rot) {
-		if (xSpeed == 0 && ySpeed == 0 && rot == 0)
-			return;
-		if (orchestra.isPlaying())
-			stopSong();
-		if (doFieldOriented)
-			mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed,
-				navX.getRotation2d().times(-1));
-		else
-			mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed);
+		if (xSpeed == 0 && ySpeed == 0 && rot == 0) {
+			if (wheelsRunning) {
+				mecanumDrive.driveCartesian(0, 0, 0);
+				wheelsRunning = false;
+			}
+		}
+		else {
+			if (orchestra.isPlaying())
+				stopSong();
+			if (doFieldOriented) {
+				mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed,
+					navX.getRotation2d().times(-1));
+				wheelsRunning = true;
+			}
+			else {
+				mecanumDrive.driveCartesian(xSpeed * maxSpeed, ySpeed * maxSpeed, rot * maxSpeed);
+				wheelsRunning = true;
+			}
+		}
 	}
 
 	public void incrementMaxSpeed() {
