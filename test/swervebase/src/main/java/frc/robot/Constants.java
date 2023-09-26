@@ -6,6 +6,63 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
+
+  public class SwerveModuleConstants {
+    public double steerKV;
+    public double steerP;
+    public double steerI;
+    public double steerD;
+    public double steerOffset;
+    public double steerRotationsPerAngle;
+
+    public double thrustKV;
+    public double thrustP;
+    public double thrustI;
+    public double thrustD;
+
+    public int steerID;
+    public int thrustID;
+    public int encoderID;
+
+    public SwerveModuleConstants(
+        double sk,
+        double sp,
+        double si,
+        double sd,
+        double so,
+        double sr,
+        double tk,
+        double tp,
+        double ti,
+        double td,
+        int sid,
+        int tid,
+        int eid) {
+      steerKV = sk;
+      steerP = sp;
+      steerI = si;
+      steerD = sd;
+      steerOffset = so;
+      steerRotationsPerAngle = sr;
+      thrustKV = tk;
+      thrustP = tp;
+      thrustI = ti;
+      thrustD = td;
+
+      steerID = sid;
+      thrustID = tid;
+      encoderID = eid;
+    }
+
+    public double getRotationsFromAngle(double angRads) {
+      return (angRads - steerOffset) * steerRotationsPerAngle;
+    }
+
+    public double getAngleFromRotations(double rotations) {
+      return (rotations / steerRotationsPerAngle) + steerOffset;
+    }
+  }
+
   public static final class IO {
     // TODO: add real values
     public static final int FL_STEER_ID = 0;
@@ -18,47 +75,12 @@ public class Constants {
     public static final int BR_DRIVE_ID = 3;
   }
 
-  public static final class Drivetrain {
+  public final class Drivetrain {
     // TODO: add real values
-    public static final double FL_STEER_P = 0;
-    public static final double FL_STEER_I = 0;
-    public static final double FL_STEER_D = 0;
-    public static final double FL_STEER_FF = 1;
-
-    public static final double FL_DRIVE_P = 0;
-    public static final double FL_DRIVE_I = 0;
-    public static final double FL_DRIVE_D = 0;
-    public static final double FL_DRIVE_FF = 1;
-
-    public static final double FR_STEER_P = 0;
-    public static final double FR_STEER_I = 0;
-    public static final double FR_STEER_D = 0;
-    public static final double FR_STEER_FF = 1;
-    public static final double FR_DRIVE_P = 0;
-    public static final double FR_DRIVE_I = 0;
-    public static final double FR_DRIVE_D = 0;
-    public static final double FR_DRIVE_FF = 1;
-
-    public static final double BL_STEER_P = 0;
-    public static final double BL_STEER_I = 0;
-    public static final double BL_STEER_D = 0;
-    public static final double BL_STEER_FF = 1;
-    public static final double BL_DRIVE_P = 0;
-    public static final double BL_DRIVE_I = 0;
-    public static final double BL_DRIVE_D = 0;
-    public static final double BL_DRIVE_FF = 1;
-
-    public static final double BR_STEER_P = 0;
-    public static final double BR_STEER_I = 0;
-    public static final double BR_STEER_D = 0;
-    public static final double BR_STEER_FF = 1;
-    public static final double BR_DRIVE_P = 0;
-    public static final double BR_DRIVE_I = 0;
-    public static final double BR_DRIVE_D = 0;
-    public static final double BR_DRIVE_FF = 1;
-
+    public final SwerveModuleConstants FL =
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final double EFFECTIVE_WHEEL_DIAMETER = 1; // TODO: add real values
-    public static final SwerveDriveKinematics KINEMATICS =
+    public final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
             new Translation2d(-1, 1),
             new Translation2d(1, 1),
