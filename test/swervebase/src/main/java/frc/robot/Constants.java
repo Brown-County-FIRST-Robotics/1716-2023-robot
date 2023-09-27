@@ -19,6 +19,7 @@ public class Constants {
     public double thrustP;
     public double thrustI;
     public double thrustD;
+    public double thrustDistancePerTick;
 
     public int steerID;
     public int thrustID;
@@ -35,6 +36,7 @@ public class Constants {
         double tp,
         double ti,
         double td,
+        double tdpk,
         int sid,
         int tid,
         int eid) {
@@ -48,6 +50,7 @@ public class Constants {
       thrustP = tp;
       thrustI = ti;
       thrustD = td;
+      thrustDistancePerTick = tdpk;
 
       steerID = sid;
       thrustID = tid;
@@ -78,9 +81,9 @@ public class Constants {
   public final class Drivetrain {
     // TODO: add real values
     public final SwerveModuleConstants FL =
-        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final double EFFECTIVE_WHEEL_DIAMETER = 1; // TODO: add real values
-    public final SwerveDriveKinematics KINEMATICS =
+    public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
             new Translation2d(-1, 1),
             new Translation2d(1, 1),
