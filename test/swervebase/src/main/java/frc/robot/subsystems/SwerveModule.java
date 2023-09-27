@@ -8,17 +8,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogInput;
-import frc.robot.Constants;
+import frc.robot.SwerveModuleConstants;
 
 public class SwerveModule {
-  Constants.SwerveModuleConstants constants;
+  SwerveModuleConstants constants;
   CANSparkMax steer;
   WPI_TalonFX thrust;
   RelativeEncoder steerEncoder;
   SparkMaxPIDController steerPID;
   AnalogInput steerAbsoluteEncoder;
 
-  public SwerveModule(Constants.SwerveModuleConstants moduleConstants) {
+  public SwerveModule(SwerveModuleConstants moduleConstants) {
     constants = moduleConstants;
     steer = new CANSparkMax(constants.steerID, CANSparkMaxLowLevel.MotorType.kBrushless);
     thrust = new WPI_TalonFX(constants.thrustID);

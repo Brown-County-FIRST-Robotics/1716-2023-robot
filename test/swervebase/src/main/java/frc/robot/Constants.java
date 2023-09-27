@@ -7,88 +7,24 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
 
-  public class SwerveModuleConstants {
-    public double steerKV;
-    public double steerP;
-    public double steerI;
-    public double steerD;
-    public double steerOffset;
-    public double steerRotationsPerAngle;
+  public static final class IO {}
 
-    public double thrustKV;
-    public double thrustP;
-    public double thrustI;
-    public double thrustD;
-    public double thrustDistancePerTick;
-
-    public int steerID;
-    public int thrustID;
-    public int encoderID;
-
-    public SwerveModuleConstants(
-        double sk,
-        double sp,
-        double si,
-        double sd,
-        double so,
-        double sr,
-        double tk,
-        double tp,
-        double ti,
-        double td,
-        double tdpk,
-        int sid,
-        int tid,
-        int eid) {
-      steerKV = sk;
-      steerP = sp;
-      steerI = si;
-      steerD = sd;
-      steerOffset = so;
-      steerRotationsPerAngle = sr;
-      thrustKV = tk;
-      thrustP = tp;
-      thrustI = ti;
-      thrustD = td;
-      thrustDistancePerTick = tdpk;
-
-      steerID = sid;
-      thrustID = tid;
-      encoderID = eid;
-    }
-
-    public double getRotationsFromAngle(double angRads) {
-      return (angRads - steerOffset) * steerRotationsPerAngle;
-    }
-
-    public double getAngleFromRotations(double rotations) {
-      return (rotations / steerRotationsPerAngle) + steerOffset;
-    }
-  }
-
-  public static final class IO {
+  public static final class Drivetrain {
     // TODO: add real values
-    public static final int FL_STEER_ID = 0;
-    public static final int FR_STEER_ID = 2;
-    public static final int BL_STEER_ID = 1;
-    public static final int BR_STEER_ID = 3;
-    public static final int FL_DRIVE_ID = 0;
-    public static final int FR_DRIVE_ID = 2;
-    public static final int BL_DRIVE_ID = 1;
-    public static final int BR_DRIVE_ID = 3;
-  }
-
-  public final class Drivetrain {
-    // TODO: add real values
-    public final SwerveModuleConstants FL =
+    public static final SwerveModuleConstants FL =
         new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-    public static final double EFFECTIVE_WHEEL_DIAMETER = 1; // TODO: add real values
+    public static final SwerveModuleConstants FR =
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    public static final SwerveModuleConstants BL =
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    public static final SwerveModuleConstants BR =
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(-1, 1),
+            new Translation2d(1, -1),
             new Translation2d(1, 1),
             new Translation2d(-1, -1),
-            new Translation2d(1, -1));
+            new Translation2d(-1, 1));
   }
 
   public static final class Auto {
