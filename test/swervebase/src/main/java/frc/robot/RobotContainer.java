@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  private final SendableChooser<Command> autoChoser = new SendableChooser<Command>();
+  private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
   public RobotContainer() {
     // Configure the button bindings
@@ -43,6 +43,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChoser.getSelected();
+    return autoChooser.getSelected();
   }
 }
