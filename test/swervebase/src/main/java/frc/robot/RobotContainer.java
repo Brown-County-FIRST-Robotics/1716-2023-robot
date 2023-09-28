@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.TeleopDrive;
+import frc.robot.subsystems.Drivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -14,6 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
+
+  private final Drivetrain drivetrain = new Drivetrain();
+
+  private final CommandXboxController controller =
+      new CommandXboxController(Constants.IO.CONTROLLER1);
 
   public RobotContainer() {
     // Configure the button bindings
@@ -27,7 +35,9 @@ public class RobotContainer {
   }
 
   // Set Subsystem Default Commands
-  public void setDefaultCommands() {}
+  public void setDefaultCommands() {
+    drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, controller));
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by

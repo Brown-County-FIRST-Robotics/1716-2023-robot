@@ -67,7 +67,7 @@ public class Drivetrain extends SubsystemBase {
   public void drive(double x, double y, double theta) {
     setModuleStates(
         Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(
-            ChassisSpeeds.fromFieldRelativeSpeeds(x, y, theta, getNavxRotation())));
+            ChassisSpeeds.fromFieldRelativeSpeeds(x, y, theta, getPose().getRotation())));
   }
 
   public void setModuleStates(SwerveModuleState[] states) {

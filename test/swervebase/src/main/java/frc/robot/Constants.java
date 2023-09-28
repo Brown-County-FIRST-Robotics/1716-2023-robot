@@ -7,7 +7,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
 
-  public static final class IO {}
+  public static final class IO {
+    public static final int CONTROLLER1 = 0;
+  }
 
   public static final class Drivetrain {
     // TODO: add real values
@@ -25,6 +27,12 @@ public class Constants {
             new Translation2d(1, 1),
             new Translation2d(-1, -1),
             new Translation2d(-1, 1));
+  }
+
+  public static final class Driver {
+    public static final double MAX_X_SPEED = 3;
+    public static final double MAX_Y_SPEED = 3;
+    public static final double MAX_THETA_SPEED = 6;
   }
 
   public static final class Auto {
