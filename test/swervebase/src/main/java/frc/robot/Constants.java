@@ -14,13 +14,13 @@ public class Constants {
   public static final class Drivetrain {
     // TODO: add real values
     public static final SwerveModuleConstants FL =
-        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        new SwerveModuleConstants(1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1);
     public static final SwerveModuleConstants FR =
-        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final SwerveModuleConstants BL =
-        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final SwerveModuleConstants BR =
-        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        new SwerveModuleConstants(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
             new Translation2d(1, -1),

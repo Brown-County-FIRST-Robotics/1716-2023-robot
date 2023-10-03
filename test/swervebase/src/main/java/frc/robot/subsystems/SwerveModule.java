@@ -7,31 +7,28 @@ import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.SwerveModuleConstants;
 
 public class SwerveModule {
   SwerveModuleConstants constants;
   CANSparkMax steer;
   WPI_TalonFX thrust;
-  RelativeEncoder steerEncoder;
+  SparkMaxAnalogSensor analogSensor;
   SparkMaxPIDController steerPID;
-  AnalogInput steerAbsoluteEncoder;
 
   public SwerveModule(SwerveModuleConstants moduleConstants) {
     constants = moduleConstants;
     steer = new CANSparkMax(constants.steerID, CANSparkMaxLowLevel.MotorType.kBrushless);
     thrust = new WPI_TalonFX(constants.thrustID);
-    steerEncoder = steer.getEncoder();
     steerPID = steer.getPIDController();
-    steerAbsoluteEncoder = new AnalogInput(constants.encoderID);
+    analogSensor = steer.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
+    analogSensor.setPositionConversionFactor(1 / 3.3);
 
     steerPID.setP(constants.steerP);
     steerPID.setI(constants.steerI);
     steerPID.setD(constants.steerD);
     steerPID.setFF(constants.steerKV);
     steer.burnFlash();
-    steerEncoder.setPosition(constants.getRotationsFromAngle(getRawAbsoluteEncoder()));
 
     thrust.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
     thrust.config_kP(0, constants.thrustP, 20);
@@ -42,8 +39,8 @@ public class SwerveModule {
 
   public void setModuleState(SwerveModuleState state) {
     steerPID.setReference(
-        constants.getRotationsFromAngle(state.angle.getRadians()),
-        CANSparkMax.ControlType.kSmartMotion);
+        state.angle.getRotations() - constants.steerOffsetRotations,
+        CANSparkMax.ControlType.kPosition);
     thrust.set(
         TalonFXControlMode.Velocity,
         10 * state.speedMetersPerSecond / constants.thrustDistancePerTick);
@@ -52,14 +49,6 @@ public class SwerveModule {
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(
         thrust.getSelectedSensorPosition() * constants.thrustDistancePerTick,
-        Rotation2d.fromRadians(constants.getAngleFromRotations(steerEncoder.getPosition())));
-  }
-
-  public double getRawAbsoluteEncoder() {
-    return 2 * Math.PI * steerAbsoluteEncoder.getVoltage() / 5;
-  }
-
-  public void updateRelativeEncoder() {
-    steerEncoder.setPosition(constants.getRotationsFromAngle(getRawAbsoluteEncoder()));
+        Rotation2d.fromRotations(analogSensor.getPosition() + constants.steerOffsetRotations));
   }
 }

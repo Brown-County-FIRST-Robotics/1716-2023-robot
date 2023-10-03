@@ -5,8 +5,7 @@ public class SwerveModuleConstants {
   public double steerP;
   public double steerI;
   public double steerD;
-  public double steerOffset;
-  public double steerRotationsPerAngle;
+  public double steerOffsetRotations;
 
   public double thrustKV;
   public double thrustP;
@@ -16,7 +15,6 @@ public class SwerveModuleConstants {
 
   public int steerID;
   public int thrustID;
-  public int encoderID;
 
   public SwerveModuleConstants(
       double sk,
@@ -24,21 +22,18 @@ public class SwerveModuleConstants {
       double si,
       double sd,
       double so,
-      double sr,
       double tk,
       double tp,
       double ti,
       double td,
       double tdpk,
       int sid,
-      int tid,
-      int eid) {
+      int tid) {
     steerKV = sk;
     steerP = sp;
     steerI = si;
     steerD = sd;
-    steerOffset = so;
-    steerRotationsPerAngle = sr;
+    steerOffsetRotations = so;
     thrustKV = tk;
     thrustP = tp;
     thrustI = ti;
@@ -47,14 +42,5 @@ public class SwerveModuleConstants {
 
     steerID = sid;
     thrustID = tid;
-    encoderID = eid;
-  }
-
-  public double getRotationsFromAngle(double angRads) {
-    return (angRads - steerOffset) * steerRotationsPerAngle;
-  }
-
-  public double getAngleFromRotations(double rotations) {
-    return (rotations / steerRotationsPerAngle) + steerOffset;
   }
 }

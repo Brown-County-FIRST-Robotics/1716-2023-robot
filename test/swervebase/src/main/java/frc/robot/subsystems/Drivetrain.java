@@ -49,10 +49,6 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(getNavxRotation(), getPositions());
-    fl.updateRelativeEncoder(); // TODO: make this periodic
-    fr.updateRelativeEncoder();
-    bl.updateRelativeEncoder();
-    br.updateRelativeEncoder();
   }
 
   public Pose2d getPose() {
