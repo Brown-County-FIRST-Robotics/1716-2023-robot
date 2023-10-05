@@ -98,7 +98,7 @@ green: tank
 blue: auto
 */
 void RobotContainer::ConfigureButtonBindings() {
-	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid(); led.SetDrivetrainMode(drivetrain.GetSolenoid());}, {&drivetrain, &led}).ToPtr());
+	frc2::Trigger([this] { return controller.GetLeftTriggerAxis() > 0.2; }).OnTrue(frc2::InstantCommand([this] {drivetrain.ToggleSolenoid();}, {&drivetrain}).ToPtr());
 		//toggle solenoid
 
 	//Drive modes
@@ -108,8 +108,7 @@ void RobotContainer::ConfigureButtonBindings() {
 		for(int col=0;col<10;col++){
 			frc2::Trigger([this, row, col] { return placePos[row][col]->GetBoolean(false); }).OnTrue(
 				frc2::SequentialCommandGroup(
-					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(true); }, {}),
-					PlacePiece(&drivetrain, &arm, &led, row, col)
+					frc2::InstantCommand([this, row, col] { placePos[row][col]->SetBoolean(true); }, {})
 				).ToPtr()
 			);
 		}

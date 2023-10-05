@@ -11,14 +11,12 @@
 #include <frc/trajectory/TrajectoryConfig.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 
-#include "subsystems/LED.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Arm.h"
 #include "commands/DriveForwardThenBalance.h"
 #include "commands/PlaceAndDriveBack.h"
 #include "commands/PlaceThenMobility.h"
 #include "commands/LogController.h"
-#include "commands/PlacePiece.h"
 
 
 class Nothing : public frc2::CommandHelper<frc2::CommandBase, Nothing> { //ignore, used for autonomous
@@ -59,7 +57,6 @@ private:
 
 	Drivetrain drivetrain{hub};
 	Arm arm{hub};
-	LED led;
 
 	void ConfigureButtonBindings();
 
