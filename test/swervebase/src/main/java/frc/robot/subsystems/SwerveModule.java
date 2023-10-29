@@ -21,14 +21,22 @@ public class SwerveModule {
     constants = moduleConstants;
     steer = new CANSparkMax(constants.steerID, CANSparkMaxLowLevel.MotorType.kBrushless);
     thrust = new WPI_TalonFX(constants.thrustID);
+    steer.restoreFactoryDefaults();
     steerPID = steer.getPIDController();
     analogSensor = steer.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     analogSensor.setPositionConversionFactor(1 / 3.3);
+    analogSensor.setInverted(true);
+    steerPID.setFeedbackDevice(analogSensor);
 
     steerPID.setP(constants.steerP);
     steerPID.setI(constants.steerI);
     steerPID.setD(constants.steerD);
     steerPID.setFF(constants.steerKV);
+    steerPID.setOutputRange(-1,1);
+    steerPID.setSmartMotionMaxVelocity(300,0);
+    steerPID.setSmartMotionMinOutputVelocity(0,0);
+    steerPID.setSmartMotionMaxAccel(300,0);
+    steerPID.setSmartMotionAllowedClosedLoopError(0.005,0);
     steer.burnFlash();
 
     thrust.configFactoryDefault();
