@@ -7,6 +7,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -67,6 +68,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.Drivetrain.MAX_WHEEL_SPEED);
     fl.setModuleState(states[0]);
     fr.setModuleState(states[1]);
     bl.setModuleState(states[2]);
@@ -88,6 +90,7 @@ public class Drivetrain extends SubsystemBase {
   public Command makePositionCommand(Pose2d dest) {
     TrajectoryConfig conf =
         new TrajectoryConfig(Constants.Auto.MAX_VELOCITY, Constants.Auto.MAX_ACCELERATION);
+    conf.setKinematics(Constants.Drivetrain.KINEMATICS);
     Trajectory trajectory =
         TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
     return makeTrajectoryCommand(trajectory);
