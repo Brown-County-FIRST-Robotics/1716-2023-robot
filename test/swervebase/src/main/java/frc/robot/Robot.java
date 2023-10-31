@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     double THRUST_KV = 1023.0 * 600.0 / (6380.0 * 2048.0);
     double STEER_KV = 1.0/300.0;
     mod=new SwerveModule(new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 0.067, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 31, 1));
+            STEER_KV, 0, 0, 0, 0.2, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 31, 23));
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
 
@@ -63,7 +63,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
 
     mod.constants.steerOffsetRotations=off.getDouble(mod.constants.steerOffsetRotations);
-    //SmartDashboard.putNumber("Pos",mod.constants.steerOffsetRotations+mod.getModulePosition().angle.getRotations());
+    SmartDashboard.putNumber("Pos",mod.constants.steerOffsetRotations+mod.getModulePosition().angle.getRotations());
 
   }
 
