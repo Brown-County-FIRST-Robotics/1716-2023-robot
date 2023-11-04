@@ -15,7 +15,7 @@ public class Constants {
     // TODO: add real values
     public static final double THRUST_DISTANCE_PER_TICK = .0254 * 4.0 * Math.PI / (2048.0 * 6.75);
     public static final double THRUST_KV = 1023.0 * 600.0 / (6380.0 * 2048.0);
-    public static final double STEER_KV = 1.0/300.0;
+    public static final double STEER_KV = 1.0 / 300.0;
     public static final SwerveModuleConstants FL =
         new SwerveModuleConstants(
             STEER_KV, 0, 0, 0, 1, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 1, 1);
