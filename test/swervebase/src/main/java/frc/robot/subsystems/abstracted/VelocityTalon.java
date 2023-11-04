@@ -4,13 +4,16 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 
 public class VelocityTalon implements VelocityMotor {
   private final WPI_TalonFX motor;
+  private final SlewRateLimiter lim=new SlewRateLimiter(12000*3); // units/100ms
+  //
 
   public VelocityTalon(int CANID, double KV, double p, double i, double d) {
     motor = new WPI_TalonFX(CANID);
-    motor.setNeutralMode(NeutralMode.Brake);
+    motor.setNeutralMode(NeutralMode.Coast);
     motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20);
     motor.configNominalOutputForward(0, 20);
     motor.configNominalOutputReverse(0, 20);
@@ -24,7 +27,7 @@ public class VelocityTalon implements VelocityMotor {
 
   @Override
   public void setVelocity(double vel) {
-    motor.set(TalonFXControlMode.Velocity, vel);
+    motor.set(TalonFXControlMode.Velocity, lim.calculate(vel));
   }
 
   @Override

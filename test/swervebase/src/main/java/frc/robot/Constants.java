@@ -18,23 +18,24 @@ public class Constants {
     public static final double STEER_KV = 1.0 / 300.0;
     public static final SwerveModuleConstants FL =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 1, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 1, 1);
+            STEER_KV, 0, 0, 0, 0.067, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 31, 20);
     public static final SwerveModuleConstants FR =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 1, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 1, 1);
+            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -1, -1);
     public static final SwerveModuleConstants BL =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 1, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 1, 1);
+            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -2, -1);
     public static final SwerveModuleConstants BR =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 1, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 1, 1);
-    public static final double MAX_WHEEL_SPEED = 3; // TODO: add real value
+            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -3, -1);
+    public static final double MAX_WHEEL_SPEED = 20; // TODO: add real value
+    public static final double D = 21.125 * 0.0254;
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(1, -1),
-            new Translation2d(1, 1),
-            new Translation2d(-1, -1),
-            new Translation2d(-1, 1));
+            new Translation2d(D / 2, D / 2),
+            new Translation2d(D / 2, -D / 2),
+            new Translation2d(-D / 2, D / 2),
+            new Translation2d(-D / 2, -D / 2));
   }
 
   public static final class Driver {

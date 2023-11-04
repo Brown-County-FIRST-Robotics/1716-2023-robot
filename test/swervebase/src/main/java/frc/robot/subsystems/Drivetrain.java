@@ -15,6 +15,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -30,6 +32,7 @@ public class Drivetrain extends SubsystemBase {
   AHRS navx = new AHRS(SPI.Port.kMXP);
 
   SwerveDrivePoseEstimator poseEstimator;
+  Field2d field;
 
   public SwerveModulePosition[] getPositions() {
     return new SwerveModulePosition[] {
@@ -38,6 +41,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Drivetrain() {
+    field = new Field2d();
     navx.reset();
     poseEstimator =
         new SwerveDrivePoseEstimator(
@@ -45,11 +49,13 @@ public class Drivetrain extends SubsystemBase {
             getNavxRotation(),
             getPositions(),
             Constants.INIT_POSE);
+    SmartDashboard.putData("Pos sort of", field);
   }
 
   @Override
   public void periodic() {
-    poseEstimator.update(getNavxRotation(), getPositions());
+    poseEstimator.update(getPose().getRotation(), getPositions());
+    field.setRobotPose(getPose());
   }
 
   public Pose2d getPose() {
@@ -64,7 +70,8 @@ public class Drivetrain extends SubsystemBase {
   public void drive(double x, double y, double theta) {
     setModuleStates(
         Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(
-            ChassisSpeeds.fromFieldRelativeSpeeds(x, y, theta, getPose().getRotation())));
+            new ChassisSpeeds(
+                -x, -y, -theta)));
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
