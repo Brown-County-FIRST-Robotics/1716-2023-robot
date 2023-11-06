@@ -8,6 +8,7 @@ import frc.robot.subsystems.Drivetrain;
 public class TeleopDrive extends CommandBase {
   private final Drivetrain drivetrain;
   private final CommandXboxController controller;
+  boolean foc = true;
 
   public TeleopDrive(Drivetrain drivetrain, CommandXboxController controller) {
     this.drivetrain = drivetrain;
@@ -28,7 +29,9 @@ public class TeleopDrive extends CommandBase {
     drivetrain.drive(
         controller.getLeftY() * Constants.Driver.MAX_X_SPEED,
         controller.getLeftX() * Constants.Driver.MAX_Y_SPEED,
-        controller.getRightX() * Constants.Driver.MAX_THETA_SPEED);
+        controller.getRightX() * Constants.Driver.MAX_THETA_SPEED,
+        foc);
+    foc = controller.getHID().getStartButtonPressed() != foc;
   }
 
   /**
@@ -59,6 +62,6 @@ public class TeleopDrive extends CommandBase {
    */
   @Override
   public void end(boolean interrupted) {
-    drivetrain.drive(0, 0, 0);
+    drivetrain.drive(0, 0, 0, false);
   }
 }

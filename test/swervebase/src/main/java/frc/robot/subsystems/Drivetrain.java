@@ -14,6 +14,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -24,6 +26,7 @@ import frc.robot.Constants;
 import java.util.List;
 
 public class Drivetrain extends SubsystemBase {
+  private final GenericEntry reset_button;
   SwerveModule fl = new SwerveModule(Constants.Drivetrain.FL);
   SwerveModule fr = new SwerveModule(Constants.Drivetrain.FR);
   SwerveModule bl = new SwerveModule(Constants.Drivetrain.BL);
@@ -50,12 +53,17 @@ public class Drivetrain extends SubsystemBase {
             getPositions(),
             Constants.INIT_POSE);
     Shuffleboard.getTab("Debug").add("Pos sort of", field);
+    reset_button = Shuffleboard.getTab("Teleop").add("Reset GYro", false).getEntry();
   }
 
   @Override
   public void periodic() {
     poseEstimator.update(getNavxRotation(), getPositions());
     field.setRobotPose(getPose());
+    if (reset_button.getBoolean(false)) {
+      setPos(new Pose2d(getPose().getTranslation(), new Rotation2d(0)));
+      reset_button.set(NetworkTableValue.makeBoolean(false));
+    }
   }
 
   public Pose2d getPose() {
@@ -67,9 +75,14 @@ public class Drivetrain extends SubsystemBase {
   }
 
   // Field-oriented drive (units are meters/second)
-  public void drive(double x, double y, double theta) {
-    setModuleStates(
-        Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(new ChassisSpeeds(-x, -y, -theta)));
+  public void drive(double x, double y, double theta, boolean foc) {
+    ChassisSpeeds sp;
+    if (foc) {
+      sp = ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -theta, getPose().getRotation());
+    } else {
+      sp = new ChassisSpeeds(-x, -y, -theta);
+    }
+    setModuleStates(Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(sp));
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
@@ -99,5 +112,9 @@ public class Drivetrain extends SubsystemBase {
     Trajectory trajectory =
         TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
     return makeTrajectoryCommand(trajectory);
+  }
+
+  public void setPos(Pose2d pos) {
+    poseEstimator.resetPosition(getNavxRotation(), getPositions(), pos);
   }
 }
