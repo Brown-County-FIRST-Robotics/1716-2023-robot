@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
+import frc.robot.utils.SuppliedCommand;
 import java.util.List;
 
 public class Drivetrain extends SubsystemBase {
@@ -98,20 +99,29 @@ public class Drivetrain extends SubsystemBase {
         trajectory,
         this::getPose,
         Constants.Drivetrain.KINEMATICS,
-        new PIDController(1, 1, 1),
-        new PIDController(1, 1, 1),
-        new ProfiledPIDController(1, 1, 1, new TrapezoidProfile.Constraints(1, 1)),
+        new PIDController(0, 0, 0),
+        new PIDController(0, 0, 0),
+        new ProfiledPIDController(
+            0,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                Constants.Auto.MAX_ANGULAR_VELOCITY, Constants.Auto.MAX_ANGULAR_ACCELERATION)),
         this::setModuleStates,
         this);
   }
 
   public Command makePositionCommand(Pose2d dest) {
-    TrajectoryConfig conf =
-        new TrajectoryConfig(Constants.Auto.MAX_VELOCITY, Constants.Auto.MAX_ACCELERATION);
-    conf.setKinematics(Constants.Drivetrain.KINEMATICS);
-    Trajectory trajectory =
-        TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
-    return makeTrajectoryCommand(trajectory);
+    return new SuppliedCommand(
+        () -> {
+          TrajectoryConfig conf =
+              new TrajectoryConfig(Constants.Auto.MAX_VELOCITY, Constants.Auto.MAX_ACCELERATION);
+          conf.setKinematics(Constants.Drivetrain.KINEMATICS);
+          Trajectory trajectory =
+              TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
+          return makeTrajectoryCommand(trajectory);
+        },
+        this);
   }
 
   public void setPos(Pose2d pos) {
