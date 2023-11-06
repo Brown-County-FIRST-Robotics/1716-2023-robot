@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -31,14 +30,15 @@ public class SwerveModule {
               constants.thrustD);
 
     } else {
-      steer = new FakePosition(String.valueOf(constants.steerID));
+      steer = new FakePosition();
       thrust = new FakeVelocity(String.valueOf(constants.steerID));
     }
   }
 
   public void setModuleState(SwerveModuleState cmd_state) {
     SwerveModuleState state = SwerveModuleState.optimize(cmd_state, getModulePosition().angle);
-    //state.speedMetersPerSecond *= getModulePosition().angle.minus(state.angle).getCos();
+    // state.speedMetersPerSecond *= getModulePosition().angle.minus(state.angle).getCos();  TODO:
+    // See if this still works
     steer.setPos(state.angle.unaryMinus().getRotations() + constants.steerOffsetRotations);
     thrust.setVelocity(0.1 * state.speedMetersPerSecond / constants.thrustDistancePerTick);
   }

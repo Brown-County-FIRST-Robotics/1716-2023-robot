@@ -8,8 +8,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 
 public class VelocityTalon implements VelocityMotor {
   private final WPI_TalonFX motor;
-  private final SlewRateLimiter lim=new SlewRateLimiter(12000*3); // units/100ms
-  //
+  private final SlewRateLimiter lim = new SlewRateLimiter(36000);
 
   public VelocityTalon(int CANID, double KV, double p, double i, double d) {
     motor = new WPI_TalonFX(CANID);
