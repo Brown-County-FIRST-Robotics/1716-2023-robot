@@ -1,5 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,6 +27,8 @@ public class RobotContainer {
       new CommandXboxController(Constants.IO.CONTROLLER1);
 
   public RobotContainer() {
+    autoChooser.addOption(
+        "Leave Community", drivetrain.makePositionCommand(new Pose2d(3, 0, new Rotation2d())));
     // Configure the button bindings
     configureButtonBindings();
 
@@ -53,6 +58,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    drivetrain.setPos(
+        DriverStation.getAlliance() == DriverStation.Alliance.Red
+            ? Constants.RED_INIT_POSE
+            : Constants.BLUE_INIT_POSE);
     return autoChooser.getSelected();
   }
 }

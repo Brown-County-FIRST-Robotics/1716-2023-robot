@@ -12,7 +12,6 @@ public class Constants {
   }
 
   public static final class Drivetrain {
-    // TODO: add real values
     public static final double THRUST_DISTANCE_PER_TICK = .0254 * 4.0 * Math.PI / (2048.0 * 6.75);
     public static final double THRUST_KV = 1023.0 * 600.0 / (6380.0 * 2048.0);
     public static final double STEER_KV = 1.0 / 300.0;
@@ -58,11 +57,13 @@ public class Constants {
     public static final double THETA_I = 0;
     public static final double THETA_D = 0;
 
-    public static final double MAX_ANGULAR_VELOCITY = 0;
-    public static final double MAX_ANGULAR_ACCELERATION = 0;
-    public static final double MAX_VELOCITY = 0;
-    public static final double MAX_ACCELERATION = 0;
+    public static final double MAX_ANGULAR_VELOCITY = 1;
+    public static final double MAX_ANGULAR_ACCELERATION = 1;
+    public static final double MAX_VELOCITY = 3;
+    public static final double MAX_ACCELERATION = 1;
   }
 
   public static final Pose2d INIT_POSE = new Pose2d(0, 0, new Rotation2d(0));
+  public static final Pose2d RED_INIT_POSE = new Pose2d(0, 0, new Rotation2d(0));
+  public static final Pose2d BLUE_INIT_POSE = new Pose2d(0, 0, new Rotation2d(0));
 }
