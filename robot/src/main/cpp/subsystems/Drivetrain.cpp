@@ -1,5 +1,6 @@
 #include <iostream>
 #include "subsystems/Drivetrain.h"
+#include <numbers>
 
 Drivetrain::Drivetrain(frc::PneumaticHub& hubRef) :
 	frontLeftEncoder{frontLeft.GetEncoder()}, 
@@ -219,10 +220,10 @@ std::vector<double> Drivetrain::GetEncoder() {
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetEncoderSpeeds() {
 	return frc::MecanumDriveWheelSpeeds{
-		frontLeftEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
-		frontRightEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
-		backLeftEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75),
-		backRightEncoder.GetVelocity() * (1/1_min) * 6_in * M_PI * (1/12.75) 
+		frontLeftEncoder.GetVelocity() * (1/1_min) * 6_in * std::numbers::pi * (1/12.75),
+		frontRightEncoder.GetVelocity() * (1/1_min) * 6_in * std::numbers::pi * (1/12.75),
+		backLeftEncoder.GetVelocity() * (1/1_min) * 6_in * std::numbers::pi * (1/12.75),
+		backRightEncoder.GetVelocity() * (1/1_min) * 6_in * std::numbers::pi * (1/12.75) 
 	};
 }
 
