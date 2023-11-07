@@ -15,19 +15,18 @@ public class Constants {
     public static final double THRUST_DISTANCE_PER_TICK = .0254 * 4.0 * Math.PI / (2048.0 * 6.75);
     public static final double THRUST_KV = 1023.0 * 600.0 / (6380.0 * 2048.0);
     public static final double STEER_KV = 1.0 / 300.0;
-    public static final SwerveModuleConstants
-        FL = // TODO: These need to be shifted around because of new front
+    public static final SwerveModuleConstants FL =
         new SwerveModuleConstants(
-                STEER_KV, 0, 0, 0, 0.067, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 31, 20);
+            STEER_KV, 0, 0, 0, 0.262, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 10, 20);
     public static final SwerveModuleConstants FR =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -1, -1);
+            STEER_KV, 0, 0, 0, 0.817, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 11, 21);
     public static final SwerveModuleConstants BL =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -2, -1);
+            STEER_KV, 0, 0, 0, 0.050, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 12, 22);
     public static final SwerveModuleConstants BR =
         new SwerveModuleConstants(
-            STEER_KV, 0, 0, 0, 0, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, -3, -1);
+            STEER_KV, 0, 0, 0, 0.750, THRUST_KV, 0, 0, 0, THRUST_DISTANCE_PER_TICK, 13, 23);
     public static final double MAX_WHEEL_SPEED = 20; // TODO: add real value
     public static final double D = 21.125 * 0.0254; // TODO: Rename this
     public static final SwerveDriveKinematics KINEMATICS =
