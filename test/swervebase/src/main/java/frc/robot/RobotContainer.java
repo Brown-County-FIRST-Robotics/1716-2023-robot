@@ -7,8 +7,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.subsystems.Bucket;
 import frc.robot.subsystems.Drivetrain;
 
 /**
@@ -22,6 +24,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
   private final Drivetrain drivetrain = new Drivetrain();
+  private final Bucket bucket = new Bucket();
 
   private final CommandXboxController controller =
       new CommandXboxController(Constants.IO.CONTROLLER1);
@@ -50,7 +53,25 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    controller
+        .leftBumper()
+        .or(controller.rightBumper())
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  bucket.SetPosition(false);
+                }));
+
+    controller
+        .leftTrigger()
+        .or(controller.rightTrigger())
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  bucket.SetPosition(true);
+                }));
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
