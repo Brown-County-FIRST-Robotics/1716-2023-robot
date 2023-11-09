@@ -36,9 +36,10 @@ public class SwerveModule {
   }
 
   public void setModuleState(SwerveModuleState cmd_state) {
-    SwerveModuleState state = SwerveModuleState.optimize(cmd_state, getModulePosition().angle);
-    // state.speedMetersPerSecond *= getModulePosition().angle.minus(state.angle).getCos();  TODO:
-    // See if this still works
+    SwerveModuleState state =
+        SwerveModuleState.optimize(
+            cmd_state, getModulePosition().angle.plus(Rotation2d.fromRotations(1.0)));
+    state.speedMetersPerSecond *= getModulePosition().angle.minus(state.angle).getCos();
     steer.setPos(state.angle.unaryMinus().getRotations() + constants.steerOffsetRotations);
     thrust.setVelocity(0.1 * state.speedMetersPerSecond / constants.thrustDistancePerTick);
   }

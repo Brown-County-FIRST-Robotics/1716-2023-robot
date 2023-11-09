@@ -24,14 +24,28 @@ public class TeleopDrive extends CommandBase {
    * The main body of a command. Called repeatedly while the command is scheduled. (That is, it is
    * called repeatedly until {@link #isFinished()} returns true.)
    */
+  static boolean deadband(double x) {
+    return Math.abs(x) < 0.1;
+  }
+
   @Override
   public void execute() {
-    drivetrain.drive(
-        controller.getLeftY() * Constants.Driver.MAX_X_SPEED,
-        controller.getLeftX() * Constants.Driver.MAX_Y_SPEED,
-        controller.getRightX() * Constants.Driver.MAX_THETA_SPEED,
-        foc);
-    foc = controller.getHID().getStartButtonPressed() != foc;
+    if (deadband(controller.getLeftY())
+        && deadband(controller.getLeftX())
+        && deadband(controller.getRightX())) {
+      drivetrain.drive(0, 0, 0, false);
+
+    } else {
+
+      drivetrain.drive(
+          controller.getLeftY() * Math.abs(controller.getLeftY()) * Constants.Driver.MAX_X_SPEED,
+          controller.getLeftX() * Math.abs(controller.getLeftX()) * Constants.Driver.MAX_Y_SPEED,
+          controller.getRightX()
+              * Math.abs(controller.getRightX())
+              * Constants.Driver.MAX_THETA_SPEED,
+          foc);
+      foc = controller.getHID().getStartButtonPressed() != foc;
+    }
   }
 
   /**
