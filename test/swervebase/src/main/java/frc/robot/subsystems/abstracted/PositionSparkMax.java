@@ -24,7 +24,7 @@ public class PositionSparkMax implements PositionMotor {
     pid.setOutputRange(-1, 1);
     pid.setSmartMotionMaxVelocity(300, 0);
     pid.setSmartMotionMinOutputVelocity(0, 0);
-    pid.setSmartMotionMaxAccel(600, 0);
+    pid.setSmartMotionMaxAccel(1200, 0);
     pid.setSmartMotionAllowedClosedLoopError(0.01, 0);
     pid.setPositionPIDWrappingEnabled(true);
     pid.setPositionPIDWrappingMaxInput(1);

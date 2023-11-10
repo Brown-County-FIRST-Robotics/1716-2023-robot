@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
@@ -45,6 +47,10 @@ public class TeleopDrive extends CommandBase {
               * Constants.Driver.MAX_THETA_SPEED,
           foc);
       foc = controller.getHID().getStartButtonPressed() != foc;
+    }
+    if (controller.getHID().getBackButtonPressed()) {
+      drivetrain.setPos(
+          new Pose2d(drivetrain.getPose().getTranslation(), Rotation2d.fromRotations(0.5)));
     }
   }
 

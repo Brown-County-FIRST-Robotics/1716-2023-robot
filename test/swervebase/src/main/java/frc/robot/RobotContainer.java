@@ -1,10 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,7 +28,8 @@ public class RobotContainer {
 
   public RobotContainer() {
     autoChooser.addOption(
-        "Leave Community", drivetrain.makePositionCommand(new Pose2d(3, 0, new Rotation2d())));
+        "Leave Community", drivetrain.makePositionCommand(new Translation2d(5, 0)));
+    Shuffleboard.getTab("Pre match").add("Auton choser", autoChooser);
     // Configure the button bindings
     configureButtonBindings();
 

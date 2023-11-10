@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -54,6 +55,7 @@ public class Drivetrain extends SubsystemBase {
             getPositions(),
             Constants.INIT_POSE);
     Shuffleboard.getTab("Debug").add("Pos sort of", field);
+    setPos(new Pose2d(getPose().getTranslation(), new Rotation2d(0)));
     reset_button = Shuffleboard.getTab("Teleop").add("Reset GYro", false).getEntry();
   }
 
@@ -119,6 +121,24 @@ public class Drivetrain extends SubsystemBase {
           conf.setKinematics(Constants.Drivetrain.KINEMATICS);
           Trajectory trajectory =
               TrajectoryGenerator.generateTrajectory(getPose(), List.of(), dest, conf);
+          return makeTrajectoryCommand(trajectory);
+        },
+        this);
+  }
+
+  public Command makePositionCommand(Translation2d dest) {
+    return new SuppliedCommand(
+        () -> {
+          TrajectoryConfig conf =
+              new TrajectoryConfig(Constants.Auto.MAX_VELOCITY, Constants.Auto.MAX_ACCELERATION);
+          Trajectory trajectory =
+              TrajectoryGenerator.generateTrajectory(
+                  new Pose2d(
+                      getPose().getTranslation(),
+                      dest.minus(getPose().getTranslation()).getAngle()),
+                  List.of(getPose().getTranslation().interpolate(dest, 0.5)),
+                  new Pose2d(dest, dest.minus(getPose().getTranslation()).getAngle()),
+                  conf);
           return makeTrajectoryCommand(trajectory);
         },
         this);
