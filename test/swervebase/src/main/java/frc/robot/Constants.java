@@ -38,8 +38,8 @@ public class Constants {
   }
 
   public static final class Driver {
-    public static final double MAX_X_SPEED = 2;
-    public static final double MAX_Y_SPEED = 2;
+    public static final double MAX_X_SPEED = 4.95;
+    public static final double MAX_Y_SPEED = 4.95;
     public static final double MAX_THETA_SPEED = 6;
   }
 

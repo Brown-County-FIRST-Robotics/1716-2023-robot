@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
@@ -11,6 +12,7 @@ public class TeleopDrive extends CommandBase {
   private final Drivetrain drivetrain;
   private final CommandXboxController controller;
   boolean foc = true;
+  boolean locked=false;
 
   public TeleopDrive(Drivetrain drivetrain, CommandXboxController controller) {
     this.drivetrain = drivetrain;
@@ -34,11 +36,11 @@ public class TeleopDrive extends CommandBase {
   public void execute() {
     if (deadband(controller.getLeftY())
         && deadband(controller.getLeftX())
-        && deadband(controller.getRightX())) {
+        && deadband(controller.getRightX()) && !locked) {
       drivetrain.drive(0, 0, 0, false);
 
     } else {
-
+      locked=false;
       drivetrain.drive(
           controller.getLeftY() * Math.abs(controller.getLeftY()) * Constants.Driver.MAX_X_SPEED,
           controller.getLeftX() * Math.abs(controller.getLeftX()) * Constants.Driver.MAX_Y_SPEED,
@@ -51,6 +53,15 @@ public class TeleopDrive extends CommandBase {
     if (controller.getHID().getBackButtonPressed()) {
       drivetrain.setPos(
           new Pose2d(drivetrain.getPose().getTranslation(), Rotation2d.fromRotations(0.5)));
+    }
+    if(controller.getHID().getXButtonPressed()){
+      locked=!locked;
+    }
+    if(locked){
+      drivetrain.setModuleStates(new SwerveModuleState[]{new SwerveModuleState(0,Rotation2d.fromDegrees(45)),
+      new SwerveModuleState(0,Rotation2d.fromDegrees(-45)),
+      new SwerveModuleState(0,Rotation2d.fromDegrees(-45)),
+      new SwerveModuleState(0,Rotation2d.fromDegrees(45))});
     }
   }
 
