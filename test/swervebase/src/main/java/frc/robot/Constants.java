@@ -58,8 +58,8 @@ public class Constants {
 
     public static final double MAX_ANGULAR_VELOCITY = 1;
     public static final double MAX_ANGULAR_ACCELERATION = 1;
-    public static final double MAX_VELOCITY = 3;
-    public static final double MAX_ACCELERATION = 1;
+    public static final double MAX_VELOCITY = 5;
+    public static final double MAX_ACCELERATION = 3;
   }
 
   public static final Pose2d INIT_POSE = new Pose2d(0, 0, Rotation2d.fromDegrees(180));
