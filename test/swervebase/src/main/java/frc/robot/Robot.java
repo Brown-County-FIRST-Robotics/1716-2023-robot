@@ -1,10 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -12,10 +15,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer = new RobotContainer();
+  private RobotContainer robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -23,7 +26,38 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    SmartDashboard.putData(new PowerDistribution());
+    // Record metadata
+    Logger.getInstance().recordMetadata("ProjectName", "Swervebase");
+
+    // Set up data receivers & replay source
+    switch (Constants.currentMode) {
+      case REAL:
+        // Running on a real robot, log to a USB stick
+        Logger.getInstance().addDataReceiver(new WPILOGWriter("/home/lvuser"));
+        Logger.getInstance().addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.getInstance().addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.getInstance().setReplaySource(new WPILOGReader(logPath));
+        Logger.getInstance()
+            .addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
+    // Logger.disableDeterministicTimestamps()
+
+    // Start AdvantageKit logger
+    Logger.getInstance().start();
+    robotContainer = new RobotContainer();
     robotContainer.getAutonomousCommand();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.

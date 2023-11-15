@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 
 public class VelocityTalon implements VelocityMotor {
   private final WPI_TalonFX motor;

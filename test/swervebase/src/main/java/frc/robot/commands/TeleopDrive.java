@@ -43,8 +43,12 @@ public class TeleopDrive extends CommandBase {
     } else {
       locked = false;
       drivetrain.drive(
-          controller.getLeftY() * Math.abs(Math.pow(controller.getLeftY(), 2)) * Constants.Driver.MAX_X_SPEED,
-          controller.getLeftX() * Math.abs(Math.pow(controller.getLeftX(), 2)) * Constants.Driver.MAX_Y_SPEED,
+          controller.getLeftY()
+              * Math.abs(Math.pow(controller.getLeftY(), 2))
+              * Constants.Driver.MAX_X_SPEED,
+          controller.getLeftX()
+              * Math.abs(Math.pow(controller.getLeftX(), 2))
+              * Constants.Driver.MAX_Y_SPEED,
           controller.getRightX()
               * Math.abs(controller.getRightX())
               * Constants.Driver.MAX_THETA_SPEED,
