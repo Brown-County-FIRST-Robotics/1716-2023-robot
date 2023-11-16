@@ -1,6 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -15,9 +14,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,15 +22,16 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.utils.SuppliedCommand;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends SubsystemBase {
-  private final GenericEntry reset_button;
   SwerveModule fl = new SwerveModule(Constants.Drivetrain.FL);
   SwerveModule fr = new SwerveModule(Constants.Drivetrain.FR);
   SwerveModule bl = new SwerveModule(Constants.Drivetrain.BL);
   SwerveModule br = new SwerveModule(Constants.Drivetrain.BR);
 
-  AHRS navx = new AHRS(SPI.Port.kMXP);
+  IMUIO imu;
+  IMUIOInputsAutoLogged imuInputs = new IMUIOInputsAutoLogged();
 
   SwerveDrivePoseEstimator poseEstimator;
   Field2d field;
@@ -47,7 +44,6 @@ public class Drivetrain extends SubsystemBase {
 
   public Drivetrain() {
     field = new Field2d();
-    navx.reset();
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Drivetrain.KINEMATICS,
@@ -56,17 +52,15 @@ public class Drivetrain extends SubsystemBase {
             Constants.INIT_POSE);
     Shuffleboard.getTab("Debug").add("Pos sort of", field);
     setPos(new Pose2d(getPose().getTranslation(), new Rotation2d(0)));
-    reset_button = Shuffleboard.getTab("Teleop").add("Reset GYro", false).getEntry();
   }
 
   @Override
   public void periodic() {
+    imu.updateInputs(imuInputs);
+    Logger.getInstance().processInputs("Drive/Gyro", imuInputs);
     poseEstimator.update(getNavxRotation(), getPositions());
+    Logger.getInstance().recordOutput("Drive/Pose", getPose());
     field.setRobotPose(getPose());
-    if (reset_button.getBoolean(false)) {
-      setPos(new Pose2d(getPose().getTranslation(), new Rotation2d(0)));
-      reset_button.set(NetworkTableValue.makeBoolean(false));
-    }
   }
 
   public Pose2d getPose() {
@@ -74,7 +68,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Rotation2d getNavxRotation() {
-    return navx.getRotation2d();
+    return Rotation2d.fromDegrees(imuInputs.yaw);
   }
 
   // Field-oriented drive (units are meters/second)
@@ -85,11 +79,13 @@ public class Drivetrain extends SubsystemBase {
     } else {
       sp = new ChassisSpeeds(-x, -y, -theta);
     }
-    setModuleStates(Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(sp));
+    SwerveModuleState[] states = Constants.Drivetrain.KINEMATICS.toSwerveModuleStates(sp);
+    setModuleStates(states);
   }
 
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.Drivetrain.MAX_WHEEL_SPEED);
+    Logger.getInstance().recordOutput("Drive/CmdStates", states);
     fl.setModuleState(states[0]);
     fr.setModuleState(states[1]);
     bl.setModuleState(states[2]);
