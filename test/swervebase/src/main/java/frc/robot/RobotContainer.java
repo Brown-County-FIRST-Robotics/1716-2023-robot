@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Bucket;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.drive.Drivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
