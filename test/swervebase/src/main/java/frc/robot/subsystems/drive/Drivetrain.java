@@ -34,7 +34,7 @@ public class Drivetrain extends SubsystemBase {
   ModuleIOInputsAutoLogged blInputs = new ModuleIOInputsAutoLogged();
   ModuleIOInputsAutoLogged brInputs = new ModuleIOInputsAutoLogged();
 
-  IMUIO imu;
+  IMUIO imu=new IMUIONavx();
   IMUIOInputsAutoLogged imuInputs = new IMUIOInputsAutoLogged();
 
   SwerveDrivePoseEstimator poseEstimator;
@@ -99,7 +99,7 @@ public class Drivetrain extends SubsystemBase {
   public void drive(double x, double y, double theta, boolean foc) {
     ChassisSpeeds sp;
     if (foc) {
-      sp = ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -theta, getPose().getRotation());
+      sp = ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -theta, getPose().getRotation().unaryMinus());
     } else {
       sp = new ChassisSpeeds(-x, -y, -theta);
     }
