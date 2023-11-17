@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drivetrain;
+import org.littletonrobotics.junction.Logger;
 
 public class TeleopDrive extends CommandBase {
   private final Drivetrain drivetrain;
@@ -71,6 +72,9 @@ public class TeleopDrive extends CommandBase {
             new SwerveModuleState(0, Rotation2d.fromDegrees(45))
           });
     }
+
+    Logger.getInstance().recordOutput("TeleopDrive/locked", locked);
+    Logger.getInstance().recordOutput("TeleopDrive/foc", foc);
   }
 
   /**

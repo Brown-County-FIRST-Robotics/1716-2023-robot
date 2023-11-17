@@ -77,6 +77,10 @@ public class Drivetrain extends SubsystemBase {
     fr.updateInputs(frInputs);
     bl.updateInputs(blInputs);
     br.updateInputs(brInputs);
+    Logger.getInstance().processInputs("Drive/FL", flInputs);
+    Logger.getInstance().processInputs("Drive/FR", frInputs);
+    Logger.getInstance().processInputs("Drive/BL", blInputs);
+    Logger.getInstance().processInputs("Drive/BR", brInputs);
 
     poseEstimator.update(getNavxRotation(), getPositions());
     Logger.getInstance().recordOutput("Drive/Pose", getPose());
