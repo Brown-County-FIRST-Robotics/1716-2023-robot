@@ -25,10 +25,14 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends SubsystemBase {
-  SwerveModule fl = new SwerveModule(Constants.Drivetrain.FL);
-  SwerveModule fr = new SwerveModule(Constants.Drivetrain.FR);
-  SwerveModule bl = new SwerveModule(Constants.Drivetrain.BL);
-  SwerveModule br = new SwerveModule(Constants.Drivetrain.BR);
+  ModuleIO fl;
+  ModuleIO fr;
+  ModuleIO bl;
+  ModuleIO br;
+  ModuleIOInputsAutoLogged flInputs = new ModuleIOInputsAutoLogged();
+  ModuleIOInputsAutoLogged frInputs = new ModuleIOInputsAutoLogged();
+  ModuleIOInputsAutoLogged blInputs = new ModuleIOInputsAutoLogged();
+  ModuleIOInputsAutoLogged brInputs = new ModuleIOInputsAutoLogged();
 
   IMUIO imu;
   IMUIOInputsAutoLogged imuInputs = new IMUIOInputsAutoLogged();
@@ -38,12 +42,23 @@ public class Drivetrain extends SubsystemBase {
 
   public SwerveModulePosition[] getPositions() {
     return new SwerveModulePosition[] {
-      fl.getModulePosition(), fr.getModulePosition(), bl.getModulePosition(), br.getModulePosition()
+      new SwerveModulePosition(flInputs.thrustPos, Rotation2d.fromRotations(flInputs.steerPos)),
+      new SwerveModulePosition(frInputs.thrustPos, Rotation2d.fromRotations(frInputs.steerPos)),
+      new SwerveModulePosition(blInputs.thrustPos, Rotation2d.fromRotations(blInputs.steerPos)),
+      new SwerveModulePosition(brInputs.thrustPos, Rotation2d.fromRotations(brInputs.steerPos))
     };
   }
 
-  public Drivetrain() {
+  public Drivetrain(ModuleIO fl, ModuleIO fr, ModuleIO bl, ModuleIO br) {
+    this.fl = fl;
+    this.fr = fr;
+    this.bl = bl;
+    this.br = br;
     field = new Field2d();
+    fl.updateInputs(flInputs);
+    fr.updateInputs(frInputs);
+    bl.updateInputs(blInputs);
+    br.updateInputs(brInputs);
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Drivetrain.KINEMATICS,
@@ -58,6 +73,11 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     imu.updateInputs(imuInputs);
     Logger.getInstance().processInputs("Drive/Gyro", imuInputs);
+    fl.updateInputs(flInputs);
+    fr.updateInputs(frInputs);
+    bl.updateInputs(blInputs);
+    br.updateInputs(brInputs);
+
     poseEstimator.update(getNavxRotation(), getPositions());
     Logger.getInstance().recordOutput("Drive/Pose", getPose());
     field.setRobotPose(getPose());
@@ -86,10 +106,10 @@ public class Drivetrain extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.Drivetrain.MAX_WHEEL_SPEED);
     Logger.getInstance().recordOutput("Drive/CmdStates", states);
-    fl.setModuleState(states[0]);
-    fr.setModuleState(states[1]);
-    bl.setModuleState(states[2]);
-    br.setModuleState(states[3]);
+    fl.setCmdState(states[0]);
+    fr.setCmdState(states[1]);
+    bl.setCmdState(states[2]);
+    br.setCmdState(states[3]);
   }
 
   public Command makeTrajectoryCommand(Trajectory trajectory) {

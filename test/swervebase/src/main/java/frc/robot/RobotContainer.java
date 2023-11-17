@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Bucket;
 import frc.robot.subsystems.drive.Drivetrain;
+import frc.robot.subsystems.drive.ModuleIOSparkFX;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,7 +24,12 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
 
-  private final Drivetrain drivetrain = new Drivetrain();
+  private final Drivetrain drivetrain =
+      new Drivetrain(
+          new ModuleIOSparkFX(Constants.Drivetrain.FL),
+          new ModuleIOSparkFX(Constants.Drivetrain.FR),
+          new ModuleIOSparkFX(Constants.Drivetrain.BL),
+          new ModuleIOSparkFX(Constants.Drivetrain.BR));
   private final Bucket bucket = new Bucket();
 
   private final CommandXboxController controller =
